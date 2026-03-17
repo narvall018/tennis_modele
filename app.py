@@ -2104,6 +2104,80 @@ def recalculate_all_elo(progress_callback=None):
     }
 
 
+def _get_secret_or_env(key, default=None):
+    try:
+        if key in st.secrets and st.secrets[key] is not None:
+            return str(st.secrets[key]).strip()
+    except Exception:
+        pass
+    return os.getenv(key, default)
+
+
+def get_github_update_config():
+    """Lit la config GitHub depuis st.secrets / variables d'environnement."""
+    token = _get_secret_or_env("GITHUB_TOKEN", "")
+    repo = _get_secret_or_env("GITHUB_REPO", "narvall018/tennis_modele")
+    workflow = _get_secret_or_env("GITHUB_WORKFLOW_FILE", "update_data.yml")
+    ref = _get_secret_or_env("GITHUB_REF", "main")
+    return {
+        "token": token,
+        "repo": repo,
+        "workflow": workflow,
+        "ref": ref
+    }
+
+
+def trigger_github_workflow_dispatch(inputs=None):
+    """Déclenche un workflow GitHub Actions (workflow_dispatch)."""
+    cfg = get_github_update_config()
+
+    if not cfg["token"]:
+        return False, "Secret manquant: GITHUB_TOKEN"
+
+    if "/" not in cfg["repo"]:
+        return False, "Format invalide pour GITHUB_REPO (attendu: owner/repo)"
+
+    owner, repo = cfg["repo"].split("/", 1)
+    url = (
+        f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/"
+        f"{cfg['workflow']}/dispatches"
+    )
+
+    payload = {
+        "ref": cfg["ref"],
+        "inputs": inputs or {}
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {cfg['token']}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            status = resp.getcode()
+            if status == 204:
+                run_url = f"https://github.com/{owner}/{repo}/actions/workflows/{cfg['workflow']}"
+                return True, run_url
+            return False, f"Réponse inattendue GitHub API: HTTP {status}"
+    except urllib.error.HTTPError as e:
+        body = ""
+        try:
+            body = e.read().decode("utf-8", errors="ignore")
+        except Exception:
+            pass
+        return False, f"HTTP {e.code}: {body or e.reason}"
+    except Exception as e:
+        return False, str(e)
+
+
 def show_calendar_page():
     """Page calendrier ATP — tournois en cours, passés et à venir"""
     
@@ -2355,6 +2429,39 @@ def show_update_page():
     
     st.title("🔄 Mise à jour des données")
     st.markdown("Télécharge les derniers résultats ATP depuis **tennis-data.co.uk** et recalcule tous les Elo.")
+
+    st.markdown("### ☁️ Mode hébergé (GitHub)")
+    gh_cfg = get_github_update_config()
+    gh_ready = bool(gh_cfg["token"])
+
+    col_remote_1, col_remote_2 = st.columns([2, 1])
+    with col_remote_1:
+        st.caption(
+            f"Repo: `{gh_cfg['repo']}` | Workflow: `{gh_cfg['workflow']}` | Branche: `{gh_cfg['ref']}`"
+        )
+    with col_remote_2:
+        remote_clicked = st.button(
+            "🚀 Lancer update GitHub",
+            type="primary",
+            use_container_width=True,
+            disabled=not gh_ready,
+            help="Déclenche un workflow GitHub Actions pour mettre à jour data/models et commit automatiquement."
+        )
+
+    if not gh_ready:
+        st.warning(
+            "Ajoute `GITHUB_TOKEN` dans Streamlit Secrets pour activer la mise à jour distante."
+        )
+
+    if remote_clicked:
+        ok, message = trigger_github_workflow_dispatch(inputs={"source": "streamlit"})
+        if ok:
+            st.success("✅ Workflow GitHub déclenché avec succès.")
+            st.markdown(f"➡️ Suivre l'exécution: {message}")
+        else:
+            st.error(f"❌ Impossible de déclencher le workflow: {message}")
+
+    st.markdown("---")
     
     # --- État actuel ---
     st.markdown("### 📊 État des données")
@@ -2376,7 +2483,7 @@ def show_update_page():
     
     st.markdown("---")
     
-    # --- Boutons d'action ---
+    # --- Boutons d'action locale ---
     col_btn1, col_btn2, col_btn3 = st.columns(3)
     
     with col_btn1:
