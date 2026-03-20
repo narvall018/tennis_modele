@@ -164,7 +164,7 @@ def load_historical_data():
 # ============================================================================
 
 # 🔐 Clé API encodée (même clé que l'app UFC)
-_ENCODED_API_KEY = "MTI4NTcwMTFmZjI3MDcwYWYxZTI4NTc2MTZkYWM1YjQ="
+_ENCODED_API_KEY = "OTU5MWZiZGZmZjM3YTA1MDAxNTFmYzA2NjQzY2YyMzI="
 
 # Mapping tournois ATP connus → métadonnées (enrichi)
 # Les tournois NON listés ici seront quand même récupérés dynamiquement
