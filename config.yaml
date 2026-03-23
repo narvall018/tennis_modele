@@ -1,0 +1,390 @@
+# ============================================================================
+# Tennis Betting Model — Configuration Centrale
+# Architecture Haute Fréquence / Rentabilité Réelle
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# DONNÉES
+# ---------------------------------------------------------------------------
+data:
+  atp_csv: "data/atp_tennis.csv"
+  wta_csv: "data/wta_tennis.csv"           # À alimenter avec données WTA
+  recent_matches_csv: "models/recent_matches.csv"
+  models_dir: "models"
+  bets_dir: "bets"
+
+  # Fenêtre glissante pour features
+  form_window_days: 365        # 12 mois
+  recent_form_matches: [3, 5, 10, 20]
+
+  # Sources WTA (tennis-data.co.uk)
+  wta_years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  atp_years: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+              2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
+              2020, 2021, 2022, 2023, 2024, 2025]
+
+# ---------------------------------------------------------------------------
+# ELO SYSTEM
+# ---------------------------------------------------------------------------
+elo:
+  initial_rating: 1500
+  k_factors:
+    global: 32
+    surface: 40
+    momentum: 24          # Elo basé sur les sets/games (momentum Elo)
+    serve: 28             # Elo spécifique service (si stats dispo)
+
+  # Decay temporel : ratings s'atténuent si inactivité
+  time_decay:
+    enabled: true
+    half_life_days: 180   # Demi-vie 6 mois d'inactivité
+    min_factor: 0.85      # Facteur plancher
+
+  surfaces: ["Hard", "Clay", "Grass", "Carpet"]
+
+  # Boost tournoi selon prestige
+  tournament_weights:
+    "Grand Slam": 1.5
+    "Masters Cup": 1.4
+    "Masters 1000": 1.2
+    "ATP500": 1.1
+    "ATP250": 1.0
+    "International Gold": 1.0
+    "International": 0.9
+
+# ---------------------------------------------------------------------------
+# FEATURE ENGINEERING
+# ---------------------------------------------------------------------------
+features:
+  # Toutes les features du vecteur modèle (ordre fixe)
+  v3_feature_cols:
+    # Elo global
+    - elo_diff
+    - elo_p1
+    - elo_p2
+    # Elo surface
+    - surf_elo_diff
+    - surf_elo_p1
+    - surf_elo_p2
+    # Elo momentum (basé sets)
+    - momentum_elo_diff
+    # Forme récente (win rate)
+    - p1_form_3
+    - p2_form_3
+    - p1_form_5
+    - p2_form_5
+    - p1_form_10
+    - p2_form_10
+    - p1_form_20
+    - p2_form_20
+    # Momentum (tendance)
+    - p1_momentum        # form_5 - form_20 (tendance haussière)
+    - p2_momentum
+    # Surface win rate
+    - p1_surf_wr_3m
+    - p2_surf_wr_3m
+    - p1_surf_wr_6m
+    - p2_surf_wr_6m
+    - p1_surf_wr_12m
+    - p2_surf_wr_12m
+    # H2H
+    - h2h_p1_wr
+    - h2h_total
+    - h2h_surf_p1_wr     # H2H surface-spécifique
+    # Fatigue / repos
+    - p1_fatigue
+    - p2_fatigue
+    - p1_days_rest
+    - p2_days_rest
+    # Ranking
+    - rank_diff
+    - rank_ratio
+    - pts_diff
+    - log_rank_diff      # Log-ratio pour non-linéarité
+    # Contexte match
+    - is_hard
+    - is_clay
+    - is_grass
+    - is_indoor
+    - best_of_5
+    - round_num
+    - series_num
+    # Saison / mois
+    - month_sin          # Encodage cyclique du mois
+    - month_cos
+    # Spécialisation surface (ratio surface vs global)
+    - p1_surf_specialist
+    - p2_surf_specialist
+    # Pression : expérience Grand Chelem, demi-finale+
+    - p1_slam_experience
+    - p2_slam_experience
+
+  # Features utilisées dans v2 (compatibilité modèle existant)
+  v2b_feature_cols:
+    - elo_diff
+    - surf_elo_diff
+    - surf_elo_p1
+    - surf_elo_p2
+    - p1_surf_wr_3m
+    - p2_surf_wr_3m
+    - p1_surf_wr_12m
+    - p2_surf_wr_12m
+    - p1_form_5
+    - p2_form_5
+    - p1_form_10
+    - p2_form_10
+    - h2h_p1_wr
+    - h2h_total
+    - p1_fatigue
+    - p2_fatigue
+    - rank_diff
+    - rank_ratio
+    - pts_diff
+    - is_hard
+    - is_clay
+    - is_grass
+    - best_of_5
+    - round_num
+    - series_num
+
+# ---------------------------------------------------------------------------
+# MODÈLES
+# ---------------------------------------------------------------------------
+models:
+  # Modèles de base dans l'ensemble
+  base_models:
+    xgboost:
+      n_estimators: 800
+      max_depth: 5
+      learning_rate: 0.03
+      subsample: 0.8
+      colsample_bytree: 0.8
+      min_child_weight: 10
+      gamma: 0.1
+      reg_alpha: 0.1
+      reg_lambda: 1.0
+      scale_pos_weight: 1.0
+      eval_metric: "logloss"
+      early_stopping_rounds: 50
+      use_label_encoder: false
+
+    lightgbm:
+      n_estimators: 800
+      max_depth: 5
+      learning_rate: 0.03
+      num_leaves: 31
+      subsample: 0.8
+      colsample_bytree: 0.8
+      min_child_samples: 20
+      reg_alpha: 0.1
+      reg_lambda: 1.0
+      objective: "binary"
+      metric: "binary_logloss"
+      verbose: -1
+
+    catboost:
+      iterations: 600
+      depth: 5
+      learning_rate: 0.05
+      l2_leaf_reg: 3.0
+      border_count: 64
+      loss_function: "Logloss"
+      eval_metric: "Logloss"
+      verbose: 0
+
+    logistic:                    # Baseline linéaire
+      C: 0.1
+      max_iter: 1000
+      solver: "lbfgs"
+
+  # Meta-learner (stacking)
+  meta_learner:
+    type: "logistic"
+    C: 1.0
+    max_iter: 500
+
+  # Calibration des probabilités
+  calibration:
+    method: "isotonic"           # "sigmoid" ou "isotonic"
+    cv: 5
+
+  # Versions de modèles sauvegardées
+  version: "v3"
+  output_dir: "models"
+
+# ---------------------------------------------------------------------------
+# STRATÉGIES DE PARIS
+# ---------------------------------------------------------------------------
+strategies:
+  # Stratégie 1 : Ultra haute confiance (faible volume, ROI maximal)
+  ultra_confidence:
+    name: "Ultra Confiance (≥72%)"
+    enabled: true
+    # Filtres match
+    model_threshold: 0.72
+    min_edge: 0.05           # 5% d'edge minimum
+    min_ev: 0.03             # EV ≥ 3%
+    # Pas de filtre tournoi — toutes surfaces, tous niveaux
+    series_filter: []        # vide = tout
+    surface_filter: []
+    round_filter: []
+    min_odds: 1.30
+    max_odds: 4.00
+    # Money management
+    stake_type: "kelly_quarter"
+    kelly_fraction: 4.0
+    max_stake_pct: 0.05
+    min_stake_pct: 0.01
+    # Objectif : ~80-120 paris/an, ROI cible ≥ 10%
+
+  # Stratégie 2 : Standard haute fréquence (volume médium)
+  standard_volume:
+    name: "Standard Volume (≥62%)"
+    enabled: true
+    model_threshold: 0.62
+    min_edge: 0.03
+    min_ev: 0.02
+    series_filter: ["Grand Slam", "Masters Cup", "Masters 1000", "ATP500"]
+    surface_filter: []
+    round_filter: []
+    min_odds: 1.25
+    max_odds: 5.00
+    stake_type: "kelly_sixth"
+    kelly_fraction: 6.0
+    max_stake_pct: 0.04
+    min_stake_pct: 0.01
+    # Objectif : ~250-350 paris/an, ROI cible ≥ 6%
+
+  # Stratégie 3 : Masse — maximum de paris rentables
+  high_volume:
+    name: "Haute Fréquence (≥57%)"
+    enabled: true
+    model_threshold: 0.57
+    min_edge: 0.02
+    min_ev: 0.01
+    series_filter: []
+    surface_filter: []
+    round_filter: []
+    min_odds: 1.20
+    max_odds: 6.00
+    stake_type: "flat"
+    flat_pct: 0.015         # 1.5% flat (risque moindre par pari)
+    max_stake_pct: 0.03
+    min_stake_pct: 0.01
+    # Objectif : ~500-800 paris/an, ROI cible ≥ 4%
+
+  # Stratégie 4 : Spécialiste surface (clay uniquement)
+  clay_specialist:
+    name: "Spécialiste Terre Battue"
+    enabled: true
+    model_threshold: 0.60
+    min_edge: 0.03
+    min_ev: 0.02
+    series_filter: []
+    surface_filter: ["Clay"]
+    round_filter: []
+    min_odds: 1.20
+    max_odds: 6.00
+    stake_type: "kelly_sixth"
+    kelly_fraction: 6.0
+    max_stake_pct: 0.04
+    min_stake_pct: 0.01
+
+  # Stratégie 5 : Chasseur d'upsets (cotes élevées, faibles favoris)
+  upset_hunter:
+    name: "Chasseur d'Upsets"
+    enabled: false           # Désactivé par défaut (risque élevé)
+    model_threshold: 0.45   # Le modèle donne ~45% à l'outsider
+    min_edge: 0.08           # Edge fort requis sur outsider
+    min_ev: 0.05
+    series_filter: []
+    surface_filter: []
+    round_filter: []
+    min_odds: 2.50           # Cotes d'outsider uniquement
+    max_odds: 8.00
+    stake_type: "flat"
+    flat_pct: 0.01           # Petites mises
+    max_stake_pct: 0.02
+
+  # Gestion globale du risque (portfolio)
+  portfolio:
+    max_daily_exposure: 0.10     # Max 10% bankroll exposé/jour
+    max_concurrent_bets: 8       # Max paris simultanés
+    max_single_tournament: 0.08  # Max 8% sur un même tournoi
+    drawdown_limit: 0.20         # Arrêt à -20% du pic bankroll
+    monthly_review: true         # Révision mensuelle des seuils
+
+# ---------------------------------------------------------------------------
+# BACKTESTING
+# ---------------------------------------------------------------------------
+backtesting:
+  # Walk-forward : train sur N années, test sur 1
+  method: "walk_forward"
+  train_years: 4           # Fenêtre d'entraînement
+  test_years: 1            # Fenêtre de test
+  min_train_samples: 5000
+
+  # Simulation bankroll
+  initial_bankroll: 1000.0
+  bookmaker_margin: 0.05   # Marge bookmaker simulée (~5%)
+
+  # Métriques à calculer
+  metrics:
+    - roi
+    - sharpe_ratio
+    - max_drawdown
+    - calmar_ratio         # ROI annualisé / max drawdown
+    - win_rate
+    - avg_odds
+    - n_bets
+    - brier_score
+    - log_loss
+    - clv_avg             # Closing Line Value moyen
+
+  # Rapport bootstrap
+  bootstrap:
+    enabled: true
+    n_iterations: 1000
+    confidence_level: 0.95
+
+# ---------------------------------------------------------------------------
+# ÉVALUATION / CLV
+# ---------------------------------------------------------------------------
+evaluation:
+  # CLV = (cote finale Pinnacle / cote au moment du pari) - 1
+  # Un CLV > 0 = pari pris à meilleure valeur que le marché final
+  clv_enabled: true
+  clv_benchmark: "pinnacle"   # Bookmaker de référence pour CLV
+
+  # Alertes performance
+  min_clv_threshold: 0.0      # Alerter si CLV moyen < 0
+  min_roi_alert: -0.05        # Alerter si ROI mensuel < -5%
+
+# ---------------------------------------------------------------------------
+# API ODDS
+# ---------------------------------------------------------------------------
+odds_api:
+  # Priorité bookmakers (du plus sharp au plus soft)
+  bookmaker_priority:
+    - pinnacle              # Référence marché (ligne la plus sharp)
+    - betfair_ex_eu         # Exchange — cotes nettes de commission
+    - unibet                # Soft, bonnes cotes
+    - winamax
+    - onexbet
+    - bet365
+    - bwin
+
+  regions: ["eu", "uk"]
+  markets: ["h2h"]
+  odds_format: "decimal"
+
+  # Refresh rate
+  cache_ttl_seconds: 300      # Cache 5 min pour ne pas brûler les crédits
+
+# ---------------------------------------------------------------------------
+# PRODUCTION
+# ---------------------------------------------------------------------------
+production:
+  min_confidence_display: 0.55   # Afficher seulement si modèle ≥ 55%
+  log_all_predictions: true
+  alert_high_edge: 0.08          # Alerter si edge ≥ 8%
