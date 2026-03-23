@@ -1399,23 +1399,24 @@ def display_prediction(pred, p1, p2, surface, tournament, round_name, odds1, odd
 # ============================================================================
 
 def show_events_page():
-    """Page des événements ATP avec cotes en direct"""
-    
-    st.title("📡 Événements ATP — Cotes en Direct")
-    
+    """Page des matchs du jour — tous les matchs + paris recommandés par les stratégies"""
+
+    st.title("📡 Matchs du Jour — Analyse & Paris")
+
     config = load_model_config()
     elo_data = load_elo_ratings()
     recent_matches = load_recent_matches()
     _, _, version = load_model()
+    current_bankroll = init_bankroll()
+
     if version == "v3" and _V3_MODULES_OK and isinstance(elo_data, TennisEloEngine):
         all_players = list(elo_data.get_all_ratings().keys())
     else:
         player_stats = load_player_stats()
         all_players = list(player_stats.keys())
-    
-    # API key status
+
+    # ── API key ────────────────────────────────────────────────────────────
     api_key = get_odds_api_key()
-    
     if not api_key:
         st.error("❌ Aucune clé API configurée")
         st.markdown("""
@@ -1429,80 +1430,65 @@ def show_events_page():
             st.session_state.temp_odds_api_key = temp_key
             st.rerun()
         return
-    
-    # Bouton de rafraîchissement
+
+    # ── Sidebar ────────────────────────────────────────────────────────────
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📡 Paramètres")
+    show_all_books = st.sidebar.checkbox("Tous les bookmakers", value=False)
+    default_round = st.sidebar.selectbox(
+        "Round par défaut",
+        ['1st Round', '2nd Round', '3rd Round', '4th Round', 'Quarterfinals', 'Semifinals', 'The Final'],
+        index=4,
+    )
+
+    # ── Refresh ────────────────────────────────────────────────────────────
     col_refresh, col_info = st.columns([1, 3])
     with col_refresh:
-        refresh = st.button("🔄 Rafraîchir les cotes", type="primary")
+        refresh = st.button("🔄 Rafraîchir", type="primary")
     with col_info:
-        st.caption("Source: The Odds API | 500 req/mois gratuites")
-    
+        st.caption(f"Bankroll actuelle : **{current_bankroll:.2f} €** | Source: The Odds API")
+
     if refresh or 'events_data' not in st.session_state:
-        with st.spinner("🔍 Recherche des tournois actifs..."):
+        with st.spinner("🔍 Recherche des matchs en cours..."):
             sports, msg_sports = fetch_active_tennis_sports(api_key)
             st.session_state.sports_msg = msg_sports
-            
             if not sports:
-                st.warning(f"Aucun tournoi ATP actif en ce moment. {msg_sports}")
                 st.session_state.events_data = {}
                 st.session_state.events_info = {}
             else:
-                all_events = {}
-                all_info = {}
+                all_events, all_info = {}, {}
                 for sport in sports:
                     sport_key = sport['key']
-                    tournament_info = infer_tournament_info(sport_key, sport.get('title', ''))
-                    with st.spinner(f"📡 {tournament_info.get('name', sport_key)}..."):
+                    t_info = infer_tournament_info(sport_key, sport.get('title', ''))
+                    with st.spinner(f"📡 {t_info.get('name', sport_key)}..."):
                         events, msg = fetch_tennis_odds(sport_key, api_key)
                         if events:
                             all_events[sport_key] = events
-                            all_info[sport_key] = {
-                                'msg': msg,
-                                'info': tournament_info,
-                                'title': sport.get('title', sport_key)
-                            }
-                
+                            all_info[sport_key] = {'msg': msg, 'info': t_info,
+                                                   'title': sport.get('title', sport_key)}
                 st.session_state.events_data = all_events
                 st.session_state.events_info = all_info
-    
-    # Display status
+
     st.caption(st.session_state.get('sports_msg', ''))
-    
     events_data = st.session_state.get('events_data', {})
     events_info = st.session_state.get('events_info', {})
-    
+
     if not events_data:
-        st.info("📭 Aucun événement ATP en cours. Cliquez sur 🔄 pour vérifier.")
+        st.info("📭 Aucun match ATP en cours. Cliquez sur 🔄 pour vérifier.")
         return
-    
-    # Bookmaker filter
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📡 Paramètres cotes")
-    show_all_books = st.sidebar.checkbox("Afficher tous les bookmakers", value=False)
-    show_non_gs = st.sidebar.checkbox("Afficher les tournois non-GS", value=True)
-    
-    # Display each tournament
+
+    # ── Traitement de tous les matchs ──────────────────────────────────────
+    # On calcule les prédictions une seule fois pour tous les matchs
+    all_processed = []  # liste de dicts avec toutes les infos
+
     for sport_key, events in events_data.items():
         info = events_info.get(sport_key, {})
-        tournament_info = info.get('info', {})
-        # Fallback: si info vide, inférer
-        if not tournament_info:
-            tournament_info = infer_tournament_info(sport_key, info.get('title', sport_key))
-        tournament_name = tournament_info.get('name', sport_key)
-        series = tournament_info.get('series', 'ATP')
-        surface = tournament_info.get('surface', 'Hard')
-        best_of = tournament_info.get('best_of', 3)
-        is_gs = series == 'Grand Slam'
-        
-        if not show_non_gs and not is_gs:
-            continue
-        
-        surf_emoji = get_surface_emoji(surface)
-        gs_badge = ' 🏆' if is_gs else ''
-        
-        st.markdown(f"### {surf_emoji} {tournament_name}{gs_badge}")
-        st.caption(f"{series} | Surface: {surface} | Best of {best_of} | {info.get('msg', '')}")
-        
+        t_info = info.get('info', {}) or infer_tournament_info(sport_key, info.get('title', sport_key))
+        tournament_name = t_info.get('name', sport_key)
+        series = t_info.get('series', 'ATP')
+        surface = t_info.get('surface', 'Hard')
+        best_of = t_info.get('best_of', 3)
+
         for event in events:
             home = event['home']
             away = event['away']
@@ -1510,164 +1496,233 @@ def show_events_page():
             odds_a = event.get('odds_away')
             bookmaker = event.get('bookmaker', 'N/A')
             commence = event.get('commence_time', '')
-            
-            # Parse time
+
             try:
                 match_time = datetime.fromisoformat(commence.replace('Z', '+00:00'))
                 time_str = match_time.strftime('%d/%m %H:%M')
             except Exception:
                 time_str = commence[:16] if commence else '?'
-            
-            # Match API names to model names
+
             model_home = match_api_name_to_model(home, all_players)
             model_away = match_api_name_to_model(away, all_players)
-            
-            matched_home = model_home or home
-            matched_away = model_away or away
-            match_status = '✅' if (model_home and model_away) else '⚠️'
-            
-            with st.container():
-                st.markdown(f"---")
-                
-                # Match header
-                head_cols = st.columns([1, 3, 3, 2])
-                with head_cols[0]:
-                    st.markdown(f"**⏰ {time_str}**")
-                with head_cols[1]:
-                    fav_h = "⭐" if odds_h and odds_a and odds_h < odds_a else ""
-                    st.markdown(f"{fav_h} **{home}**")
-                    if model_home:
-                        elo_g, elo_s = get_player_elo(model_home, elo_data, surface)
-                        st.caption(f"Elo: {elo_g:.0f} | {surface}: {elo_s:.0f}")
-                    else:
-                        st.caption("⚠️ Joueur non trouvé dans le modèle")
-                with head_cols[2]:
-                    fav_a = "⭐" if odds_h and odds_a and odds_a < odds_h else ""
-                    st.markdown(f"{fav_a} **{away}**")
-                    if model_away:
-                        elo_g, elo_s = get_player_elo(model_away, elo_data, surface)
-                        st.caption(f"Elo: {elo_g:.0f} | {surface}: {elo_s:.0f}")
-                    else:
-                        st.caption("⚠️ Joueur non trouvé dans le modèle")
-                with head_cols[3]:
-                    if odds_h and odds_a:
-                        st.markdown(f"📚 **{bookmaker}**")
-                        st.caption(f"{odds_h:.2f} — {odds_a:.2f}")
-                    else:
-                        st.caption("Pas de cotes")
-                
-                # Prediction if both players matched
-                if model_home and model_away and odds_h and odds_a:
-                    # Get latest rankings from recent_matches
-                    rank_h, pts_h = get_latest_rank(model_home, recent_matches)
-                    rank_a, pts_a = get_latest_rank(model_away, recent_matches)
-                    
-                    # Use a reasonable round for unknown
-                    round_name = 'Quarterfinals'  # Default — user can override
-                    
+
+            pred = None
+            stake_info = None
+            if model_home and model_away and odds_h and odds_a:
+                rank_h, pts_h = get_latest_rank(model_home, recent_matches)
+                rank_a, pts_a = get_latest_rank(model_away, recent_matches)
+                try:
                     pred = predict_match(
-                        model_home, model_away, surface, series, round_name, best_of,
+                        model_home, model_away, surface, series, default_round, best_of,
                         rank_h, rank_a, pts_h, pts_a, odds_h, odds_a
                     )
-                    
-                    # Show prediction bar
-                    pred_cols = st.columns([2, 1, 2])
-                    with pred_cols[0]:
-                        color_h = '#4CAF50' if pred['proba_p1'] > 0.5 else '#F44336'
-                        st.markdown(f"<span style='color:{color_h}; font-size:1.3rem;'><b>{pred['proba_p1']:.1%}</b></span>"
-                                    f" | Edge: <span style='color:{color_h};'>{pred['edge_p1']*100:+.1f}%</span>",
-                                    unsafe_allow_html=True)
-                    with pred_cols[1]:
-                        margin = pred['margin']
-                        st.caption(f"Marge: {margin:.1f}%")
-                    with pred_cols[2]:
-                        color_a = '#4CAF50' if pred['proba_p2'] > 0.5 else '#F44336'
-                        st.markdown(f"<span style='color:{color_a}; font-size:1.3rem;'><b>{pred['proba_p2']:.1%}</b></span>"
-                                    f" | Edge: <span style='color:{color_a};'>{pred['edge_p2']*100:+.1f}%</span>",
-                                    unsafe_allow_html=True)
-                    
-                    # Strategy eligibility
-                    strategy = config['strategy']
-                    
-                    # Allow user to specify round for this match
-                    with st.expander(f"⚙️ Réglages pour {home} vs {away}"):
-                        round_override = st.selectbox(
-                            "Round réel",
-                            ['1st Round', '2nd Round', '3rd Round', '4th Round',
-                             'Quarterfinals', 'Semifinals', 'The Final'],
-                            index=4,
-                            key=f"round_{event.get('event_id', '')}"
-                        )
-                        
-                        if round_override != round_name:
-                            pred = predict_match(
-                                model_home, model_away, surface, series, round_override, best_of,
-                                rank_h, rank_a, pts_h, pts_a, odds_h, odds_a
-                            )
-                        
-                        is_eligible = (
-                            series in strategy['series_filter'] and
-                            round_override in strategy['rounds_filter']
-                        )
-                        
-                        if show_all_books:
-                            st.markdown("**📚 Toutes les cotes :**")
-                            for bk in event.get('all_bookmakers', []):
-                                odds_str = " | ".join([f"{n}: {o:.2f}" for n, o in bk['odds'].items()])
-                                st.caption(f"{bk['name']:20s} → {odds_str}")
-                    
-                    # Value bet badge
                     if pred['best_bet']:
                         bet = pred['best_bet']
-                        is_eligible_check = (
-                            series in strategy['series_filter'] and
-                            round_name in strategy['rounds_filter']
+                        strat_name = st.session_state.get('selected_strategy', "📊 PLATE STANDARD")
+                        strat = BETTING_STRATEGIES.get(strat_name, BETTING_STRATEGIES["📊 PLATE STANDARD"])
+                        stake_info = calculate_stake(bet['proba'], bet['odds'], current_bankroll, strat)
+                        # Override avec stake_pct du StrategyManager si v3
+                        if version == "v3" and 'stake_pct' in bet:
+                            stake_info['stake'] = current_bankroll * bet['stake_pct']
+                            stake_info['stake_pct'] = bet['stake_pct']
+                except Exception:
+                    pred = None
+
+            all_processed.append({
+                'home': home, 'away': away,
+                'model_home': model_home, 'model_away': model_away,
+                'odds_h': odds_h, 'odds_a': odds_a,
+                'bookmaker': bookmaker, 'time_str': time_str,
+                'tournament_name': tournament_name, 'series': series,
+                'surface': surface, 'best_of': best_of,
+                'event_id': event.get('event_id', ''),
+                'all_bookmakers': event.get('all_bookmakers', []),
+                'pred': pred,
+                'stake_info': stake_info,
+                'has_bet': pred is not None and pred.get('best_bet') is not None,
+            })
+
+    # ── Résumé global ──────────────────────────────────────────────────────
+    n_total = len(all_processed)
+    recommended = [m for m in all_processed if m['has_bet']]
+    n_bets = len(recommended)
+    total_stake = sum(m['stake_info']['stake'] for m in recommended if m['stake_info'])
+    total_ev = sum(
+        m['stake_info']['stake'] * m['pred']['best_bet']['ev']
+        for m in recommended
+        if m['stake_info'] and m['pred'] and m['pred'].get('best_bet')
+    )
+
+    metric_cols = st.columns(4)
+    metric_cols[0].metric("Matchs du jour", n_total)
+    metric_cols[1].metric("Paris recommandés", n_bets)
+    metric_cols[2].metric("Mise totale suggérée", f"{total_stake:.2f} €")
+    metric_cols[3].metric("EV total estimé", f"{total_ev:+.2f} €")
+
+    st.markdown("---")
+
+    # ── Onglets ────────────────────────────────────────────────────────────
+    tab_bets, tab_all = st.tabs([
+        f"🎯 Paris Recommandés ({n_bets})",
+        f"📋 Tous les Matchs ({n_total})",
+    ])
+
+    # ══════════════════════════════════════════════════════════════════════
+    # ONGLET 1 : PARIS RECOMMANDÉS
+    # ══════════════════════════════════════════════════════════════════════
+    with tab_bets:
+        if not recommended:
+            st.info("Aucun match ne satisfait les critères des stratégies pour l'instant.")
+            st.caption("Les stratégies v3 requièrent : probabilité ≥ 57-68% selon la stratégie + edge positif.")
+        else:
+            for m in recommended:
+                pred = m['pred']
+                bet = pred['best_bet']
+                si = m['stake_info']
+                surf_em = get_surface_emoji(m['surface'])
+                conf_color = {'high': '#4CAF50', 'medium': '#FF9800', 'low': '#9E9E9E'}.get(
+                    bet.get('confidence', 'medium'), '#FF9800')
+                conf_label = {'high': '🔥 HAUTE', 'medium': '📊 MOYENNE', 'low': '📉 FAIBLE'}.get(
+                    bet.get('confidence', 'medium'), '📊 MOYENNE')
+
+                st.markdown(f"""
+                <div class="bet-recommendation" style="margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:1.1rem;">
+                            {surf_em} <b>{m['home']}</b> vs <b>{m['away']}</b>
+                        </span>
+                        <span style="color:{conf_color}; font-weight:bold;">{conf_label}</span>
+                    </div>
+                    <div style="margin-top:4px; color:#aaa; font-size:0.85rem;">
+                        {m['tournament_name']} | {m['series']} | {m['surface']} | ⏰ {m['time_str']}
+                    </div>
+                    <hr style="margin:8px 0; border-color:#444;">
+                    <div style="display:flex; gap:24px; flex-wrap:wrap;">
+                        <span>🎯 <b>Parier sur :</b> <span style="font-size:1.15rem; color:#4CAF50;"><b>{bet['player']}</b></span></span>
+                        <span>📈 Cote : <b>{bet['odds']:.2f}</b></span>
+                        <span>🧠 Prob modèle : <b>{bet['proba']:.1%}</b></span>
+                        <span>⚡ Edge : <b style="color:#4CAF50;">{bet['edge']*100:+.1f}%</b></span>
+                        <span>💹 EV : <b style="color:{'#4CAF50' if bet['ev']>0 else '#F44336'};">{bet['ev']*100:+.1f}%</b></span>
+                    </div>
+                    <div style="margin-top:8px; background:#1a3a1a; padding:8px 12px; border-radius:6px;">
+                        💰 <b>Mise recommandée :</b>
+                        <span style="font-size:1.2rem; color:#4CAF50;"><b>{si['stake']:.2f} €</b></span>
+                        <span style="color:#aaa;">({si['stake_pct']:.1%} du bankroll)</span>
+                        {f"<span style='margin-left:12px; color:#aaa;'>Stratégie : {bet.get('strategy', 'Standard')}</span>" if version == 'v3' else ''}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                col_save, col_detail = st.columns([1, 3])
+                with col_save:
+                    if st.button(f"💾 Enregistrer", key=f"save_bet_{m['event_id']}_{bet['player']}"):
+                        add_bet(
+                            tournament=m['tournament_name'],
+                            round_name=default_round,
+                            player1=m['home'], player2=m['away'],
+                            pick=bet['player'], odds=bet['odds'],
+                            stake=si['stake'], model_prob=bet['proba'],
+                            edge=bet['edge'], ev=bet['ev']
                         )
-                        
-                        if is_eligible_check:
-                            current_bankroll = init_bankroll()
-                            strategy_name = st.session_state.get('selected_strategy', "📊 PLATE STANDARD")
-                            strat = BETTING_STRATEGIES.get(strategy_name, BETTING_STRATEGIES["📊 PLATE STANDARD"])
-                            stake_info = calculate_stake(bet['proba'], bet['odds'], current_bankroll, strat)
-                            
-                            st.markdown(f"""
-                            <div class="bet-recommendation">
-                                <b>✅ VALUE BET</b> — Parier sur <b>{bet['player']}</b> 
-                                @ {bet['odds']:.2f} | Prob: {bet['proba']:.1%} 
-                                | Edge: {bet['edge']*100:+.1f}% | EV: {bet['ev']*100:+.1f}%
-                                | Mise: {stake_info['stake']:.2f}€ ({stake_info['stake_pct']:.1%})
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            if st.button(f"💾 Enregistrer le pari sur {bet['player']}", key=f"bet_{event.get('event_id', '')}"):
-                                success = add_bet(
-                                    tournament=tournament_name,
-                                    round_name=round_name,
-                                    player1=home,
-                                    player2=away,
-                                    pick=bet['player'],
-                                    odds=bet['odds'],
-                                    stake=stake_info['stake'],
-                                    model_prob=bet['proba'],
-                                    edge=bet['edge'],
-                                    ev=bet['ev']
-                                )
-                                if success:
-                                    save_bankroll(current_bankroll - stake_info['stake'])
-                                    st.success(f"✅ Pari enregistré : {stake_info['stake']:.2f}€ sur {bet['player']}")
-                                    st.rerun()
+                        save_bankroll(current_bankroll - si['stake'])
+                        st.success(f"✅ {si['stake']:.2f}€ sur {bet['player']} @ {bet['odds']:.2f}")
+                        st.rerun()
+                with col_detail:
+                    if m['odds_h'] and m['odds_a']:
+                        p1_col = '#4CAF50' if pred['proba_p1'] > 0.5 else '#888'
+                        p2_col = '#4CAF50' if pred['proba_p2'] > 0.5 else '#888'
+                        st.caption(
+                            f"{m['home']}: "
+                            f"<span style='color:{p1_col};'>{pred['proba_p1']:.1%}</span> @ {m['odds_h']:.2f}  |  "
+                            f"{m['away']}: "
+                            f"<span style='color:{p2_col};'>{pred['proba_p2']:.1%}</span> @ {m['odds_a']:.2f}  |  "
+                            f"📚 {m['bookmaker']}",
+                            unsafe_allow_html=True
+                        )
+
+    # ══════════════════════════════════════════════════════════════════════
+    # ONGLET 2 : TOUS LES MATCHS
+    # ══════════════════════════════════════════════════════════════════════
+    with tab_all:
+        # Grouper par tournoi
+        from itertools import groupby
+        sorted_matches = sorted(all_processed, key=lambda x: x['tournament_name'])
+
+        for tourn_name, group in groupby(sorted_matches, key=lambda x: x['tournament_name']):
+            group = list(group)
+            surf = group[0]['surface']
+            series = group[0]['series']
+            surf_em = get_surface_emoji(surf)
+            gs_badge = ' 🏆' if series == 'Grand Slam' else ''
+            st.markdown(f"#### {surf_em} {tourn_name}{gs_badge} — {series} | {surf}")
+
+            for m in group:
+                pred = m['pred']
+                has_bet = m['has_bet']
+
+                # Badge pari recommandé
+                bet_badge = ""
+                if has_bet and pred and pred.get('best_bet'):
+                    bet = pred['best_bet']
+                    si = m['stake_info']
+                    bet_badge = (
+                        f"&nbsp;&nbsp;<span style='background:#1a5c1a; color:#4CAF50; "
+                        f"padding:2px 8px; border-radius:4px; font-size:0.8rem;'>"
+                        f"🎯 PARI: {bet['player']} @ {bet['odds']:.2f} — {si['stake']:.2f}€</span>"
+                    )
+
+                fav_h = "⭐" if m['odds_h'] and m['odds_a'] and m['odds_h'] < m['odds_a'] else ""
+                fav_a = "⭐" if m['odds_h'] and m['odds_a'] and m['odds_a'] < m['odds_h'] else ""
+
+                with st.container():
+                    row_cols = st.columns([1, 4, 4, 3])
+                    with row_cols[0]:
+                        st.caption(f"⏰ {m['time_str']}")
+                    with row_cols[1]:
+                        elo_txt = ""
+                        if m['model_home'] and pred:
+                            elo_g, elo_s = get_player_elo(m['model_home'], elo_data, m['surface'])
+                            elo_txt = f"<br><span style='color:#888;font-size:0.8rem;'>Elo {m['surface']}: {elo_s:.0f}</span>"
+                        prob_h_txt = ""
+                        if pred:
+                            c = '#4CAF50' if pred['proba_p1'] > 0.5 else '#aaa'
+                            prob_h_txt = f"<span style='color:{c};'>  {pred['proba_p1']:.1%}</span>"
+                        st.markdown(
+                            f"{fav_h} **{m['home']}**{prob_h_txt}{elo_txt}",
+                            unsafe_allow_html=True
+                        )
+                    with row_cols[2]:
+                        elo_txt = ""
+                        if m['model_away'] and pred:
+                            elo_g, elo_s = get_player_elo(m['model_away'], elo_data, m['surface'])
+                            elo_txt = f"<br><span style='color:#888;font-size:0.8rem;'>Elo {m['surface']}: {elo_s:.0f}</span>"
+                        prob_a_txt = ""
+                        if pred:
+                            c = '#4CAF50' if pred['proba_p2'] > 0.5 else '#aaa'
+                            prob_a_txt = f"<span style='color:{c};'>  {pred['proba_p2']:.1%}</span>"
+                        st.markdown(
+                            f"{fav_a} **{m['away']}**{prob_a_txt}{elo_txt}",
+                            unsafe_allow_html=True
+                        )
+                    with row_cols[3]:
+                        if m['odds_h'] and m['odds_a']:
+                            st.caption(f"📚 {m['bookmaker']}")
+                            st.markdown(
+                                f"**{m['odds_h']:.2f}** — **{m['odds_a']:.2f}**"
+                                + (f"{bet_badge}" if has_bet else ""),
+                                unsafe_allow_html=True
+                            )
                         else:
-                            st.markdown(f"""
-                            <div class="no-bet">
-                                <b>📊 Signal modèle</b> — {bet['player']} ({bet['proba']:.1%})
-                                mais <b>hors stratégie</b> ({series} {round_name})
-                            </div>
-                            """, unsafe_allow_html=True)
-                else:
-                    if not is_gs:
-                        pass  # Don't show anything for non-GS with no signal
-                    else:
-                        st.caption(f"Aucun value bet détecté (P1: {pred['proba_p1']:.1%}, P2: {pred['proba_p2']:.1%})")
+                            st.caption("Pas de cotes")
+
+                    # Détails / tous les bookmakers
+                    if m['all_bookmakers'] and show_all_books:
+                        with st.expander("📚 Toutes les cotes"):
+                            for bk in m['all_bookmakers']:
+                                odds_str = " | ".join([f"{n}: {o:.2f}" for n, o in bk['odds'].items()])
+                                st.caption(f"{bk['name']:25s} → {odds_str}")
+
+                st.markdown("<hr style='margin:4px 0; border-color:#333;'>", unsafe_allow_html=True)
 
 # ============================================================================
 # PAGE BANKROLL
