@@ -1328,19 +1328,20 @@ def show_prediction_page():
 
     # ── Cotes bookmaker (optionnel) ────────────────────────────────────────
     odds1 = odds2 = None
-    with st.expander("💰 Cotes bookmaker (optionnel — pour calcul edge/EV)"):
+    use_odds = st.checkbox("💰 Renseigner les cotes bookmaker (edge / EV)", value=False, key="use_odds")
+    if use_odds:
         odd_cols = st.columns(2)
         with odd_cols[0]:
-            odds1_input = st.number_input("Cote Joueur 1", min_value=1.01,
-                                          max_value=50.0, value=1.80, step=0.05, key="odds1")
+            odds1 = st.number_input("Cote Joueur 1", min_value=1.01,
+                                    max_value=50.0, value=1.80, step=0.05, key="odds1")
         with odd_cols[1]:
-            odds2_input = st.number_input("Cote Joueur 2", min_value=1.01,
-                                          max_value=50.0, value=2.10, step=0.05, key="odds2")
-        odds1 = odds1_input
-        odds2 = odds2_input
+            odds2 = st.number_input("Cote Joueur 2", min_value=1.01,
+                                    max_value=50.0, value=2.10, step=0.05, key="odds2")
 
     # ── Options avancées ───────────────────────────────────────────────────
-    with st.expander("⚙️ Options avancées (classement ATP)"):
+    rank1 = rank2 = pts1 = pts2 = None
+    use_advanced = st.checkbox("⚙️ Renseigner le classement ATP manuellement", value=False, key="use_advanced")
+    if use_advanced:
         adv_cols = st.columns(2)
         with adv_cols[0]:
             st.markdown("**Joueur 1**")
