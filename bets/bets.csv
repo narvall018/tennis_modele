@@ -1,2 +1,3 @@
 bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,ev,status,result,profit
-1774309724,2026-03-23 23:48,Miami Open,Quarterfinals,Quentin Halys,Kamil Majchrzak,Majchrzak K.,5.7,15.0,0.6592592592592592,0.48382066276803115,2.7577777777777777,open,,0.0
+1774309724,2026-03-23 23:48,Miami Open,Quarterfinals,Quentin Halys,Kamil Majchrzak,Majchrzak K.,5.7,15.0,0.6592592592592592,0.4838206627680311,2.7577777777777777,open,,0.0
+1774309733,2026-03-23 23:48,Miami Open,Quarterfinals,Ugo Humbert,Francisco Cerundolo,Cerundolo F.,1.96,40.0,0.6592592592592592,0.14905517762660614,0.29214814814814805,open,,0.0
