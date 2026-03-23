@@ -2397,7 +2397,23 @@ def recalculate_all_elo(progress_callback=None):
                 player_stats[player]['elo_by_surface'][surface] = elo_surface[surface][player]
     
     joblib.dump(player_stats, MODELS_DIR / "player_stats.pkl")
-    
+
+    # === Update TennisEloEngine v3 ===
+    v3_elo_path = MODELS_DIR / "elo_engine_v3.pkl"
+    if v3_elo_path.exists():
+        try:
+            from src.features.elo_system import TennisEloEngine as _TElo
+            if progress_callback:
+                progress_callback("🔄 Mise à jour TennisEloEngine v3...")
+            elo_engine = _TElo.load(str(v3_elo_path))
+            elo_engine.fit(df, progress_callback=progress_callback)
+            elo_engine.save(str(v3_elo_path))
+            if progress_callback:
+                progress_callback("✅ TennisEloEngine v3 mis à jour")
+        except Exception as _e:
+            if progress_callback:
+                progress_callback(f"⚠️ TennisEloEngine v3 non mis à jour : {_e}")
+
     if progress_callback:
         progress_callback("💾 Sauvegarde recent_matches.csv...")
     
