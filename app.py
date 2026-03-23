@@ -804,6 +804,7 @@ def save_bankroll(amount):
     bankroll_file = BETS_DIR / "bankroll.json"
     with open(bankroll_file, 'w') as f:
         json.dump({'bankroll': amount, 'updated': datetime.now().isoformat()}, f)
+    _gh_push_bets()
 
 def add_bet(tournament, round_name, player1, player2, pick, odds, stake, 
             model_prob, edge, ev):
@@ -835,6 +836,7 @@ def add_bet(tournament, round_name, player1, player2, pick, odds, stake,
         df = new_bet
     
     df.to_csv(bets_file, index=False)
+    _gh_push_bets()
     return True
 
 def get_open_bets():
@@ -868,6 +870,7 @@ def close_bet(bet_id, result):
         df.loc[mask, 'profit'] = 0
     
     df.to_csv(bets_file, index=False)
+    _gh_push_bets()
     return True
 
 def get_all_bets():
@@ -876,6 +879,79 @@ def get_all_bets():
     if not bets_file.exists():
         return pd.DataFrame()
     return pd.read_csv(bets_file)
+
+
+# ============================================================================
+# PERSISTANCE GITHUB — bets.csv + bankroll.json
+# ============================================================================
+
+def _gh_bets_headers():
+    cfg = get_github_update_config()
+    if not cfg.get("token"):
+        return None, None, None
+    owner, repo = cfg["repo"].split("/", 1)
+    headers = {
+        "Authorization": f"token {cfg['token']}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+    return owner, repo, headers
+
+
+def _gh_fetch_bets():
+    """Télécharge bets.csv et bankroll.json depuis GitHub vers le filesystem local."""
+    owner, repo, headers = _gh_bets_headers()
+    if not headers:
+        return
+    for gh_path, local_path in [
+        ("bets/bets.csv", BETS_DIR / "bets.csv"),
+        ("bets/bankroll.json", BETS_DIR / "bankroll.json"),
+    ]:
+        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{gh_path}"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read())
+                content = base64.b64decode(data["content"])
+                local_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(local_path, "wb") as f:
+                    f.write(content)
+        except Exception:
+            pass  # Fichier inexistant sur GitHub ou erreur réseau
+
+
+def _gh_push_bets():
+    """Pousse bets.csv et bankroll.json du filesystem local vers GitHub."""
+    owner, repo, headers = _gh_bets_headers()
+    if not headers:
+        return
+    put_headers = {**headers, "Content-Type": "application/json"}
+    for gh_path, local_path in [
+        ("bets/bets.csv", BETS_DIR / "bets.csv"),
+        ("bets/bankroll.json", BETS_DIR / "bankroll.json"),
+    ]:
+        if not local_path.exists():
+            continue
+        with open(local_path, "rb") as f:
+            content_b64 = base64.b64encode(f.read()).decode("utf-8")
+        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{gh_path}"
+        # Récupère le SHA actuel (nécessaire pour les mises à jour)
+        sha = None
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                sha = json.loads(resp.read()).get("sha")
+        except Exception:
+            pass
+        payload = {"message": f"chore: update {gh_path}", "content": content_b64}
+        if sha:
+            payload["sha"] = sha
+        try:
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(url, data=data, headers=put_headers, method="PUT")
+            urllib.request.urlopen(req, timeout=15)
+        except Exception:
+            pass
+
 
 # ============================================================================
 # PRÉDICTION
@@ -2950,8 +3026,12 @@ def show_update_page():
 # ============================================================================
 
 def main():
-    
-    st.markdown('<div class="main-title">🎾 ATP Tennis Value Betting 🎾</div>', 
+    # Sync bets depuis GitHub au premier chargement de la session
+    if "bets_synced" not in st.session_state:
+        _gh_fetch_bets()
+        st.session_state["bets_synced"] = True
+
+    st.markdown('<div class="main-title">🎾 ATP Tennis Value Betting 🎾</div>',
                 unsafe_allow_html=True)
     _, _, _active_ver = load_model(mtime=_model_file_mtime())
     _sub = "XGBoost + LightGBM + Elo Multi-variantes — Stratégies Multi-tournois" if _active_ver == "v3" else "XGBoost + Elo Surface — Stratégie Grand Slam Late Rounds"
