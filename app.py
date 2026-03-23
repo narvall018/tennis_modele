@@ -1683,12 +1683,16 @@ def show_events_page():
                         if m['model_home'] and pred:
                             elo_g, elo_s = get_player_elo(m['model_home'], elo_data, m['surface'])
                             elo_txt = f"<br><span style='color:#888;font-size:0.8rem;'>Elo {m['surface']}: {elo_s:.0f}</span>"
-                        prob_h_txt = ""
+                        prob_edge_h = ""
                         if pred:
                             c = '#4CAF50' if pred['proba_p1'] > 0.5 else '#aaa'
-                            prob_h_txt = f"<span style='color:{c};'>  {pred['proba_p1']:.1%}</span>"
+                            edge_c = '#4CAF50' if pred['edge_p1'] > 0 else '#F44336'
+                            prob_edge_h = (
+                                f"<span style='color:{c};'>  {pred['proba_p1']:.1%}</span>"
+                                f"<span style='color:{edge_c}; font-size:0.8rem;'> (edge {pred['edge_p1']*100:+.1f}%)</span>"
+                            )
                         st.markdown(
-                            f"{fav_h} **{m['home']}**{prob_h_txt}{elo_txt}",
+                            f"{fav_h} **{m['home']}**{prob_edge_h}{elo_txt}",
                             unsafe_allow_html=True
                         )
                     with row_cols[2]:
@@ -1696,12 +1700,16 @@ def show_events_page():
                         if m['model_away'] and pred:
                             elo_g, elo_s = get_player_elo(m['model_away'], elo_data, m['surface'])
                             elo_txt = f"<br><span style='color:#888;font-size:0.8rem;'>Elo {m['surface']}: {elo_s:.0f}</span>"
-                        prob_a_txt = ""
+                        prob_edge_a = ""
                         if pred:
                             c = '#4CAF50' if pred['proba_p2'] > 0.5 else '#aaa'
-                            prob_a_txt = f"<span style='color:{c};'>  {pred['proba_p2']:.1%}</span>"
+                            edge_c = '#4CAF50' if pred['edge_p2'] > 0 else '#F44336'
+                            prob_edge_a = (
+                                f"<span style='color:{c};'>  {pred['proba_p2']:.1%}</span>"
+                                f"<span style='color:{edge_c}; font-size:0.8rem;'> (edge {pred['edge_p2']*100:+.1f}%)</span>"
+                            )
                         st.markdown(
-                            f"{fav_a} **{m['away']}**{prob_a_txt}{elo_txt}",
+                            f"{fav_a} **{m['away']}**{prob_edge_a}{elo_txt}",
                             unsafe_allow_html=True
                         )
                     with row_cols[3]:
