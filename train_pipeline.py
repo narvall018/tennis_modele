@@ -144,6 +144,10 @@ def load_atp_data(cfg: dict) -> pd.DataFrame:
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
     df = df.dropna(subset=["Date", "Player_1", "Player_2"]).copy()
 
+    # Normaliser 'Best of' (avec espace) → 'Best_of'
+    if "Best of" in df.columns and "Best_of" not in df.columns:
+        df = df.rename(columns={"Best of": "Best_of"})
+
     # Normaliser la colonne Winner
     if "Winner" not in df.columns:
         if "winner" in df.columns:
@@ -155,6 +159,14 @@ def load_atp_data(cfg: dict) -> pd.DataFrame:
     for col in ["Rank_1", "Rank_2", "Pts_1", "Pts_2"]:
         if col not in df.columns:
             df[col] = 0
+
+    # Cotes réelles (Odd_1/Odd_2 dans les données tennis-data.co.uk)
+    # -1 = absent → on les remplace par NaN pour ne pas les confondre avec une vraie cote
+    for odd_col, target_col in [("Odd_1", "odds_p1"), ("Odd_2", "odds_p2")]:
+        if odd_col in df.columns:
+            df[target_col] = df[odd_col].apply(lambda x: float(x) if float(x) > 1.0 else np.nan)
+        else:
+            df[target_col] = np.nan
 
     df["Source"] = "ATP"
     log(f"✅ ATP : {len(df):,} matchs chargés ({df['Date'].min().year}–{df['Date'].max().year})")
@@ -254,13 +266,15 @@ def run_pipeline(
 
     # Ajouter colonnes Rank/Pts depuis df_all si disponibles
     elo_history_merged = elo_history.copy()
-    rank_cols = [c for c in df_all.columns if c in ["Rank_1", "Rank_2", "Pts_1", "Pts_2"]]
-    if rank_cols:
-        df_ranks = df_all[["Date", "Player_1", "Player_2"] + rank_cols].copy()
-        df_ranks["Date"] = pd.to_datetime(df_ranks["Date"])
+    # Merge ranking + cotes réelles depuis df_all
+    extra_cols = [c for c in df_all.columns if c in ["Rank_1", "Rank_2", "Pts_1", "Pts_2", "odds_p1", "odds_p2", "Best_of"]]
+    if extra_cols:
+        df_extra = df_all[["Date", "Player_1", "Player_2"] + extra_cols].copy()
+        df_extra["Date"] = pd.to_datetime(df_extra["Date"])
         elo_history_merged = elo_history_merged.merge(
-            df_ranks, on=["Date", "Player_1", "Player_2"], how="left"
+            df_extra, on=["Date", "Player_1", "Player_2"], how="left"
         )
+    cb(f"Cotes réelles disponibles : {(elo_history_merged.get('odds_p1', pd.Series()) > 1).sum():,} matchs")
 
     builder = FeatureBuilder(feature_cols=FEATURE_COLS_V3)
 

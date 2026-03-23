@@ -253,23 +253,31 @@ class WalkForwardBacktester:
                 f"  AUC: {model_auc:.4f} | Brier: {model_brier:.4f} | LogLoss: {model_logloss:.4f}"
             )
 
-            # Simuler les cotes si absentes
+            # Simuler les cotes si absentes (via Elo, pas le modèle → pas de circularité)
             df_test = self._ensure_odds(df_test, test_probs)
 
             # Évaluer les stratégies
             self.strategy_manager.reset_portfolio()
             bankroll = self.initial_bankroll
             fold_bets = []
+            test_probs_list = test_probs.tolist()  # aligner index
 
-            for i, row in df_test.iterrows():
-                prob = float(test_probs[i])
+            for enum_i, (row_idx, row) in enumerate(df_test.iterrows()):
+                prob = float(test_probs_list[enum_i])
+
+                odds_p1 = float(row.get("odds_p1") or 2.0)
+                odds_p2 = float(row.get("odds_p2") or 2.0)
+                if odds_p1 <= 1.0 or np.isnan(odds_p1):
+                    odds_p1 = 2.0
+                if odds_p2 <= 1.0 or np.isnan(odds_p2):
+                    odds_p2 = 2.0
 
                 recs = self.strategy_manager.evaluate_match(
                     player1=str(row.get("_p1", "P1")),
                     player2=str(row.get("_p2", "P2")),
                     model_prob_p1=prob,
-                    odds_p1=float(row.get("odds_p1", 2.0)),
-                    odds_p2=float(row.get("odds_p2", 2.0)),
+                    odds_p1=odds_p1,
+                    odds_p2=odds_p2,
                     surface=str(row.get("_surface", "Hard")),
                     series=str(row.get("_series", "ATP250")),
                     round_name=str(row.get("_round", "1st Round")),
@@ -285,7 +293,11 @@ class WalkForwardBacktester:
                         rec.player == str(row.get("_p2", "")) and row["_label"] == 0
                     )
 
-                    profit = rec.stake_amount * (rec.odds - 1) if actual_winner_is_player else -rec.stake_amount
+                    # Mise calculée sur bankroll initiale (pas sur bankroll courante)
+                    # pour éviter le compounding exponentiel en backtest.
+                    # Cela donne un ROI stable et interprétable.
+                    fixed_stake = self.initial_bankroll * rec.stake_pct
+                    profit = fixed_stake * (rec.odds - 1) if actual_winner_is_player else -fixed_stake
                     bankroll += profit
 
                     fold_bets.append({
@@ -297,7 +309,7 @@ class WalkForwardBacktester:
                         "odds": rec.odds,
                         "edge": rec.edge,
                         "ev": rec.ev,
-                        "stake": rec.stake_amount,
+                        "stake": fixed_stake,
                         "stake_pct": rec.stake_pct,
                         "won": actual_winner_is_player,
                         "profit": profit,
@@ -355,17 +367,31 @@ class WalkForwardBacktester:
         en appliquant la marge bookmaker.
         """
         df = df.copy()
-        if "odds_p1" not in df.columns or df["odds_p1"].isna().all():
-            # Cotes simulées avec marge
+        has_real_odds = (
+            "odds_p1" in df.columns
+            and not df["odds_p1"].isna().all()
+            and (df["odds_p1"].dropna() > 1.0).any()
+        )
+        if not has_real_odds:
+            # Cotes simulées à partir de l'ELO (pas du modèle) pour éviter
+            # la circularité : marché = Elo simple + marge bookmaker.
+            # L'edge est réel seulement si l'ensemble bat l'Elo pur.
             margin = self.bookmaker_margin
-            raw_prob = model_probs
-            raw_prob_p2 = 1.0 - raw_prob
-            # Appliquer la marge (surround)
-            total = raw_prob + raw_prob_p2 + margin
-            adj_p1 = raw_prob / total * (1 + margin)
-            adj_p2 = raw_prob_p2 / total * (1 + margin)
-            df["odds_p1"] = np.where(adj_p1 > 0, 1.0 / np.clip(adj_p1, 0.01, 0.99), 2.0)
-            df["odds_p2"] = np.where(adj_p2 > 0, 1.0 / np.clip(adj_p2, 0.01, 0.99), 2.0)
+            elo_p1 = df.get("elo_p1", pd.Series([1500.0] * len(df))).fillna(1500.0).values
+            elo_p2 = df.get("elo_p2", pd.Series([1500.0] * len(df))).fillna(1500.0).values
+            # Probabilité Elo pure (formule standard)
+            elo_prob_p1 = 1.0 / (1.0 + 10.0 ** ((elo_p2 - elo_p1) / 400.0))
+            elo_prob_p2 = 1.0 - elo_prob_p1
+            # Marge overround (bookmaker gagne sa commission)
+            total = elo_prob_p1 + elo_prob_p2 + margin
+            adj_p1 = elo_prob_p1 / total * (1 + margin)
+            adj_p2 = elo_prob_p2 / total * (1 + margin)
+            df["odds_p1"] = 1.0 / np.clip(adj_p1, 0.02, 0.98)
+            df["odds_p2"] = 1.0 / np.clip(adj_p2, 0.02, 0.98)
+        else:
+            # Garde les cotes réelles, remplace -1 ou NaN par NaN pour filtrage ultérieur
+            df["odds_p1"] = df["odds_p1"].apply(lambda x: float(x) if x and float(x) > 1 else np.nan)
+            df["odds_p2"] = df["odds_p2"].apply(lambda x: float(x) if x and float(x) > 1 else np.nan)
         return df
 
     def _compute_strategy_metrics(self, bets_df: pd.DataFrame) -> Dict[str, dict]:
