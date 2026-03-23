@@ -958,10 +958,11 @@ def _gh_push_bets():
 # ============================================================================
 
 def predict_match(player1, player2, surface, series, round_name, best_of,
-                  rank1, rank2, pts1, pts2, odds1, odds2):
+                  rank1, rank2, pts1, pts2, odds1=None, odds2=None):
     """
     Prédit le résultat d'un match et identifie les value bets.
     Utilise le modèle v3 (TennisEnsemble) si disponible, sinon v2 (XGBoost).
+    odds1/odds2 sont optionnels : edge/EV/recommandations ne sont calculés que si fournis.
     """
     model_obj, scaler, version = load_model(mtime=_model_file_mtime())
     elo_data = load_elo_ratings()
@@ -997,20 +998,28 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
     proba_p2 = 1.0 - proba_p1
 
     # ── Marché ───────────────────────────────────────────────────────────────
-    fair_prob_1 = (1/odds1) / (1/odds1 + 1/odds2) if odds1 > 0 and odds2 > 0 else 0.5
-    fair_prob_2 = 1.0 - fair_prob_1
-    margin = (1/odds1 + 1/odds2 - 1) * 100 if odds1 > 0 and odds2 > 0 else 0
-
-    edge_p1 = proba_p1 - fair_prob_1
-    edge_p2 = proba_p2 - fair_prob_2
-    ev_p1 = proba_p1 * odds1 - 1
-    ev_p2 = proba_p2 * odds2 - 1
+    has_odds = bool(odds1 and odds2 and odds1 > 1.0 and odds2 > 1.0)
+    if has_odds:
+        fair_prob_1 = (1/odds1) / (1/odds1 + 1/odds2)
+        fair_prob_2 = 1.0 - fair_prob_1
+        margin = (1/odds1 + 1/odds2 - 1) * 100
+        edge_p1 = proba_p1 - fair_prob_1
+        edge_p2 = proba_p2 - fair_prob_2
+        ev_p1 = proba_p1 * odds1 - 1
+        ev_p2 = proba_p2 * odds2 - 1
+    else:
+        fair_prob_1 = fair_prob_2 = 0.5
+        margin = 0.0
+        edge_p1 = edge_p2 = ev_p1 = ev_p2 = 0.0
+        odds1 = odds2 = 0.0
 
     # ── Stratégies ───────────────────────────────────────────────────────────
     best_bet = None
     is_eligible = False
 
-    if version == "v3":
+    if not has_odds:
+        pass  # Pas de recommandation sans cotes
+    elif version == "v3":
         # Multi-stratégie v3 : StrategyManager
         strat_cfg = config.get("strategies", {})
         if strat_cfg:
@@ -1055,7 +1064,7 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
                             'proba': proba_p2, 'odds': odds2,
                             'edge': edge_p2, 'ev': ev_p2, 'side': 'P2',
                             'strategy': 'Standard v3', 'stake_pct': 0.02, 'confidence': 'medium'}
-    else:
+    elif version != "v3":
         # Logique v2 originale
         strategy = config.get('strategy', {})
         is_eligible = (
@@ -1104,6 +1113,9 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
         'elo_p1_surf': elo_p1_surf,
         'elo_p2_surf': elo_p2_surf,
         'model_version': version,
+        'has_odds': has_odds,
+        'odds1': odds1,
+        'odds2': odds2,
     }
 
 # ============================================================================
@@ -1256,107 +1268,118 @@ def show_home_page():
 
 def show_prediction_page():
     """Page de prédiction de match"""
-    
+
     st.title("🎾 Prédiction de Match")
-    
-    config = load_model_config()
     _, _, version = load_model(mtime=_model_file_mtime())
 
-    # Liste des joueurs pour l'autocomplétion — v3 depuis EloEngine, v2 depuis player_stats
+    # ── Liste des joueurs ─────────────────────────────────────────────────
     if version == "v3" and _V3_MODULES_OK:
         elo_data = load_elo_ratings()
         if isinstance(elo_data, TennisEloEngine):
             all_players = sorted(elo_data.get_all_ratings().keys())
         else:
-            player_stats = load_player_stats()
-            all_players = sorted(player_stats.keys())
+            all_players = sorted(load_player_stats().keys())
     else:
-        player_stats = load_player_stats()
-        all_players = sorted(player_stats.keys())
-    
-    st.markdown("""
-    <div class="card">
-        <h4>📋 Saisie du match</h4>
-        <p>Entrez les détails du match Grand Slam à analyser</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Match details
-    col1, col2 = st.columns(2)
-    
+        all_players = sorted(load_player_stats().keys())
+
+    version_label = f"🤖 Modèle actif : **{'TennisEnsemble v3 (XGBoost + LightGBM + Elo)' if version == 'v3' else 'XGBoost v2'}**"
+    st.info(version_label)
+
+    # ── Sélection des joueurs ──────────────────────────────────────────────
+    col1, col_vs, col2 = st.columns([5, 1, 5])
     with col1:
-        st.markdown("#### 🟢 Joueur 1")
-        player1 = st.selectbox("Joueur 1", all_players, index=None, 
+        player1 = st.selectbox("🟢 Joueur 1", all_players, index=None,
                                placeholder="Tapez un nom...", key="p1")
-        
-        rank1 = st.number_input("Classement ATP", min_value=1, max_value=2000, 
-                                value=10, key="rank1")
-        pts1 = st.number_input("Points ATP", min_value=0, max_value=20000, 
-                               value=3000, key="pts1")
-        odds1 = st.number_input("Cote Joueur 1", min_value=1.01, max_value=50.0, 
-                                value=1.50, step=0.05, key="odds1")
-    
+    with col_vs:
+        st.markdown("<div style='text-align:center;padding-top:28px;font-size:1.3rem;font-weight:bold;'>VS</div>",
+                    unsafe_allow_html=True)
     with col2:
-        st.markdown("#### 🔵 Joueur 2")
-        player2 = st.selectbox("Joueur 2", all_players, index=None, 
+        player2 = st.selectbox("🔵 Joueur 2", all_players, index=None,
                                placeholder="Tapez un nom...", key="p2")
-        
-        rank2 = st.number_input("Classement ATP", min_value=1, max_value=2000, 
-                                value=20, key="rank2")
-        pts2 = st.number_input("Points ATP", min_value=0, max_value=20000, 
-                               value=1500, key="pts2")
-        odds2 = st.number_input("Cote Joueur 2", min_value=1.01, max_value=50.0, 
-                                value=2.50, step=0.05, key="odds2")
-    
-    # Context
-    ctx_cols = st.columns(4)
-    with ctx_cols[0]:
-        tournament = st.selectbox("Tournoi", [
-            "Australian Open", "French Open", "Wimbledon", "US Open"
-        ])
-    with ctx_cols[1]:
-        surface = st.selectbox("Surface", ["Hard", "Clay", "Grass"])
-    with ctx_cols[2]:
-        round_name = st.selectbox("Round", [
-            "Quarterfinals", "Semifinals", "The Final"
-        ])
-    with ctx_cols[3]:
-        best_of = st.selectbox("Format", [5, 3], index=0)
-    
-    # Auto-detect surface
-    surface_map = {"Australian Open": "Hard", "French Open": "Clay", 
-                   "Wimbledon": "Grass", "US Open": "Hard"}
-    surface = surface_map.get(tournament, surface)
-    
+
+    # ── Surface ────────────────────────────────────────────────────────────
+    surface = st.selectbox("🎾 Surface", ["Hard", "Clay", "Grass"], index=0)
+
+    # ── Contexte du match (optionnel) ──────────────────────────────────────
+    with st.expander("📋 Contexte du match (optionnel)"):
+        ctx_cols = st.columns(3)
+        with ctx_cols[0]:
+            tournament = st.selectbox("Tournoi", [
+                "Australian Open", "French Open", "Wimbledon", "US Open",
+                "Indian Wells", "Miami", "Roland Garros", "Autre"
+            ], index=0, key="ctx_tournament")
+        with ctx_cols[1]:
+            round_name = st.selectbox("Round", [
+                "Quarterfinals", "Semifinals", "The Final",
+                "Round of 16", "Round of 32", "Round of 64", "Round of 128"
+            ], index=0, key="ctx_round")
+        with ctx_cols[2]:
+            best_of = st.selectbox("Format", [3, 5], index=0, key="ctx_bestof")
+        series = st.selectbox("Catégorie", [
+            "Grand Slam", "Masters 1000", "ATP 500", "ATP 250"
+        ], index=0, key="ctx_series")
+        # Sync surface depuis le tournoi si Grand Slam
+        surface_map = {"Australian Open": "Hard", "French Open": "Clay",
+                       "Wimbledon": "Grass", "US Open": "Hard", "Roland Garros": "Clay"}
+        if tournament in surface_map:
+            surface = surface_map[tournament]
+            st.caption(f"Surface auto-détectée depuis le tournoi : **{surface}**")
+    # Les variables tournament/round_name/best_of/series sont toujours définies via les widgets
+
+    # ── Cotes bookmaker (optionnel) ────────────────────────────────────────
+    odds1 = odds2 = None
+    with st.expander("💰 Cotes bookmaker (optionnel — pour calcul edge/EV)"):
+        odd_cols = st.columns(2)
+        with odd_cols[0]:
+            odds1_input = st.number_input("Cote Joueur 1", min_value=1.01,
+                                          max_value=50.0, value=1.80, step=0.05, key="odds1")
+        with odd_cols[1]:
+            odds2_input = st.number_input("Cote Joueur 2", min_value=1.01,
+                                          max_value=50.0, value=2.10, step=0.05, key="odds2")
+        odds1 = odds1_input
+        odds2 = odds2_input
+
+    # ── Options avancées ───────────────────────────────────────────────────
+    with st.expander("⚙️ Options avancées (classement ATP)"):
+        adv_cols = st.columns(2)
+        with adv_cols[0]:
+            st.markdown("**Joueur 1**")
+            rank1 = st.number_input("Classement ATP J1", min_value=1, max_value=2000,
+                                    value=50, key="rank1")
+            pts1 = st.number_input("Points ATP J1", min_value=0, max_value=20000,
+                                   value=2000, key="pts1")
+        with adv_cols[1]:
+            st.markdown("**Joueur 2**")
+            rank2 = st.number_input("Classement ATP J2", min_value=1, max_value=2000,
+                                    value=80, key="rank2")
+            pts2 = st.number_input("Points ATP J2", min_value=0, max_value=20000,
+                                   value=1200, key="pts2")
+
     st.markdown("---")
-    
-    # Predict button
+
     if st.button("🎯 Analyser le match", type="primary", use_container_width=True):
         if not player1 or not player2:
             st.error("❌ Veuillez sélectionner les deux joueurs")
             return
-        
         if player1 == player2:
             st.error("❌ Les deux joueurs doivent être différents")
             return
-        
+
         with st.spinner("Analyse en cours..."):
             prediction = predict_match(
-                player1, player2, surface, "Grand Slam", round_name, best_of,
+                player1, player2, surface, series, round_name, best_of,
                 rank1, rank2, pts1, pts2, odds1, odds2
             )
-        
-        # Store prediction in session
+
         st.session_state.last_prediction = prediction
         st.session_state.last_match = {
             'player1': player1, 'player2': player2, 'surface': surface,
             'tournament': tournament, 'round': round_name,
-            'odds1': odds1, 'odds2': odds2
+            'odds1': odds1 or 0, 'odds2': odds2 or 0
         }
-        
-        # Display results
-        display_prediction(prediction, player1, player2, surface, tournament, 
-                          round_name, odds1, odds2)
+
+        display_prediction(prediction, player1, player2, surface, tournament,
+                           round_name, odds1 or 0, odds2 or 0)
 
 def get_surface_emoji(surface):
     if surface == "Clay":
@@ -1368,136 +1391,119 @@ def get_surface_emoji(surface):
 
 def display_prediction(pred, p1, p2, surface, tournament, round_name, odds1, odds2):
     """Affiche les résultats de la prédiction"""
-    
+
     surf_emoji = get_surface_emoji(surface)
-    
-    st.markdown(f"### {surf_emoji} {tournament} — {round_name}")
-    st.markdown(f"**{p1}** vs **{p2}** | Surface: **{surface}** | Marge bookmaker: {pred['margin']:.1f}%")
-    
-    # Tableau de comparaison
-    col1, col2, col3 = st.columns([2, 1, 2])
-    
+    has_odds = pred.get('has_odds', False)
+
+    st.markdown(f"### {surf_emoji} {tournament} — {round_name} | Surface : **{surface}**")
+    if has_odds:
+        st.caption(f"Marge bookmaker : {pred['margin']:.1f}%")
+
+    # ── Cartes joueurs ────────────────────────────────────────────────────
+    fav = p1 if pred['proba_p1'] >= pred['proba_p2'] else p2
+    col1, col_vs, col2 = st.columns([5, 1, 5])
+
+    def _player_card(name, proba, elo_surf, elo_global, odds, fair_prob, edge, ev, color_dot):
+        is_fav = proba >= 0.5
+        prob_color = "#4CAF50" if is_fav else "#F44336"
+        card = f"""
+        <div class="card" style="text-align:center;">
+            <h3>{color_dot} {name}</h3>
+            <div class="metric-value" style="color:{prob_color};">{proba:.1%}</div>
+            <p>Elo Global : <b>{elo_global:.0f}</b></p>
+            <p>Elo Surface : <b>{elo_surf:.0f}</b></p>"""
+        if has_odds and odds > 1:
+            edge_color = "#4CAF50" if edge > 0 else "#F44336"
+            ev_color   = "#4CAF50" if ev > 0 else "#F44336"
+            card += f"""
+            <p>Cote : <b>{odds:.2f}</b> | Marché : {fair_prob:.1%}</p>
+            <p style="color:{edge_color};">Edge : {edge*100:+.1f}%</p>
+            <p style="color:{ev_color};">EV : {ev*100:+.1f}%</p>"""
+        card += "</div>"
+        return card
+
     with col1:
-        st.markdown(f"""
-        <div class="card" style="text-align: center;">
-            <h3>🟢 {p1}</h3>
-            <div class="metric-value" style="color: {'#4CAF50' if pred['proba_p1'] > pred['proba_p2'] else '#F44336'};">
-                {pred['proba_p1']:.1%}
-            </div>
-            <p>Elo Surface: {pred['elo_p1_surf']:.0f}</p>
-            <p>Cote: <b>{odds1:.2f}</b></p>
-            <p>Marché: {pred['fair_prob_1']:.1%}</p>
-            <p style="color: {'#4CAF50' if pred['edge_p1'] > 0 else '#F44336'};">
-                Edge: {pred['edge_p1']*100:+.1f}%
-            </p>
-            <p style="color: {'#4CAF50' if pred['ev_p1'] > 0 else '#F44336'};">
-                EV: {pred['ev_p1']*100:+.1f}%
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    
+        st.markdown(_player_card(
+            p1, pred['proba_p1'], pred['elo_p1_surf'], pred['elo_p1_global'],
+            odds1, pred['fair_prob_1'], pred['edge_p1'], pred['ev_p1'], "🟢"
+        ), unsafe_allow_html=True)
+
+    with col_vs:
+        st.markdown("<div style='text-align:center;padding-top:50px;font-size:1.3rem;font-weight:bold;'>VS</div>",
+                    unsafe_allow_html=True)
+
     with col2:
-        st.markdown("""
-        <div style="text-align: center; padding-top: 60px;">
-            <h2>VS</h2>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown(f"""
-        <div class="card" style="text-align: center;">
-            <h3>🔵 {p2}</h3>
-            <div class="metric-value" style="color: {'#4CAF50' if pred['proba_p2'] > pred['proba_p1'] else '#F44336'};">
-                {pred['proba_p2']:.1%}
-            </div>
-            <p>Elo Surface: {pred['elo_p2_surf']:.0f}</p>
-            <p>Cote: <b>{odds2:.2f}</b></p>
-            <p>Marché: {pred['fair_prob_2']:.1%}</p>
-            <p style="color: {'#4CAF50' if pred['edge_p2'] > 0 else '#F44336'};">
-                Edge: {pred['edge_p2']*100:+.1f}%
-            </p>
-            <p style="color: {'#4CAF50' if pred['ev_p2'] > 0 else '#F44336'};">
-                EV: {pred['ev_p2']*100:+.1f}%
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Recommendation
+        st.markdown(_player_card(
+            p2, pred['proba_p2'], pred['elo_p2_surf'], pred['elo_p2_global'],
+            odds2, pred['fair_prob_2'], pred['edge_p2'], pred['ev_p2'], "🔵"
+        ), unsafe_allow_html=True)
+
+    # ── Favori du modèle ──────────────────────────────────────────────────
+    fav_prob = max(pred['proba_p1'], pred['proba_p2'])
+    st.success(f"🏆 Favori du modèle : **{fav}** ({fav_prob:.1%})")
+
     st.markdown("---")
-    
-    if pred['best_bet']:
-        bet = pred['best_bet']
-        st.markdown(f"""
-        <div class="bet-recommendation">
-            <h4>✅ RECOMMANDATION DE PARI</h4>
-            <p><b>Parier sur :</b> 🎾 <b>{bet['player']}</b></p>
-            <p><b>Cote :</b> {bet['odds']:.2f}</p>
-            <p><b>Probabilité modèle :</b> {bet['proba']:.1%}</p>
-            <p><b>Edge :</b> {bet['edge']*100:+.1f}%</p>
-            <p><b>EV :</b> {bet['ev']*100:+.1f}%</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Stake calculation
-        current_bankroll = init_bankroll()
-        strategy_name = st.session_state.get('selected_strategy', "📊 PLATE STANDARD")
-        strategy = BETTING_STRATEGIES.get(strategy_name, BETTING_STRATEGIES["📊 PLATE STANDARD"])
-        
-        stake_info = calculate_stake(bet['proba'], bet['odds'], current_bankroll, strategy)
-        
-        st.markdown(f"""
-        <div class="card">
-            <h5>💰 Calcul de mise ({strategy_name})</h5>
-            <p><b>Bankroll :</b> {current_bankroll:.2f} €</p>
-            <p><b>Mise recommandée :</b> {stake_info['stake']:.2f} € ({stake_info['stake_pct']:.1%} du bankroll)</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Save bet button
-        match_info = st.session_state.get('last_match', {})
-        if st.button("💾 Enregistrer ce pari", type="primary"):
-            success = add_bet(
-                tournament=match_info.get('tournament', ''),
-                round_name=match_info.get('round', ''),
-                player1=match_info.get('player1', ''),
-                player2=match_info.get('player2', ''),
-                pick=bet['player'],
-                odds=bet['odds'],
-                stake=stake_info['stake'],
-                model_prob=bet['proba'],
-                edge=bet['edge'],
-                ev=bet['ev']
-            )
-            if success:
-                # Update bankroll
-                new_bankroll = current_bankroll - stake_info['stake']
-                save_bankroll(new_bankroll)
-                st.success(f"✅ Pari enregistré : {stake_info['stake']:.2f}€ sur {bet['player']} @ {bet['odds']:.2f}")
-                st.rerun()
-    else:
-        if not pred['is_eligible']:
-            st.markdown("""
-            <div class="no-bet">
-                <h4>ℹ️ Match hors stratégie</h4>
-                <p>Ce match n'est pas dans le périmètre de la stratégie (Grand Slam QF/SF/F uniquement).</p>
-                <p>L'analyse est affichée à titre informatif.</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
+
+    # ── Recommandation de pari (seulement si cotes fournies) ─────────────
+    if has_odds:
+        if pred['best_bet']:
+            bet = pred['best_bet']
             st.markdown(f"""
-            <div class="no-bet">
-                <h4>ℹ️ Aucun pari recommandé</h4>
-                <p>Aucun joueur n'atteint le seuil de probabilité modèle (> 60%).</p>
-                <p>{p1}: {pred['proba_p1']:.1%} | {p2}: {pred['proba_p2']:.1%}</p>
+            <div class="bet-recommendation">
+                <h4>✅ RECOMMANDATION DE PARI</h4>
+                <p><b>Parier sur :</b> 🎾 <b>{bet['player']}</b></p>
+                <p><b>Cote :</b> {bet['odds']:.2f}</p>
+                <p><b>Probabilité modèle :</b> {bet['proba']:.1%}</p>
+                <p><b>Edge :</b> {bet['edge']*100:+.1f}%</p>
+                <p><b>EV :</b> {bet['ev']*100:+.1f}%</p>
             </div>
             """, unsafe_allow_html=True)
-    
-    # Feature details
+
+            current_bankroll = init_bankroll()
+            strategy_name = st.session_state.get('selected_strategy', "📊 PLATE STANDARD")
+            strategy = BETTING_STRATEGIES.get(strategy_name, BETTING_STRATEGIES["📊 PLATE STANDARD"])
+            stake_info = calculate_stake(bet['proba'], bet['odds'], current_bankroll, strategy)
+
+            st.markdown(f"""
+            <div class="card">
+                <h5>💰 Calcul de mise ({strategy_name})</h5>
+                <p><b>Bankroll :</b> {current_bankroll:.2f} €</p>
+                <p><b>Mise recommandée :</b> {stake_info['stake']:.2f} €
+                   ({stake_info['stake_pct']:.1%} du bankroll)</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            match_info = st.session_state.get('last_match', {})
+            if st.button("💾 Enregistrer ce pari", type="primary"):
+                success = add_bet(
+                    tournament=match_info.get('tournament', ''),
+                    round_name=match_info.get('round', ''),
+                    player1=match_info.get('player1', ''),
+                    player2=match_info.get('player2', ''),
+                    pick=bet['player'],
+                    odds=bet['odds'],
+                    stake=stake_info['stake'],
+                    model_prob=bet['proba'],
+                    edge=bet['edge'],
+                    ev=bet['ev']
+                )
+                if success:
+                    new_bankroll = current_bankroll - stake_info['stake']
+                    save_bankroll(new_bankroll)
+                    st.success(f"✅ Pari enregistré : {stake_info['stake']:.2f}€ sur {bet['player']} @ {bet['odds']:.2f}")
+                    st.rerun()
+        elif not pred['is_eligible']:
+            st.info("ℹ️ Match hors périmètre de stratégie — analyse affichée à titre indicatif.")
+        else:
+            st.warning(f"ℹ️ Aucun pari recommandé — probabilités insuffisantes ({p1}: {pred['proba_p1']:.1%} | {p2}: {pred['proba_p2']:.1%})")
+    else:
+        st.info("💡 Ajoutez les **cotes bookmaker** dans le formulaire pour obtenir edge, EV et recommandation de mise.")
+
+    # ── Détails features ──────────────────────────────────────────────────
     with st.expander("🔍 Détails des features"):
-        features = pred['features']
         feat_df = pd.DataFrame([
             {"Feature": k, "Valeur": f"{v:.4f}" if isinstance(v, float) else str(v)}
-            for k, v in features.items()
+            for k, v in pred['features'].items()
         ])
         st.dataframe(feat_df, use_container_width=True, hide_index=True)
 
