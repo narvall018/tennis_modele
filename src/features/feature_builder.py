@@ -282,7 +282,10 @@ class FeatureBuilder:
             is_h, is_c, is_g = encode_surface(surface)
             indoor = is_indoor(surface, str(row.get("Tournament", "")))
             best_of_val = row.get("Best_of", row.get("Best of", 3))
-            best5 = 1 if int(best_of_val or 3) == 5 else 0
+            try:
+                best5 = 1 if int(float(best_of_val or 3)) == 5 else 0
+            except (ValueError, TypeError):
+                best5 = 0
             round_num = ROUND_MAP.get(round_name, 3)
             series_num = SERIES_MAP.get(series, 3)
             m_sin, m_cos = encode_month_cyclic(row["Date"].month)
