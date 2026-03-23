@@ -341,6 +341,9 @@ class TennisEnsemble:
         if not self.is_trained:
             raise RuntimeError("Le modèle n'est pas entraîné.")
 
+        if len(X) == 0:
+            return np.empty((0, 2), dtype=np.float32)
+
         X_s = self.scaler.transform(X)
         raw_proba = self._meta_predict_raw(X, X_s)
 
