@@ -155,11 +155,17 @@ def load_model(mtime: float = 0.0):
     Priorité : TennisEnsemble v3 > XGBoost v2 (fallback).
     mtime est inclus dans la clé de cache → cache invalidé si le fichier change.
     Appeler avec load_model(mtime=_model_file_mtime()).
+    Les imports v3 sont tentés ici (et non au niveau module) pour gérer le cas
+    où le process a démarré avant que les modules v3 soient disponibles.
     """
     v3_path = MODELS_DIR / "ensemble_v3.pkl"
-    if _V3_MODULES_OK and v3_path.exists():
-        ensemble = TennisEnsemble.load(str(v3_path))
-        return ensemble, None, "v3"
+    if v3_path.exists():
+        try:
+            from src.models.ensemble import TennisEnsemble as _TE
+            ensemble = _TE.load(str(v3_path))
+            return ensemble, None, "v3"
+        except Exception:
+            pass
     # Fallback v2
     model = joblib.load(MODELS_DIR / "xgb_v2b_model.pkl")
     scaler = joblib.load(MODELS_DIR / "scaler_v2b.pkl")
@@ -173,8 +179,12 @@ def load_elo_ratings():
     Retourne l'objet (TennisEloEngine ou dict legacy).
     """
     v3_path = MODELS_DIR / "elo_engine_v3.pkl"
-    if _V3_MODULES_OK and v3_path.exists():
-        return TennisEloEngine.load(str(v3_path))
+    if v3_path.exists():
+        try:
+            from src.features.elo_system import TennisEloEngine as _TElo
+            return _TElo.load(str(v3_path))
+        except Exception:
+            pass
     return joblib.load(MODELS_DIR / "elo_ratings.pkl")
 
 @st.cache_resource
