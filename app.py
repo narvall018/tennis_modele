@@ -140,12 +140,21 @@ st.markdown("""
 # CHARGEMENT DU MODÈLE ET DES DONNÉES
 # ============================================================================
 
+def _model_file_mtime() -> float:
+    """Retourne le mtime du fichier modèle actif (pour invalider le cache si le fichier change)."""
+    v3_path = MODELS_DIR / "ensemble_v3.pkl"
+    if _V3_MODULES_OK and v3_path.exists():
+        return v3_path.stat().st_mtime
+    p = MODELS_DIR / "xgb_v2b_model.pkl"
+    return p.stat().st_mtime if p.exists() else 0.0
+
 @st.cache_resource
-def load_model():
+def load_model(mtime: float = 0.0):
     """
     Charge le modèle prédictif.
     Priorité : TennisEnsemble v3 > XGBoost v2 (fallback).
-    Retourne (model_or_ensemble, scaler_or_None, version_str).
+    mtime est inclus dans la clé de cache → cache invalidé si le fichier change.
+    Appeler avec load_model(mtime=_model_file_mtime()).
     """
     v3_path = MODELS_DIR / "ensemble_v3.pkl"
     if _V3_MODULES_OK and v3_path.exists():
@@ -187,7 +196,7 @@ def load_player_stats():
 
 def is_v3_active() -> bool:
     """Retourne True si le modèle v3 est chargé."""
-    _, _, version = load_model()
+    _, _, version = load_model(mtime=_model_file_mtime())
     return version == "v3"
 
 @st.cache_data
@@ -856,7 +865,7 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
     Prédit le résultat d'un match et identifie les value bets.
     Utilise le modèle v3 (TennisEnsemble) si disponible, sinon v2 (XGBoost).
     """
-    model_obj, scaler, version = load_model()
+    model_obj, scaler, version = load_model(mtime=_model_file_mtime())
     elo_data = load_elo_ratings()
     config = load_model_config()
     recent_matches = load_recent_matches()
@@ -1006,7 +1015,7 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
 def show_home_page():
     """Page d'accueil avec statistiques du modèle"""
 
-    _, _, version = load_model()
+    _, _, version = load_model(mtime=_model_file_mtime())
     v3_active = (version == "v3")
 
     badge = (
@@ -1153,7 +1162,7 @@ def show_prediction_page():
     st.title("🎾 Prédiction de Match")
     
     config = load_model_config()
-    _, _, version = load_model()
+    _, _, version = load_model(mtime=_model_file_mtime())
 
     # Liste des joueurs pour l'autocomplétion — v3 depuis EloEngine, v2 depuis player_stats
     if version == "v3" and _V3_MODULES_OK:
@@ -1406,7 +1415,7 @@ def show_events_page():
     config = load_model_config()
     elo_data = load_elo_ratings()
     recent_matches = load_recent_matches()
-    _, _, version = load_model()
+    _, _, version = load_model(mtime=_model_file_mtime())
     current_bankroll = init_bankroll()
 
     if version == "v3" and _V3_MODULES_OK and isinstance(elo_data, TennisEloEngine):
@@ -1891,7 +1900,7 @@ def show_rankings_page():
     """Classement Elo des joueurs — v3 enrichi ou v2 legacy"""
 
     elo_data = load_elo_ratings()
-    _, _, version = load_model()
+    _, _, version = load_model(mtime=_model_file_mtime())
 
     st.title("🏆 Classement ATP — Ratings Elo")
     if version == "v3":
@@ -2894,8 +2903,9 @@ def main():
     
     st.markdown('<div class="main-title">🎾 ATP Tennis Value Betting 🎾</div>', 
                 unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">XGBoost + Elo Surface — Stratégie Grand Slam Late Rounds</div>', 
-                unsafe_allow_html=True)
+    _, _, _active_ver = load_model(mtime=_model_file_mtime())
+    _sub = "XGBoost + LightGBM + Elo Multi-variantes — Stratégies Multi-tournois" if _active_ver == "v3" else "XGBoost + Elo Surface — Stratégie Grand Slam Late Rounds"
+    st.markdown(f'<div class="sub-title">{_sub}</div>', unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
@@ -2919,8 +2929,19 @@ def main():
         strategy = BETTING_STRATEGIES[strategy_name]
         st.info(strategy['description'])
         
+        # Model version indicator + reload button
+        _, _, _ver = load_model(mtime=_model_file_mtime())
+        v_color = '#4CAF50' if _ver == 'v3' else '#FF9800'
+        st.markdown(
+            f"<span style='color:{v_color}; font-size:0.85rem;'>⚙️ Modèle actif : <b>{_ver}</b></span>",
+            unsafe_allow_html=True
+        )
+        if st.button("🔄 Recharger le modèle", help="Vide le cache Streamlit et recharge le modèle depuis le disque"):
+            st.cache_resource.clear()
+            st.rerun()
+
         st.markdown("---")
-        
+
         # Quick stats
         all_bets = get_all_bets()
         if not all_bets.empty:
