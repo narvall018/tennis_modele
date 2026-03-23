@@ -1,4 +1,3 @@
 __pycache__/
 *.pyc
 *.pkl
-src/models/__pycache__/ensemble.cpython-311.pyc
