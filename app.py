@@ -549,6 +549,18 @@ def get_latest_rank(player, recent_matches):
 
 def get_player_elo(player, elo_data, surface=None):
     """Récupère l'Elo d'un joueur (global ou surface)"""
+    # TennisEloEngine v3
+    if hasattr(elo_data, 'get_player_snapshot'):
+        snap = elo_data.get_player_snapshot(player)
+        if snap is None:
+            return 1500, 1500
+        global_elo = snap.global_elo
+        if surface and surface in snap.surface_elo:
+            surface_elo = snap.surface_elo[surface]
+        else:
+            surface_elo = 1500
+        return global_elo, surface_elo
+    # dict legacy v2
     global_elo = elo_data['global'].get(player, 1500)
     if surface and surface in elo_data['surface']:
         surface_elo = elo_data['surface'][surface].get(player, 1500)
@@ -1999,14 +2011,26 @@ def show_rankings_page():
                 df_rank["Elo"] = df_rank["Elo"].apply(lambda x: f"{x:.0f}")
                 st.dataframe(df_rank, use_container_width=True)
 
+        # Fallback : si on a quand même un TennisEloEngine ici, convertir en dict
+        if hasattr(elo_data, 'get_ratings_dataframe'):
+            df_fb = elo_data.get_ratings_dataframe()
+            _global = dict(zip(df_fb["player"], df_fb["global_elo"]))
+            _hard   = dict(zip(df_fb["player"], df_fb["hard_elo"]))
+            _clay   = dict(zip(df_fb["player"], df_fb["clay_elo"]))
+            _grass  = dict(zip(df_fb["player"], df_fb["grass_elo"]))
+        else:
+            _global = elo_data.get('global', {})
+            _hard   = elo_data.get('surface', {}).get('Hard', {})
+            _clay   = elo_data.get('surface', {}).get('Clay', {})
+            _grass  = elo_data.get('surface', {}).get('Grass', {})
         with tab_global:
-            display_ranking(elo_data.get('global', {}), "Elo Global")
+            display_ranking(_global, "Elo Global")
         with tab_hard:
-            display_ranking(elo_data.get('surface', {}).get('Hard', {}), "Elo Hard Court")
+            display_ranking(_hard, "Elo Hard Court")
         with tab_clay:
-            display_ranking(elo_data.get('surface', {}).get('Clay', {}), "Elo Terre Battue")
+            display_ranking(_clay, "Elo Terre Battue")
         with tab_grass:
-            display_ranking(elo_data.get('surface', {}).get('Grass', {}), "Elo Gazon")
+            display_ranking(_grass, "Elo Gazon")
 
 # ============================================================================
 # PAGE STATISTIQUES
