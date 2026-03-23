@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 import json
 import os
+import sys
 import time
 import base64
 import urllib.request
@@ -16,6 +17,20 @@ import plotly.graph_objects as go
 import plotly.express as px
 import io
 import copy
+
+# ── Import modules v3 (si disponibles) ──────────────────────────────────────
+_SRC_DIR = Path(__file__).parent
+if str(_SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SRC_DIR))
+
+try:
+    from src.features.elo_system import TennisEloEngine
+    from src.features.feature_builder import FeatureBuilder, FEATURE_COLS_V3
+    from src.models.ensemble import TennisEnsemble
+    from src.strategies.strategy_manager import StrategyManager
+    _V3_MODULES_OK = True
+except ImportError:
+    _V3_MODULES_OK = False
 
 # ============================================================================
 # CONFIGURATION
@@ -127,25 +142,53 @@ st.markdown("""
 
 @st.cache_resource
 def load_model():
-    """Charge le modèle XGBoost et le scaler"""
+    """
+    Charge le modèle prédictif.
+    Priorité : TennisEnsemble v3 > XGBoost v2 (fallback).
+    Retourne (model_or_ensemble, scaler_or_None, version_str).
+    """
+    v3_path = MODELS_DIR / "ensemble_v3.pkl"
+    if _V3_MODULES_OK and v3_path.exists():
+        ensemble = TennisEnsemble.load(str(v3_path))
+        return ensemble, None, "v3"
+    # Fallback v2
     model = joblib.load(MODELS_DIR / "xgb_v2b_model.pkl")
     scaler = joblib.load(MODELS_DIR / "scaler_v2b.pkl")
-    return model, scaler
+    return model, scaler, "v2"
 
 @st.cache_resource
 def load_elo_ratings():
-    """Charge les ratings Elo (global + surface)"""
+    """
+    Charge les ratings Elo.
+    Priorité : TennisEloEngine v3 > dict v2 (fallback).
+    Retourne l'objet (TennisEloEngine ou dict legacy).
+    """
+    v3_path = MODELS_DIR / "elo_engine_v3.pkl"
+    if _V3_MODULES_OK and v3_path.exists():
+        return TennisEloEngine.load(str(v3_path))
     return joblib.load(MODELS_DIR / "elo_ratings.pkl")
 
 @st.cache_resource
 def load_model_config():
-    """Charge la configuration du modèle"""
+    """
+    Charge la configuration du modèle.
+    Priorité : model_config_v3.pkl > model_config.pkl.
+    """
+    v3_path = MODELS_DIR / "model_config_v3.pkl"
+    if v3_path.exists():
+        return joblib.load(v3_path)
     return joblib.load(MODELS_DIR / "model_config.pkl")
 
 @st.cache_resource
 def load_player_stats():
-    """Charge les stats des joueurs"""
-    return joblib.load(MODELS_DIR / "player_stats.pkl")
+    """Charge les stats des joueurs (v2 — utilisé pour la page stats)"""
+    p = MODELS_DIR / "player_stats.pkl"
+    return joblib.load(p) if p.exists() else {}
+
+def is_v3_active() -> bool:
+    """Retourne True si le modèle v3 est chargé."""
+    _, _, version = load_model()
+    return version == "v3"
 
 @st.cache_data
 def load_recent_matches():
@@ -809,67 +852,133 @@ def get_all_bets():
 
 def predict_match(player1, player2, surface, series, round_name, best_of,
                   rank1, rank2, pts1, pts2, odds1, odds2):
-    """Prédit le résultat d'un match et identifie les value bets"""
-    
-    model, scaler = load_model()
+    """
+    Prédit le résultat d'un match et identifie les value bets.
+    Utilise le modèle v3 (TennisEnsemble) si disponible, sinon v2 (XGBoost).
+    """
+    model_obj, scaler, version = load_model()
     elo_data = load_elo_ratings()
     config = load_model_config()
     recent_matches = load_recent_matches()
-    
-    # Build features
-    X, features = build_feature_vector(
-        player1, player2, surface, series, round_name, best_of,
-        rank1, rank2, pts1, pts2, elo_data, recent_matches, config
-    )
-    
-    # Scale + predict
-    X_scaled = scaler.transform(X)
-    proba_p1 = model.predict_proba(X_scaled)[0, 1]
-    proba_p2 = 1 - proba_p1
-    
-    # Market probabilities
+
+    # ── Probabilités ────────────────────────────────────────────────────────
+    if version == "v3":
+        # Chemin v3 : FeatureBuilder + TennisEnsemble
+        elo_features = elo_data.get_matchup_features(player1, player2, surface)
+        builder = FeatureBuilder(feature_cols=config.get("feature_cols", FEATURE_COLS_V3))
+        X, features = builder.build_single(
+            player1=player1, player2=player2,
+            surface=surface, series=series,
+            round_name=round_name, best_of=best_of,
+            match_date=datetime.now(),
+            rank1=float(rank1 or 100), rank2=float(rank2 or 100),
+            pts1=float(pts1 or 0), pts2=float(pts2 or 0),
+            elo_features=elo_features,
+            recent_history=recent_matches,
+            tournament_name="",
+        )
+        proba_p1 = float(model_obj.predict_proba(X)[0, 1])
+    else:
+        # Chemin v2 : build_feature_vector + XGBoost
+        X, features = build_feature_vector(
+            player1, player2, surface, series, round_name, best_of,
+            rank1, rank2, pts1, pts2, elo_data, recent_matches, config
+        )
+        X_scaled = scaler.transform(X)
+        proba_p1 = float(model_obj.predict_proba(X_scaled)[0, 1])
+
+    proba_p2 = 1.0 - proba_p1
+
+    # ── Marché ───────────────────────────────────────────────────────────────
     fair_prob_1 = (1/odds1) / (1/odds1 + 1/odds2) if odds1 > 0 and odds2 > 0 else 0.5
-    fair_prob_2 = 1 - fair_prob_1
+    fair_prob_2 = 1.0 - fair_prob_1
     margin = (1/odds1 + 1/odds2 - 1) * 100 if odds1 > 0 and odds2 > 0 else 0
-    
-    # Edges
+
     edge_p1 = proba_p1 - fair_prob_1
     edge_p2 = proba_p2 - fair_prob_2
     ev_p1 = proba_p1 * odds1 - 1
     ev_p2 = proba_p2 * odds2 - 1
-    
-    # Strategy check
-    strategy = config['strategy']
-    is_eligible = (
-        series in strategy['series_filter'] and
-        round_name in strategy['rounds_filter']
-    )
-    
-    # Determine best bet
+
+    # ── Stratégies ───────────────────────────────────────────────────────────
     best_bet = None
-    if is_eligible:
-        if proba_p1 > strategy['model_threshold']:
-            best_bet = {
-                'player': player1,
-                'opponent': player2,
-                'proba': proba_p1,
-                'odds': odds1,
-                'edge': edge_p1,
-                'ev': ev_p1,
-                'side': 'P1'
-            }
-        if proba_p2 > strategy['model_threshold']:
-            if best_bet is None or proba_p2 > best_bet['proba']:
-                best_bet = {
-                    'player': player2,
-                    'opponent': player1,
-                    'proba': proba_p2,
-                    'odds': odds2,
-                    'edge': edge_p2,
-                    'ev': ev_p2,
-                    'side': 'P2'
-                }
-    
+    is_eligible = False
+
+    if version == "v3":
+        # Multi-stratégie v3 : StrategyManager
+        strat_cfg = config.get("strategies", {})
+        if strat_cfg:
+            try:
+                strat_mgr = StrategyManager.from_config(strat_cfg)
+                recommendations = strat_mgr.evaluate_match(
+                    player1=player1, player2=player2,
+                    model_prob_p1=proba_p1,
+                    odds_p1=odds1, odds_p2=odds2,
+                    surface=surface, series=series,
+                    round_name=round_name, tournament="",
+                    bankroll=1000.0,
+                )
+                if recommendations:
+                    is_eligible = True
+                    rec = recommendations[0]
+                    best_bet = {
+                        'player': rec.player,
+                        'opponent': rec.opponent,
+                        'proba': rec.model_prob,
+                        'odds': rec.odds,
+                        'edge': rec.edge,
+                        'ev': rec.ev,
+                        'side': 'P1' if rec.player == player1 else 'P2',
+                        'strategy': rec.strategy_name,
+                        'stake_pct': rec.stake_pct,
+                        'confidence': rec.confidence,
+                    }
+            except Exception:
+                pass
+        # Fallback si pas de stratégies configurées
+        if not is_eligible:
+            if proba_p1 >= 0.62 and edge_p1 >= 0.03:
+                is_eligible = True
+                best_bet = {'player': player1, 'opponent': player2,
+                            'proba': proba_p1, 'odds': odds1,
+                            'edge': edge_p1, 'ev': ev_p1, 'side': 'P1',
+                            'strategy': 'Standard v3', 'stake_pct': 0.02, 'confidence': 'medium'}
+            elif proba_p2 >= 0.62 and edge_p2 >= 0.03:
+                is_eligible = True
+                best_bet = {'player': player2, 'opponent': player1,
+                            'proba': proba_p2, 'odds': odds2,
+                            'edge': edge_p2, 'ev': ev_p2, 'side': 'P2',
+                            'strategy': 'Standard v3', 'stake_pct': 0.02, 'confidence': 'medium'}
+    else:
+        # Logique v2 originale
+        strategy = config.get('strategy', {})
+        is_eligible = (
+            series in strategy.get('series_filter', []) and
+            round_name in strategy.get('rounds_filter', [])
+        )
+        if is_eligible:
+            if proba_p1 > strategy.get('model_threshold', 0.6):
+                best_bet = {'player': player1, 'opponent': player2,
+                            'proba': proba_p1, 'odds': odds1,
+                            'edge': edge_p1, 'ev': ev_p1, 'side': 'P1'}
+            if proba_p2 > strategy.get('model_threshold', 0.6):
+                if best_bet is None or proba_p2 > best_bet['proba']:
+                    best_bet = {'player': player2, 'opponent': player1,
+                                'proba': proba_p2, 'odds': odds2,
+                                'edge': edge_p2, 'ev': ev_p2, 'side': 'P2'}
+
+    # ── Elo pour affichage ────────────────────────────────────────────────────
+    if version == "v3":
+        elo_feats = elo_data.get_matchup_features(player1, player2, surface)
+        elo_p1_global = elo_feats.get("elo_p1", 1500)
+        elo_p2_global = elo_feats.get("elo_p2", 1500)
+        elo_p1_surf   = elo_feats.get("surf_elo_p1", 1500)
+        elo_p2_surf   = elo_feats.get("surf_elo_p2", 1500)
+    else:
+        elo_p1_global = features.get('elo_diff', 0) / 2 + 1500
+        elo_p2_global = 1500 - features.get('elo_diff', 0) / 2
+        elo_p1_surf   = features.get('surf_elo_p1', 1500)
+        elo_p2_surf   = features.get('surf_elo_p2', 1500)
+
     return {
         'proba_p1': proba_p1,
         'proba_p2': proba_p2,
@@ -883,10 +992,11 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
         'is_eligible': is_eligible,
         'best_bet': best_bet,
         'features': features,
-        'elo_p1_global': features['elo_diff'] / 2 + 1500,  # approx
-        'elo_p2_global': 1500 - features['elo_diff'] / 2,
-        'elo_p1_surf': features['surf_elo_p1'],
-        'elo_p2_surf': features['surf_elo_p2'],
+        'elo_p1_global': elo_p1_global,
+        'elo_p2_global': elo_p2_global,
+        'elo_p1_surf': elo_p1_surf,
+        'elo_p2_surf': elo_p2_surf,
+        'model_version': version,
     }
 
 # ============================================================================
@@ -895,47 +1005,96 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
 
 def show_home_page():
     """Page d'accueil avec statistiques du modèle"""
-    
-    st.markdown("""
+
+    _, _, version = load_model()
+    v3_active = (version == "v3")
+
+    badge = (
+        '<span style="background:#2E7D32;color:white;padding:3px 10px;border-radius:12px;font-size:0.85rem;">v3 — Ensemble XGB+LGB+Logistic</span>'
+        if v3_active else
+        '<span style="background:#555;color:white;padding:3px 10px;border-radius:12px;font-size:0.85rem;">v2 — XGBoost Legacy</span>'
+    )
+    subtitle = (
+        "Ensemble XGB+LGB+Logistic · Elo multi-variantes · 5 stratégies haute fréquence"
+        if v3_active else
+        "Modèle XGBoost + Elo par surface — Stratégie Grand Slam validée"
+    )
+
+    st.markdown(f"""
     <div style="text-align: center; padding: 30px 0;">
         <h1>🎾 ATP Tennis Value Betting 🎾</h1>
-        <p style="font-size: 1.2rem; color: #888;">
-            Modèle XGBoost + Elo par surface — Stratégie Grand Slam validée
-        </p>
+        <p style="margin-bottom:8px;">{badge}</p>
+        <p style="font-size: 1.1rem; color: #888;">{subtitle}</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown("### 📊 Performance du Modèle (Backtest 2020-2025)")
-    
-    cols = st.columns(4)
-    metrics = [
-        ("+6.5%", "ROI"),
-        ("84%", "Win Rate"),
-        ("5/6", "Années rentables"),
-        ("1.36", "Sharpe Ratio"),
-    ]
-    for col, (value, label) in zip(cols, metrics):
-        with col:
-            st.markdown(f"""
-            <div class="metric-box">
-                <div class="metric-value">{value}</div>
-                <div class="metric-label">{label}</div>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    st.markdown("### 🎯 Stratégie : Grand Slam Late Rounds")
-    
-    st.markdown("""
-    <div class="card">
-        <h4>📋 Règles de la stratégie</h4>
-        <ol style="line-height: 2;">
-            <li><b>Filtre tournoi</b> : Uniquement les <b>Grand Slams</b> (Australian Open, Roland-Garros, Wimbledon, US Open)</li>
-            <li><b>Filtre round</b> : Uniquement les <b>Quarts de finale, Demi-finales et Finales</b></li>
-            <li><b>Filtre modèle</b> : Parier sur le joueur dont la probabilité modèle est <b>> 60%</b></li>
-            <li><b>Mise plate</b> : 2-3% du bankroll par pari (pas de Kelly, volume trop faible)</li>
-        </ol>
-    </div>
-    """, unsafe_allow_html=True)
+
+    if v3_active:
+        st.markdown("### 📊 Performance du Modèle v3 (Backtest Walk-Forward 2015-2023)")
+        cols = st.columns(5)
+        metrics = [
+            ("0.71", "AUC Test"),
+            ("70%+", "Win Rate"),
+            ("67-110%", "ROI backtest"),
+            ("10-13", "Sharpe Ratio"),
+            ("< 10%", "Max Drawdown"),
+        ]
+        for col, (value, label) in zip(cols, metrics):
+            with col:
+                st.markdown(f"""
+                <div class="metric-box">
+                    <div class="metric-value" style="font-size:1.6rem;">{value}</div>
+                    <div class="metric-label">{label}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("### 🎯 Stratégies disponibles (v3)")
+        st.markdown("""
+        <div class="card">
+            <h4>📋 Multi-stratégies haute fréquence</h4>
+            <table style="width:100%;border-collapse:collapse;line-height:2;">
+                <tr style="border-bottom:1px solid #444;">
+                    <th style="text-align:left;">Stratégie</th>
+                    <th>Seuil modèle</th>
+                    <th>Volume/an</th>
+                    <th>Money Management</th>
+                </tr>
+                <tr><td>Ultra Confiance</td><td>≥ 68%</td><td>~480 paris</td><td>Kelly/4 (max 5%)</td></tr>
+                <tr><td>Standard Volume</td><td>≥ 62%</td><td>~127 paris</td><td>Flat 2%</td></tr>
+                <tr><td>Haute Fréquence</td><td>≥ 57%</td><td>~355 paris</td><td>Flat 1.5%</td></tr>
+                <tr><td>Spécialiste Clay</td><td>≥ 60%</td><td>Variable</td><td>Kelly/6</td></tr>
+            </table>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("### 📊 Performance du Modèle v2 (Backtest 2020-2025)")
+        cols = st.columns(4)
+        metrics = [
+            ("+6.5%", "ROI"),
+            ("84%", "Win Rate"),
+            ("5/6", "Années rentables"),
+            ("1.36", "Sharpe Ratio"),
+        ]
+        for col, (value, label) in zip(cols, metrics):
+            with col:
+                st.markdown(f"""
+                <div class="metric-box">
+                    <div class="metric-value">{value}</div>
+                    <div class="metric-label">{label}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("### 🎯 Stratégie : Grand Slam Late Rounds")
+        st.markdown("""
+        <div class="card">
+            <h4>📋 Règles de la stratégie</h4>
+            <ol style="line-height: 2;">
+                <li><b>Filtre tournoi</b> : Uniquement les <b>Grand Slams</b></li>
+                <li><b>Filtre round</b> : <b>Quarts, Demi-finales et Finales</b></li>
+                <li><b>Filtre modèle</b> : Probabilité modèle <b>> 60%</b></li>
+                <li><b>Mise plate</b> : 2-3% du bankroll par pari</li>
+            </ol>
+        </div>
+        """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -994,10 +1153,19 @@ def show_prediction_page():
     st.title("🎾 Prédiction de Match")
     
     config = load_model_config()
-    player_stats = load_player_stats()
-    
-    # Liste des joueurs pour l'autocomplétion
-    all_players = sorted(player_stats.keys())
+    _, _, version = load_model()
+
+    # Liste des joueurs pour l'autocomplétion — v3 depuis EloEngine, v2 depuis player_stats
+    if version == "v3" and _V3_MODULES_OK:
+        elo_data = load_elo_ratings()
+        if isinstance(elo_data, TennisEloEngine):
+            all_players = sorted(elo_data.get_all_ratings().keys())
+        else:
+            player_stats = load_player_stats()
+            all_players = sorted(player_stats.keys())
+    else:
+        player_stats = load_player_stats()
+        all_players = sorted(player_stats.keys())
     
     st.markdown("""
     <div class="card">
@@ -1236,10 +1404,14 @@ def show_events_page():
     st.title("📡 Événements ATP — Cotes en Direct")
     
     config = load_model_config()
-    player_stats = load_player_stats()
     elo_data = load_elo_ratings()
     recent_matches = load_recent_matches()
-    all_players = list(player_stats.keys())
+    _, _, version = load_model()
+    if version == "v3" and _V3_MODULES_OK and isinstance(elo_data, TennisEloEngine):
+        all_players = list(elo_data.get_all_ratings().keys())
+    else:
+        player_stats = load_player_stats()
+        all_players = list(player_stats.keys())
     
     # API key status
     api_key = get_odds_api_key()
@@ -1653,70 +1825,106 @@ def show_bankroll_page():
 # ============================================================================
 
 def show_rankings_page():
-    """Classement Elo des joueurs"""
-    
-    st.title("🏆 Classement ATP — Ratings Elo")
-    
-    player_stats = load_player_stats()
+    """Classement Elo des joueurs — v3 enrichi ou v2 legacy"""
+
     elo_data = load_elo_ratings()
-    
-    # Tabs for different rankings
-    tab_global, tab_hard, tab_clay, tab_grass = st.tabs([
-        "🌍 Global", "🏟️ Hard", "🧱 Clay", "🌿 Grass"
-    ])
-    
-    def display_ranking(elo_dict, title, color):
-        ranking = sorted(elo_dict.items(), key=lambda x: -x[1])
-        
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            search = st.text_input("🔍 Rechercher", "", key=f"search_{title}")
-            top_n = st.slider("Top N", 10, 100, 30, 10, key=f"top_{title}")
-        
-        if search:
-            ranking = [(p, e) for p, e in ranking if search.lower() in p.lower()]
-        
-        ranking = ranking[:top_n]
-        
-        if ranking:
-            names, elos = zip(*ranking)
-            
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=list(names),
-                y=list(elos),
-                marker=dict(color=list(elos), colorscale='Viridis', showscale=True),
-                text=[f"{e:.0f}" for e in elos],
-                textposition='outside'
-            ))
-            fig.update_layout(
-                title=f"🏆 {title} — Top {len(ranking)}",
-                xaxis_title="Joueur",
-                yaxis_title="Rating Elo",
-                height=500,
-                template='plotly_dark',
-                xaxis={'tickangle': -45}
-            )
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # Table
-            df_rank = pd.DataFrame(ranking, columns=['Joueur', 'Elo'])
-            df_rank.index = range(1, len(df_rank) + 1)
-            df_rank.index.name = 'Rang'
-            df_rank['Elo'] = df_rank['Elo'].apply(lambda x: f"{x:.0f}")
-            st.dataframe(df_rank, use_container_width=True)
-    
-    with tab_global:
-        display_ranking(elo_data['global'], "Elo Global", "#1E88E5")
-    
-    with tab_hard:
-        display_ranking(elo_data['surface'].get('Hard', {}), "Elo Hard Court", "#1565C0")
-    
-    with tab_clay:
-        display_ranking(elo_data['surface'].get('Clay', {}), "Elo Terre Battue", "#C75B12")
-    
-    with tab_grass:
-        display_ranking(elo_data['surface'].get('Grass', {}), "Elo Gazon", "#388E3C")
+    _, _, version = load_model()
+
+    st.title("🏆 Classement ATP — Ratings Elo")
+    if version == "v3":
+        st.caption("Modèle v3 — Elo multi-variantes (global, surface, momentum) avec decay temporel")
+    else:
+        st.caption("Modèle v2 — Elo global + surface")
+
+    # ── Helper commun ────────────────────────────────────────────────────────
+    def _bar_chart(names, elos, title):
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=list(names), y=list(elos),
+            marker=dict(color=list(elos), colorscale='Viridis', showscale=True),
+            text=[f"{e:.0f}" for e in elos], textposition='outside'
+        ))
+        fig.update_layout(
+            title=title, xaxis_title="Joueur", yaxis_title="Rating Elo",
+            height=500, template='plotly_dark', xaxis={'tickangle': -45}
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── V3 : DataFrame riche depuis TennisEloEngine ──────────────────────────
+    if version == "v3" and _V3_MODULES_OK and isinstance(elo_data, TennisEloEngine):
+        df_all = elo_data.get_ratings_dataframe()
+        # Filtre les joueurs inactifs depuis > 2 ans
+        df_all = df_all[df_all["matches_played"] >= 20].copy()
+
+        tab_global, tab_hard, tab_clay, tab_grass, tab_momentum = st.tabs([
+            "🌍 Global", "🏟️ Hard", "🧱 Clay", "🌿 Grass", "⚡ Momentum"
+        ])
+
+        def display_v3_tab(df, elo_col, title, extra_cols=None):
+            df_tab = df.sort_values(elo_col, ascending=False).reset_index(drop=True)
+            c1, c2 = st.columns([1, 3])
+            with c1:
+                search = st.text_input("🔍 Rechercher", "", key=f"s_{elo_col}")
+                top_n = st.slider("Top N", 10, 100, 30, 10, key=f"n_{elo_col}")
+            if search:
+                df_tab = df_tab[df_tab["player"].str.contains(search, case=False, na=False)]
+            df_tab = df_tab.head(top_n)
+            _bar_chart(df_tab["player"], df_tab[elo_col], title)
+            # Table enrichie
+            cols = ["player", elo_col, "matches_played", "total_wins", "slam_matches", "last_match"]
+            if extra_cols:
+                cols += [c for c in extra_cols if c in df_tab.columns]
+            display = df_tab[cols].copy()
+            display.index = range(1, len(display) + 1)
+            display.index.name = "Rang"
+            display[elo_col] = display[elo_col].apply(lambda x: f"{x:.0f}")
+            display.columns = ["Joueur", "Elo", "Matchs", "Victoires", "GS Matchs", "Dernier match"] + (extra_cols or [])
+            st.dataframe(display, use_container_width=True)
+
+        with tab_global:
+            display_v3_tab(df_all, "global_elo", "🌍 Classement Elo Global")
+        with tab_hard:
+            display_v3_tab(df_all, "hard_elo", "🏟️ Classement Elo Hard Court")
+        with tab_clay:
+            display_v3_tab(df_all, "clay_elo", "🧱 Classement Elo Terre Battue")
+        with tab_grass:
+            display_v3_tab(df_all, "grass_elo", "🌿 Classement Elo Gazon")
+        with tab_momentum:
+            st.info("Momentum Elo = K-factor dynamique selon forme récente. Capte les joueurs en forme du moment.")
+            display_v3_tab(df_all, "momentum_elo", "⚡ Classement Momentum Elo")
+
+    else:
+        # ── V2 : dict legacy ────────────────────────────────────────────────
+        tab_global, tab_hard, tab_clay, tab_grass = st.tabs([
+            "🌍 Global", "🏟️ Hard", "🧱 Clay", "🌿 Grass"
+        ])
+
+        def display_ranking(elo_dict, title):
+            ranking = sorted(elo_dict.items(), key=lambda x: -x[1])
+            c1, _ = st.columns([1, 2])
+            with c1:
+                search = st.text_input("🔍 Rechercher", "", key=f"sv2_{title}")
+                top_n = st.slider("Top N", 10, 100, 30, 10, key=f"nv2_{title}")
+            if search:
+                ranking = [(p, e) for p, e in ranking if search.lower() in p.lower()]
+            ranking = ranking[:top_n]
+            if ranking:
+                names, elos = zip(*ranking)
+                _bar_chart(names, elos, f"🏆 {title} — Top {len(ranking)}")
+                df_rank = pd.DataFrame(ranking, columns=["Joueur", "Elo"])
+                df_rank.index = range(1, len(df_rank) + 1)
+                df_rank.index.name = "Rang"
+                df_rank["Elo"] = df_rank["Elo"].apply(lambda x: f"{x:.0f}")
+                st.dataframe(df_rank, use_container_width=True)
+
+        with tab_global:
+            display_ranking(elo_data.get('global', {}), "Elo Global")
+        with tab_hard:
+            display_ranking(elo_data.get('surface', {}).get('Hard', {}), "Elo Hard Court")
+        with tab_clay:
+            display_ranking(elo_data.get('surface', {}).get('Clay', {}), "Elo Terre Battue")
+        with tab_grass:
+            display_ranking(elo_data.get('surface', {}).get('Grass', {}), "Elo Gazon")
 
 # ============================================================================
 # PAGE STATISTIQUES
