@@ -4,3 +4,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1774309750,2026-03-23 23:49,Miami Open,Quarterfinals,Terence Atmane,Frances Tiafoe,Tiafoe F.,1.39,19.2,0.7385321100917431,0.0413643541004576,0.0265596330275228,open,,0.0
 1774309759,2026-03-23 23:49,Miami Open,Quarterfinals,Jiri Lehecka,Taylor Fritz,Fritz T.,1.53,17.987622641509457,0.6933333333333334,0.0397385620915032,0.0607999999999999,open,,0.0
 1774310737,2026-03-24 00:05,Miami Open,Quarterfinals,Marin Cilic,Alexander Zverev,Zverev A.,1.31,31.938734834652085,0.8125,0.0491412213740458,0.064375,open,,0.0
+1774312777,2026-03-24 00:39,Miami Open,Quarterfinals,Tomas Martin Etcheverry,Tommy Paul,Paul T.,1.4,14.217185660377357,0.7385321100917431,0.02424639580602883,0.03394495412844023,open,,0.0
