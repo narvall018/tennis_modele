@@ -1318,12 +1318,11 @@ def show_prediction_page():
         series = st.selectbox("Catégorie", [
             "Grand Slam", "Masters 1000", "ATP 500", "ATP 250"
         ], index=0, key="ctx_series")
-        # Sync surface depuis le tournoi si Grand Slam
+        # Suggestion surface depuis le tournoi (sans override)
         surface_map = {"Australian Open": "Hard", "French Open": "Clay",
                        "Wimbledon": "Grass", "US Open": "Hard", "Roland Garros": "Clay"}
         if tournament in surface_map:
-            surface = surface_map[tournament]
-            st.caption(f"Surface auto-détectée depuis le tournoi : **{surface}**")
+            st.caption(f"ℹ️ Surface habituelle pour {tournament} : **{surface_map[tournament]}**")
     # Les variables tournament/round_name/best_of/series sont toujours définies via les widgets
 
     # ── Cotes bookmaker (optionnel) ────────────────────────────────────────
