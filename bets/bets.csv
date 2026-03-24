@@ -1,6 +1,6 @@
 bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,ev,status,result,profit
-1774309724,2026-03-23 23:48,Miami Open,Quarterfinals,Quentin Halys,Kamil Majchrzak,Majchrzak K.,5.7,15.0,0.6592592592592592,0.4838206627680311,2.7577777777777777,open,,0.0
+1774309724,2026-03-23 23:48,Miami Open,Quarterfinals,Quentin Halys,Kamil Majchrzak,Majchrzak K.,5.7,15.0,0.6592592592592592,0.4838206627680311,2.7577777777777777,closed,loss,-15.0
 1774309733,2026-03-23 23:48,Miami Open,Quarterfinals,Ugo Humbert,Francisco Cerundolo,Cerundolo F.,1.96,40.0,0.6592592592592592,0.1490551776266061,0.292148148148148,open,,0.0
 1774309750,2026-03-23 23:49,Miami Open,Quarterfinals,Terence Atmane,Frances Tiafoe,Tiafoe F.,1.39,19.2,0.7385321100917431,0.0413643541004576,0.0265596330275228,open,,0.0
 1774309759,2026-03-23 23:49,Miami Open,Quarterfinals,Jiri Lehecka,Taylor Fritz,Fritz T.,1.53,17.987622641509457,0.6933333333333334,0.0397385620915032,0.0607999999999999,open,,0.0
-1774310737,2026-03-24 00:05,Miami Open,Quarterfinals,Marin Cilic,Alexander Zverev,Zverev A.,1.31,31.938734834652085,0.8125,0.04914122137404586,0.06437500000000007,open,,0.0
+1774310737,2026-03-24 00:05,Miami Open,Quarterfinals,Marin Cilic,Alexander Zverev,Zverev A.,1.31,31.938734834652085,0.8125,0.0491412213740458,0.064375,open,,0.0
