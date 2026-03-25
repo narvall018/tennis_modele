@@ -226,7 +226,7 @@ def load_historical_data():
 # ============================================================================
 
 # 🔐 Clé API encodée (même clé que l'app UFC)
-_ENCODED_API_KEY = "OTU5MWZiZGZmZjM3YTA1MDAxNTFmYzA2NjQzY2YyMzI="
+_ENCODED_API_KEY = "ZTBjY2M1ZDI2NzM2YTc4ZDI3MTI1NzAzNmE4MzEzYjc="
 
 # Mapping tournois ATP connus → métadonnées (enrichi)
 # Les tournois NON listés ici seront quand même récupérés dynamiquement
@@ -441,6 +441,37 @@ def fetch_tennis_odds(sport_key, api_key=None):
         return None, f"❌ Erreur API: {e.code}"
     except Exception as e:
         return None, f"❌ Erreur: {str(e)}"
+
+# ── Cache disque des cotes (1 appel API par jour max) ───────────────────────
+_ODDS_CACHE_FILE = BETS_DIR / "odds_cache.json"
+
+def load_odds_cache():
+    """Retourne le cache si valide pour aujourd'hui, sinon None."""
+    if not _ODDS_CACHE_FILE.exists():
+        return None
+    try:
+        with open(_ODDS_CACHE_FILE, 'r') as f:
+            cache = json.load(f)
+        if cache.get('date') == datetime.now().strftime('%Y-%m-%d'):
+            return cache
+    except Exception:
+        pass
+    return None
+
+def save_odds_cache(events_data, events_info, sports_msg):
+    """Sauvegarde les données de cotes pour aujourd'hui."""
+    try:
+        cache = {
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'fetched_at': datetime.now().strftime('%H:%M'),
+            'events_data': events_data,
+            'events_info': events_info,
+            'sports_msg': sports_msg,
+        }
+        with open(_ODDS_CACHE_FILE, 'w') as f:
+            json.dump(cache, f)
+    except Exception:
+        pass
 
 # ============================================================================
 # NAME MATCHING — Correspondance noms API ↔ noms modèle
@@ -1590,9 +1621,18 @@ def show_events_page():
     # ── Refresh ────────────────────────────────────────────────────────────
     col_refresh, col_info = st.columns([1, 3])
     with col_refresh:
-        refresh = st.button("🔄 Rafraîchir", type="primary")
+        refresh = st.button("🔄 Rafraîchir les cotes", type="primary",
+                            help="Force un nouvel appel API (consomme votre quota)")
     with col_info:
         st.caption(f"Bankroll actuelle : **{current_bankroll:.2f} €** | Source: The Odds API")
+
+    # Charger depuis le cache disque si dispo pour aujourd'hui
+    cache = load_odds_cache()
+    if cache and not refresh and 'events_data' not in st.session_state:
+        st.session_state.events_data = cache['events_data']
+        st.session_state.events_info = cache['events_info']
+        st.session_state.sports_msg = cache['sports_msg']
+        st.session_state.odds_fetched_at = cache.get('fetched_at', '')
 
     if refresh or 'events_data' not in st.session_state:
         with st.spinner("🔍 Recherche des matchs en cours..."):
@@ -1614,8 +1654,15 @@ def show_events_page():
                                                    'title': sport.get('title', sport_key)}
                 st.session_state.events_data = all_events
                 st.session_state.events_info = all_info
+            fetched_at = datetime.now().strftime('%H:%M')
+            st.session_state.odds_fetched_at = fetched_at
+            save_odds_cache(st.session_state.events_data,
+                            st.session_state.events_info,
+                            st.session_state.sports_msg)
 
-    st.caption(st.session_state.get('sports_msg', ''))
+    fetched_at = st.session_state.get('odds_fetched_at', '')
+    cache_label = f" — données du {datetime.now().strftime('%d/%m')} à {fetched_at}" if fetched_at else ""
+    st.caption(st.session_state.get('sports_msg', '') + cache_label)
     events_data = st.session_state.get('events_data', {})
     events_info = st.session_state.get('events_info', {})
 
