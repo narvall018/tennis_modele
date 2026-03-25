@@ -788,22 +788,55 @@ def calculate_stake(proba_model, odds, bankroll, strategy):
 def get_bets_file():
     return BETS_DIR / "bets.csv"
 
+def compute_bankroll_from_history(initial=None):
+    """Recalcule la bankroll depuis l'historique des paris.
+    bankroll = initial + sum(profits clôturés) - sum(mises ouvertes)
+    """
+    bankroll_file = BETS_DIR / "bankroll.json"
+    if initial is None:
+        if bankroll_file.exists():
+            with open(bankroll_file, 'r') as f:
+                data = json.load(f)
+            initial = data.get('initial_bankroll', 1000.0)
+        else:
+            initial = 1000.0
+
+    bets_file = get_bets_file()
+    if not bets_file.exists():
+        return initial
+
+    df = pd.read_csv(bets_file)
+    closed_profit = df[df['status'] == 'closed']['profit'].sum()
+    open_stakes   = df[df['status'] == 'open']['stake'].sum()
+    return initial + closed_profit - open_stakes
+
 def init_bankroll(default=1000.0):
-    """Initialise ou charge la bankroll"""
+    """Initialise ou charge la bankroll (toujours recalculée depuis l'historique)."""
     bankroll_file = BETS_DIR / "bankroll.json"
     if bankroll_file.exists():
         with open(bankroll_file, 'r') as f:
             data = json.load(f)
-            return data.get('bankroll', default)
+        initial = data.get('initial_bankroll', data.get('bankroll', default))
     else:
-        save_bankroll(default)
-        return default
+        initial = default
+        # Sauvegarde initiale
+        with open(bankroll_file, 'w') as f:
+            json.dump({'initial_bankroll': initial, 'updated': datetime.now().isoformat()}, f)
+
+    return compute_bankroll_from_history(initial)
 
 def save_bankroll(amount):
-    """Sauvegarde la bankroll"""
+    """Sauvegarde la bankroll courante (ne modifie pas initial_bankroll)."""
     bankroll_file = BETS_DIR / "bankroll.json"
+    if bankroll_file.exists():
+        with open(bankroll_file, 'r') as f:
+            data = json.load(f)
+        initial = data.get('initial_bankroll', amount)
+    else:
+        initial = amount
     with open(bankroll_file, 'w') as f:
-        json.dump({'bankroll': amount, 'updated': datetime.now().isoformat()}, f)
+        json.dump({'initial_bankroll': initial, 'bankroll': amount,
+                   'updated': datetime.now().isoformat()}, f)
     _gh_push_bets()
 
 def add_bet(tournament, round_name, player1, player2, pick, odds, stake, 
@@ -1877,7 +1910,19 @@ def show_bankroll_page():
                 if new_bankroll < 0:
                     st.error("❌ Bankroll ne peut pas être négative")
                 else:
-                    save_bankroll(new_bankroll)
+                    # Dépôt/retrait = ajustement de la bankroll initiale
+                    bankroll_file = BETS_DIR / "bankroll.json"
+                    if bankroll_file.exists():
+                        with open(bankroll_file, 'r') as f:
+                            data = json.load(f)
+                        old_initial = data.get('initial_bankroll', current_bankroll)
+                    else:
+                        old_initial = current_bankroll
+                    new_initial = old_initial + amt
+                    with open(bankroll_file, 'w') as f:
+                        json.dump({'initial_bankroll': new_initial,
+                                   'updated': datetime.now().isoformat()}, f)
+                    _gh_push_bets()
                     st.success(f"✅ Bankroll mise à jour : {new_bankroll:.2f}€")
                     st.rerun()
     
