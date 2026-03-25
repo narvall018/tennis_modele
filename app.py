@@ -1942,9 +1942,11 @@ def show_bankroll_page():
             total_bets = len(closed)
             wins = len(closed[closed['result'] == 'win'])
             losses = len(closed[closed['result'] == 'loss'])
-            win_rate = wins / total_bets if total_bets > 0 else 0
+            decisive = wins + losses
+            win_rate = wins / decisive if decisive > 0 else 0
             total_profit = closed['profit'].sum()
-            total_staked = closed['stake'].sum()
+            non_void = closed[closed['result'] != 'void']
+            total_staked = non_void['stake'].sum()
             roi = (total_profit / total_staked * 100) if total_staked > 0 else 0
             
             stats_cols = st.columns(5)
@@ -3084,9 +3086,10 @@ def main():
             closed = all_bets[all_bets['status'] == 'closed']
             if not closed.empty:
                 total_profit = closed['profit'].sum()
-                total_staked = closed['stake'].sum()
+                non_void = closed[closed['result'] != 'void']
+                total_staked = non_void['stake'].sum()
                 roi = (total_profit / total_staked * 100) if total_staked > 0 else 0
-                
+
                 st.markdown("### 📈 Performance")
                 st.metric("Paris clôturés", len(closed))
                 st.metric("Profit total", f"{total_profit:+.2f}€")
