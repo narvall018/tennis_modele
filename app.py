@@ -1911,13 +1911,13 @@ def show_bankroll_page():
                     if st.button("✅ Victoire", key=f"win_{bet['bet_id']}"):
                         if close_bet(int(bet['bet_id']), "win"):
                             profit = bet['stake'] * (bet['odds'] - 1)
-                            save_bankroll(current_bankroll + profit)
+                            save_bankroll(current_bankroll + bet['stake'] + profit)
                             st.success(f"✅ +{profit:.2f}€")
                             st.rerun()
                 with res_cols[1]:
                     if st.button("❌ Défaite", key=f"loss_{bet['bet_id']}"):
                         if close_bet(int(bet['bet_id']), "loss"):
-                            save_bankroll(current_bankroll - bet['stake'])
+                            # mise déjà déduite à l'enregistrement du pari
                             st.warning(f"❌ -{bet['stake']:.2f}€")
                             st.rerun()
                 with res_cols[2]:
