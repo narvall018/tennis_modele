@@ -2888,6 +2888,11 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                     st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
                     st.session_state.ufc_odds_message = message
                     save_ufc_odds_cache(odds_data, message)
+                    # Vider les valeurs des widgets de cotes pour forcer la réinitialisation
+                    for key in list(st.session_state.keys()):
+                        if key.startswith("odds_a_") or key.startswith("odds_b_"):
+                            del st.session_state[key]
+                    st.rerun()
                 else:
                     st.warning(message)
 
