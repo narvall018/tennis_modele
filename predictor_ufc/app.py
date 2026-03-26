@@ -2847,9 +2847,24 @@ def show_home_page(model_data=None):
 def show_events_page(model_data, fighters_data, current_bankroll):
     """Affiche la page des événements à venir"""
 
+    # ── Traiter le flag de rafraîchissement des cotes EN PREMIER,
+    #    avant tout rendu de widget, pour que les number_input soient
+    #    créés avec les nouvelles valeurs dès ce run.
+    if st.session_state.pop("_refresh_odds_requested", False):
+        with st.spinner("Récupération des cotes..."):
+            odds_data, message = fetch_mma_odds()
+        if odds_data:
+            st.session_state.api_odds = odds_data
+            st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
+            st.session_state.ufc_odds_message = message
+            save_ufc_odds_cache(odds_data, message)
+            for key in list(st.session_state.keys()):
+                if key.startswith("odds_a_") or key.startswith("odds_b_"):
+                    del st.session_state[key]
+        else:
+            st.warning(message)
+
     # Pré-charger les événements depuis le cache (24h TTL) pour stabiliser le widget tree.
-    # Sans ça, les tabs intérieurs apparaissent en cours de run lors du premier clic,
-    # ce qui fait resetter les tabs extérieurs à l'index 0.
     if 'events' not in st.session_state:
         st.session_state.events = get_upcoming_events()
 
@@ -2881,20 +2896,8 @@ def show_events_page(model_data, fighters_data, current_bankroll):
     with btn_cols[1]:
         if st.button("💰 Rafraîchir les cotes", type="primary",
                      help="Force un nouvel appel API (consomme votre quota)"):
-            with st.spinner("Récupération des cotes..."):
-                odds_data, message = fetch_mma_odds()
-                if odds_data:
-                    st.session_state.api_odds = odds_data
-                    st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
-                    st.session_state.ufc_odds_message = message
-                    save_ufc_odds_cache(odds_data, message)
-                    # Vider les valeurs des widgets de cotes pour forcer la réinitialisation
-                    for key in list(st.session_state.keys()):
-                        if key.startswith("odds_a_") or key.startswith("odds_b_"):
-                            del st.session_state[key]
-                    st.rerun()
-                else:
-                    st.warning(message)
+            st.session_state["_refresh_odds_requested"] = True
+            st.rerun()
 
     with btn_cols[2]:
         if st.button("🥊 Rafraîchir les combats",
