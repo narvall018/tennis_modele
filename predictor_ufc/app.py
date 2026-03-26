@@ -162,7 +162,11 @@ def get_github_config():
     try:
         token = _get_secret_or_env("GITHUB_TOKEN", "")
         repo = _get_secret_or_env("GITHUB_REPO", "")
-        branch = _get_secret_or_env("GITHUB_REF", "main") or "main"
+        branch = _get_secret_or_env("GITHUB_REF", "")
+        if not branch:
+            branch = _get_secret_or_env("GITHUB_REF_NAME", "")
+        if not branch:
+            branch = "main"
         base_path = _get_secret_or_env("GITHUB_BASE_PATH", "").strip("/")
         return {
             "token": token,
@@ -184,8 +188,9 @@ def github_api_request(method, endpoint, data=None, github_config=None):
     
     url = f"https://api.github.com/repos/{github_config['repo']}/{endpoint}"
     headers = {
-        "Authorization": f"token {github_config['token']}",
-        "Accept": "application/vnd.github.v3+json",
+        "Authorization": f"Bearer {github_config['token']}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "UFC-Predictor-App"
     }
     
@@ -3843,10 +3848,34 @@ def show_stats_update_page():
         startup_pulled = int(st.session_state.get("_ufc_bootstrap_sync_pulled", 0) or 0)
         if startup_pulled > 0:
             st.caption(f"Chargement démarrage: {startup_pulled} fichier(s) UFC récupéré(s) depuis GitHub.")
+        if st.button("⬇️ Recharger les données UFC depuis GitHub", use_container_width=True):
+            pulled, pull_errors = sync_ufc_data_artifacts_from_github()
+            if pulled > 0:
+                st.success(f"✅ {pulled} fichier(s) UFC récupéré(s) depuis GitHub.")
+                st.cache_data.clear()
+                st.rerun()
+            else:
+                st.error("❌ Aucun fichier UFC récupéré depuis GitHub.")
+            if pull_errors:
+                st.warning("⚠️ Détail pull GitHub:\n- " + "\n- ".join(pull_errors))
     else:
         st.warning(
             "Sync GitHub désactivée. Ajoute `GITHUB_TOKEN` et `GITHUB_REPO` dans les secrets Streamlit."
         )
+
+    def _push_and_report(prefix_msg):
+        pushed, push_errors = sync_ufc_data_artifacts_to_github(message_prefix=prefix_msg)
+        if pushed > 0:
+            st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
+        else:
+            st.error(
+                "❌ Aucun fichier UFC n'a été poussé sur GitHub. "
+                "Vérifie les secrets (`GITHUB_TOKEN`, `GITHUB_REPO`, `GITHUB_REF`, `GITHUB_BASE_PATH`) "
+                "et les permissions du token (Contents: Read and write)."
+            )
+        if push_errors:
+            st.warning("⚠️ Détail sync GitHub:\n- " + "\n- ".join(push_errors))
+        return pushed
     
     # ✅ Bouton pour vider le cache
     col_cache1, col_cache2 = st.columns([3, 1])
@@ -3922,13 +3951,7 @@ def show_stats_update_page():
                     result = recalculate_features_and_elo(progress_callback=update_progress)
                     if gh_enabled:
                         update_progress("☁️ Sync GitHub des fichiers UFC...")
-                        pushed, push_errors = sync_ufc_data_artifacts_to_github(
-                            message_prefix="chore: ufc recalc from streamlit"
-                        )
-                        if pushed:
-                            st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
-                        if push_errors:
-                            st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
+                        _push_and_report("chore: ufc recalc from streamlit")
                     st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants)")
                     st.cache_data.clear()
                     st.rerun()
@@ -3952,13 +3975,7 @@ def show_stats_update_page():
                 
                 if gh_enabled:
                     update_progress("☁️ Sync GitHub des fichiers UFC...")
-                    pushed, push_errors = sync_ufc_data_artifacts_to_github(
-                        message_prefix="chore: ufc update from streamlit"
-                    )
-                    if pushed:
-                        st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
-                    if push_errors:
-                        st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
+                    _push_and_report("chore: ufc update from streamlit")
 
                 st.success(f"✅ Mise à jour terminée ! {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants")
                 st.cache_data.clear()
@@ -3990,13 +4007,7 @@ def show_stats_update_page():
                 result = recalculate_features_and_elo(progress_callback=update_progress)
             if gh_enabled:
                 update_progress("☁️ Sync GitHub des fichiers UFC...")
-                pushed, push_errors = sync_ufc_data_artifacts_to_github(
-                    message_prefix="chore: ufc manual recalc from streamlit"
-                )
-                if pushed:
-                    st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
-                if push_errors:
-                    st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
+                _push_and_report("chore: ufc manual recalc from streamlit")
             
             st.success("✅ Recalcul terminé !")
             
@@ -4036,12 +4047,16 @@ def show_stats_update_page():
 # ============================================================================
 
 def main():
-    if GITHUB_CONFIG.get("enabled") and not st.session_state.get("_ufc_bootstrap_sync_done"):
-        pulled, _ = sync_ufc_data_artifacts_from_github()
-        st.session_state["_ufc_bootstrap_sync_done"] = True
-        st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
-        if pulled > 0:
-            st.cache_data.clear()
+    if GITHUB_CONFIG.get("enabled"):
+        now_ts = time.time()
+        last_sync_ts = float(st.session_state.get("_ufc_bootstrap_sync_ts", 0.0) or 0.0)
+        # Limiter les appels API: max 1 pull / 60s / session.
+        if now_ts - last_sync_ts >= 60.0:
+            pulled, _ = sync_ufc_data_artifacts_from_github()
+            st.session_state["_ufc_bootstrap_sync_ts"] = now_ts
+            st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
+            if pulled > 0:
+                st.cache_data.clear()
 
     model_data = load_model_and_data()
     fighters_data = load_fighters_data()
