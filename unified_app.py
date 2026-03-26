@@ -931,7 +931,7 @@ def current_user() -> Optional[sqlite3.Row]:
     return user
 
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def fetch_events(sport: str, include_completed: bool = True) -> list[dict]:
     with db_conn() as conn:
         query = """
@@ -1223,7 +1223,7 @@ def apply_event_result(event_id: int, winner_side: Optional[str]) -> tuple[bool,
     return True, f"Resultat applique ({len(bets)} paris mis a jour)."
 
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def fetch_user_bets(user_id: int, sport: Optional[str] = None) -> pd.DataFrame:
     with db_conn() as conn:
         query = """
@@ -1280,7 +1280,7 @@ def fetch_user_bets(user_id: int, sport: Optional[str] = None) -> pd.DataFrame:
     return df[cols]
 
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def fetch_user_stats(user_id: int) -> dict[str, float]:
     with db_conn() as conn:
         row = conn.execute(

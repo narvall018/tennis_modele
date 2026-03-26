@@ -288,6 +288,36 @@ BETS_DIR = APP_DIR / "bets"
 for d in [DATA_DIR, RAW_DIR, INTERIM_DIR, PROC_DIR, BETS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
+# ── Cache disque des cotes UFC (1 appel API par jour max) ───────────────────
+_UFC_ODDS_CACHE_FILE = BETS_DIR / "ufc_odds_cache.json"
+
+def load_ufc_odds_cache():
+    """Retourne le cache si valide pour aujourd'hui, sinon None."""
+    if not _UFC_ODDS_CACHE_FILE.exists():
+        return None
+    try:
+        with open(_UFC_ODDS_CACHE_FILE, 'r') as f:
+            cache = json.load(f)
+        if cache.get('date') == datetime.datetime.now().strftime('%Y-%m-%d'):
+            return cache
+    except Exception:
+        pass
+    return None
+
+def save_ufc_odds_cache(odds_data, message):
+    """Sauvegarde les données de cotes UFC pour aujourd'hui."""
+    try:
+        cache = {
+            'date': datetime.datetime.now().strftime('%Y-%m-%d'),
+            'fetched_at': datetime.datetime.now().strftime('%H:%M'),
+            'odds_data': odds_data,
+            'message': message,
+        }
+        with open(_UFC_ODDS_CACHE_FILE, 'w') as f:
+            json.dump(cache, f)
+    except Exception:
+        pass
+
 
 def _resolve_github_repo_path(local_path):
     """
@@ -1625,6 +1655,18 @@ def load_model_and_data():
     return data
 
 @st.cache_data(ttl=3600)
+def _load_ratings_df() -> pd.DataFrame:
+    """Charge ratings_timeseries.parquet une seule fois (partagé entre load_fighters_data et get_fighter_recent_fights)."""
+    ratings_path = INTERIM_DIR / "ratings_timeseries.parquet"
+    if not ratings_path.exists():
+        return pd.DataFrame()
+    try:
+        return pd.read_parquet(ratings_path)
+    except Exception:
+        return pd.DataFrame()
+
+
+@st.cache_data(ttl=3600)
 def load_fighters_data():
     """Charge les données des combattants avec Elo POST et données bio (reach, age)"""
     fighters = {}
@@ -1634,67 +1676,74 @@ def load_fighters_data():
     bio_path = RAW_DIR / "fighter_bio.parquet"
     if bio_path.exists():
         try:
-            bio_df = pd.read_parquet(bio_path)
-            for _, row in bio_df.iterrows():
-                fighter_id = id_from_url(row.get("fighter_url", ""))
-                if fighter_id:
-                    # Calculer l'âge à partir de dob
-                    age = None
-                    if pd.notna(row.get("dob")):
-                        try:
-                            dob = pd.to_datetime(row["dob"])
-                            age = (pd.Timestamp.now() - dob).days / 365.25
-                        except:
-                            pass
-                    fighter_bio[fighter_id] = {
-                        "reach_cm": row.get("reach_cm"),
-                        "age": age,
-                        "bio_name": row.get("fighter_name", "")
-                    }
+            bio_df = pd.read_parquet(bio_path).copy()
+            bio_df["fighter_id"] = bio_df["fighter_url"].apply(id_from_url)
+            bio_df = bio_df[bio_df["fighter_id"].notna() & (bio_df["fighter_id"] != "")]
+            now = pd.Timestamp.now()
+            dob_parsed = pd.to_datetime(bio_df["dob"], errors="coerce")
+            bio_df["age_calc"] = (now - dob_parsed).dt.days / 365.25
+            for row in bio_df[["fighter_id", "reach_cm", "age_calc", "fighter_name"]].itertuples(index=False):
+                age_val = row.age_calc
+                fighter_bio[row.fighter_id] = {
+                    "reach_cm": row.reach_cm if pd.notna(row.reach_cm) else None,
+                    "age": float(age_val) if pd.notna(age_val) else None,
+                    "bio_name": row.fighter_name if pd.notna(row.fighter_name) else "",
+                }
         except Exception as e:
             st.warning(f"⚠️ Erreur chargement fighter_bio: {e}")
     
-    # ✅ Charger les Elo POST depuis ratings_timeseries
+    # ✅ Charger les Elo POST depuis ratings_timeseries (parquet partagé + caché)
     elo_post_dict = {}
-    ratings_path = INTERIM_DIR / "ratings_timeseries.parquet"
-    if ratings_path.exists():
+    ratings_df = _load_ratings_df()
+    if not ratings_df.empty:
         try:
-            ratings_df = pd.read_parquet(ratings_path)
-            
             # Détecter le format du fichier
             if 'fighter_1_id' in ratings_df.columns and 'fighter_2_id' in ratings_df.columns:
-                # Format actuel: fighter_1_id, fighter_2_id, elo_1_post, elo_2_post
+                # Format actuel: dernière valeur chronologique par combattant
                 ratings_sorted = ratings_df.sort_values('event_date')
-                for _, row in ratings_sorted.iterrows():
-                    f1_id = row.get('fighter_1_id')
-                    f1_elo = row.get('elo_1_post', row.get('elo_1_pre', BASE_ELO))
-                    f2_id = row.get('fighter_2_id')
-                    f2_elo = row.get('elo_2_post', row.get('elo_2_pre', BASE_ELO))
-                    
-                    if f1_id and pd.notna(f1_id):
-                        elo_post_dict[f1_id] = f1_elo
-                    if f2_id and pd.notna(f2_id):
-                        elo_post_dict[f2_id] = f2_elo
-            
+                cols1 = [c for c in ('elo_1_post', 'elo_1_pre') if c in ratings_sorted.columns]
+                cols2 = [c for c in ('elo_2_post', 'elo_2_pre') if c in ratings_sorted.columns]
+                if cols1:
+                    elo1 = ratings_sorted[cols1[0]]
+                    if len(cols1) > 1:
+                        elo1 = elo1.fillna(ratings_sorted[cols1[1]])
+                    elo1 = elo1.fillna(BASE_ELO)
+                    last_f1 = (ratings_sorted[['fighter_1_id']].assign(_elo=elo1)
+                               .dropna(subset=['fighter_1_id'])
+                               .groupby('fighter_1_id')['_elo'].last())
+                    elo_post_dict.update(last_f1.to_dict())
+                if cols2:
+                    elo2 = ratings_sorted[cols2[0]]
+                    if len(cols2) > 1:
+                        elo2 = elo2.fillna(ratings_sorted[cols2[1]])
+                    elo2 = elo2.fillna(BASE_ELO)
+                    last_f2 = (ratings_sorted[['fighter_2_id']].assign(_elo=elo2)
+                               .dropna(subset=['fighter_2_id'])
+                               .groupby('fighter_2_id')['_elo'].last())
+                    elo_post_dict.update(last_f2.to_dict())
+
             elif 'fa' in ratings_df.columns and 'fb' in ratings_df.columns:
-                # Ancien format
-                for fighter_id in ratings_df['fa'].unique():
-                    last_fight = ratings_df[ratings_df['fa'] == fighter_id].iloc[-1]
-                    elo_post_dict[fighter_id] = last_fight['elo_global_fa_post']
-                
-                for fighter_id in ratings_df['fb'].unique():
+                # Ancien format: groupby.last() remplace les boucles O(n²)
+                has_date = 'event_date' in ratings_df.columns
+                if has_date:
+                    rdf = ratings_df.sort_values('event_date')
+                else:
+                    rdf = ratings_df
+
+                last_fa = rdf.groupby('fa')[['elo_global_fa_post'] + (['event_date'] if has_date else [])].last()
+                last_fb = rdf.groupby('fb')[['elo_global_fb_post'] + (['event_date'] if has_date else [])].last()
+
+                elo_post_dict.update(last_fa['elo_global_fa_post'].to_dict())
+
+                for fighter_id, row_fb in last_fb.iterrows():
                     if fighter_id not in elo_post_dict:
-                        last_fight = ratings_df[ratings_df['fb'] == fighter_id].iloc[-1]
-                        elo_post_dict[fighter_id] = last_fight['elo_global_fb_post']
-                    else:
-                        last_fight_b = ratings_df[ratings_df['fb'] == fighter_id].iloc[-1]
-                        last_fight_a = ratings_df[ratings_df['fa'] == fighter_id].iloc[-1]
-                        if 'event_date' in ratings_df.columns:
-                            date_a = last_fight_a.get('event_date')
-                            date_b = last_fight_b.get('event_date')
-                            if pd.notna(date_b) and pd.notna(date_a) and date_b > date_a:
-                                elo_post_dict[fighter_id] = last_fight_b['elo_global_fb_post']
-                        
+                        elo_post_dict[fighter_id] = row_fb['elo_global_fb_post']
+                    elif has_date and fighter_id in last_fa.index:
+                        date_a = last_fa.loc[fighter_id, 'event_date']
+                        date_b = row_fb['event_date']
+                        if pd.notna(date_b) and pd.notna(date_a) and date_b > date_a:
+                            elo_post_dict[fighter_id] = row_fb['elo_global_fb_post']
+
         except Exception as e:
             st.warning(f"⚠️ Erreur chargement Elo POST: {e}")
     
@@ -1787,18 +1836,15 @@ def load_fighters_data():
 def get_fighter_recent_fights(fighter_id, n_fights=3):
     """
     Récupère les n derniers combats d'un combattant.
-    
+
     Returns:
         Liste de dicts avec: opponent_name, result (W/L), event_date, method
     """
-    ratings_path = INTERIM_DIR / "ratings_timeseries.parquet"
-    
-    if not ratings_path.exists():
-        return []
-    
     try:
-        ratings_df = pd.read_parquet(ratings_path)
-        
+        ratings_df = _load_ratings_df()
+        if ratings_df.empty:
+            return []
+
         # Filtrer les combats du combattant (position 1 ou 2)
         fights_as_1 = ratings_df[ratings_df['fighter_1_id'] == fighter_id].copy()
         fights_as_1['position'] = 1
@@ -1821,17 +1867,16 @@ def get_fighter_recent_fights(fighter_id, n_fights=3):
         # Prendre les n derniers combats
         recent = all_fights.head(n_fights)
         
-        result = []
-        for _, row in recent.iterrows():
-            result.append({
-                'opponent': row['opponent_name'],
-                'result': row['result'],
-                'date': row['event_date'].strftime('%d/%m/%Y') if pd.notna(row['event_date']) else 'N/A'
-            })
-        
-        return result
-        
-    except Exception as e:
+        return [
+            {
+                'opponent': row.opponent_name,
+                'result': row.result,
+                'date': row.event_date.strftime('%d/%m/%Y') if pd.notna(row.event_date) else 'N/A',
+            }
+            for row in recent[['opponent_name', 'result', 'event_date']].itertuples(index=False)
+        ]
+
+    except Exception:
         return []
 
 # ============================================================================
@@ -2808,10 +2853,18 @@ def show_events_page(model_data, fighters_data, current_bankroll):
     if 'events' not in st.session_state:
         st.session_state.events = get_upcoming_events()
 
+    # Charger les cotes depuis le cache disque si dispo pour aujourd'hui
+    if 'api_odds' not in st.session_state:
+        cache = load_ufc_odds_cache()
+        if cache:
+            st.session_state.api_odds = cache['odds_data']
+            st.session_state.ufc_odds_fetched_at = cache.get('fetched_at', '')
+            st.session_state.ufc_odds_message = cache.get('message', '')
+
     st.title("📅 Événements UFC à venir")
 
     # Boutons principaux
-    btn_cols = st.columns([2, 2, 1])
+    btn_cols = st.columns([2, 2, 2])
 
     with btn_cols[0]:
         if st.button("🔄 Récupérer les événements", type="primary"):
@@ -2824,17 +2877,36 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                     st.success(f"✅ {len(events)} événements récupérés")
                 else:
                     st.error("❌ Aucun événement trouvé")
-    
+
     with btn_cols[1]:
-        if st.button("💰 Récupérer cotes (API)", help="Récupère automatiquement les cotes MMA depuis The Odds API"):
+        if st.button("💰 Rafraîchir les cotes", type="primary",
+                     help="Force un nouvel appel API (consomme votre quota)"):
             with st.spinner("Récupération des cotes..."):
                 odds_data, message = fetch_mma_odds()
                 if odds_data:
                     st.session_state.api_odds = odds_data
-                    st.success(message)
+                    st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
+                    st.session_state.ufc_odds_message = message
+                    save_ufc_odds_cache(odds_data, message)
                 else:
                     st.warning(message)
-    
+
+    with btn_cols[2]:
+        if st.button("🥊 Rafraîchir les combats",
+                     help="Force le rechargement des combats (utile si de nouveaux combats apparaissent quelques heures avant l'événement)"):
+            extract_fights_from_event.clear()
+            for key in list(st.session_state.keys()):
+                if key.startswith("fights_"):
+                    del st.session_state[key]
+            st.rerun()
+
+    # Label timestamp (inspiré tennis)
+    fetched_at = st.session_state.get('ufc_odds_fetched_at', '')
+    odds_msg = st.session_state.get('ufc_odds_message', '')
+    if fetched_at:
+        cache_label = f" — données du {datetime.datetime.now().strftime('%d/%m')} à {fetched_at}"
+        st.caption((odds_msg + cache_label) if odds_msg else cache_label)
+
     # Afficher les cotes disponibles si récupérées
     if 'api_odds' in st.session_state and st.session_state.api_odds:
         with st.expander(f"📊 Cotes API disponibles ({len(st.session_state.api_odds)} combats)", expanded=False):
@@ -2899,389 +2971,384 @@ def show_events_page(model_data, fighters_data, current_bankroll):
             with param_cols[2]:
                 st.metric("Mise min", f"{strategy['min_bet_pct']:.1%}")
         
+        # Pré-charger les combats pour tous les événements avant de créer les tabs
+        # (stabilise le widget tree + évite un bouton inutile)
+        for i, event in enumerate(st.session_state.events):
+            if f"fights_{i}" not in st.session_state:
+                with st.spinner(f"Chargement des combats — {event['name']}..."):
+                    st.session_state[f"fights_{i}"] = extract_fights_from_event(event['url'])
+
         tabs = st.tabs([event['name'] for event in st.session_state.events])
 
         for i, (event, tab) in enumerate(zip(st.session_state.events, tabs)):
             with tab:
                 st.subheader(f"🥊 {event['name']}")
-                
-                if st.button(f"Charger les combats", key=f"load_fights_{i}"):
-                    with st.spinner("Récupération des combats..."):
-                        fights = extract_fights_from_event(event['url'])
-                        st.session_state[f"fights_{i}"] = fights
+
+                fights = st.session_state.get(f"fights_{i}", [])
+                if fights:
+                    st.markdown("---")
+                    st.markdown("### 🎯 Recommandations de paris")
                         
-                        if fights:
-                            st.success(f"✅ {len(fights)} combats chargés")
-                        else:
-                            st.warning("⚠️ Aucun combat trouvé")
-                
-                if f"fights_{i}" in st.session_state:
-                    fights = st.session_state[f"fights_{i}"]
-                    
-                    if fights:
-                        st.markdown("---")
-                        st.markdown("### 🎯 Recommandations de paris")
+                    for j, fight in enumerate(fights):
+                        st.markdown(f"#### Combat {j+1}")
                         
-                        for j, fight in enumerate(fights):
-                            st.markdown(f"#### Combat {j+1}")
+                        # ✅ Utiliser la fonction avec fallback par nom
+                        fighter_a_data = get_fighter_data_with_fallback(
+                            fight['red_url'], 
+                            fight['red_fighter'], 
+                            fighters_data, 
+                            model_data
+                        )
+                        
+                        fighter_b_data = get_fighter_data_with_fallback(
+                            fight['blue_url'], 
+                            fight['blue_fighter'], 
+                            fighters_data, 
+                            model_data
+                        )
+                        
+                        # ✅ Détecter les nouveaux combattants via fallback explicite
+                        # (plus fiable que "Elo == 1500", qui génère des faux positifs).
+                        elo_a = float(fighter_a_data.get('elo_global', BASE_ELO) or BASE_ELO)
+                        elo_b = float(fighter_b_data.get('elo_global', BASE_ELO) or BASE_ELO)
+                        is_new_fighter_a = bool(fighter_a_data.get('is_new_fighter_fallback', False))
+                        is_new_fighter_b = bool(fighter_b_data.get('is_new_fighter_fallback', False))
+                        has_new_fighter = is_new_fighter_a or is_new_fighter_b
+                        
+                        fight_cols = st.columns(2)
+                        
+                        with fight_cols[0]:
+                            new_badge_a = " 🆕" if is_new_fighter_a else ""
+                            elo_display_a = f"Elo: {elo_a:.0f}" if not is_new_fighter_a else "Elo: 1500 (nouveau)"
+                            st.markdown(f"""
+                            <div class="fighter-card fighter-card-red">
+                                <h4>🔴 {fight['red_fighter']}{new_badge_a}</h4>
+                                <p>{elo_display_a}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
                             
-                            # ✅ Utiliser la fonction avec fallback par nom
-                            fighter_a_data = get_fighter_data_with_fallback(
-                                fight['red_url'], 
+                            # 📜 Derniers combats du combattant rouge
+                            fighter_a_id = id_from_url(fight['red_url']) if fight.get('red_url') else None
+                            if fighter_a_id and not is_new_fighter_a:
+                                recent_a = get_fighter_recent_fights(fighter_a_id, 3)
+                                if recent_a:
+                                    history_html = "<div style='font-size: 0.85em; margin-top: 5px;'><b>📜 Derniers combats:</b><br>"
+                                    for f in recent_a:
+                                        emoji = "✅" if f['result'] == 'W' else "❌"
+                                        history_html += f"{emoji} vs {f['opponent']} ({f['date']})<br>"
+                                    history_html += "</div>"
+                                    st.markdown(history_html, unsafe_allow_html=True)
+                        
+                        with fight_cols[1]:
+                            new_badge_b = " 🆕" if is_new_fighter_b else ""
+                            elo_display_b = f"Elo: {elo_b:.0f}" if not is_new_fighter_b else "Elo: 1500 (nouveau)"
+                            st.markdown(f"""
+                            <div class="fighter-card fighter-card-blue">
+                                <h4>🔵 {fight['blue_fighter']}{new_badge_b}</h4>
+                                <p>{elo_display_b}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # 📜 Derniers combats du combattant bleu
+                            fighter_b_id = id_from_url(fight['blue_url']) if fight.get('blue_url') else None
+                            if fighter_b_id and not is_new_fighter_b:
+                                recent_b = get_fighter_recent_fights(fighter_b_id, 3)
+                                if recent_b:
+                                    history_html = "<div style='font-size: 0.85em; margin-top: 5px;'><b>📜 Derniers combats:</b><br>"
+                                    for f in recent_b:
+                                        emoji = "✅" if f['result'] == 'W' else "❌"
+                                        history_html += f"{emoji} vs {f['opponent']} ({f['date']})<br>"
+                                    history_html += "</div>"
+                                    st.markdown(history_html, unsafe_allow_html=True)
+                        
+                        # ⚠️ Avertissement si nouveau combattant
+                        if has_new_fighter:
+                            new_fighters = []
+                            if is_new_fighter_a:
+                                new_fighters.append(fight['red_fighter'])
+                            if is_new_fighter_b:
+                                new_fighters.append(fight['blue_fighter'])
+                            st.warning(f"⚠️ **Nouveau(x) combattant(s) détecté(s)** : {', '.join(new_fighters)}. "
+                                      f"Elo par défaut (1500) = manque de données historiques. **Pari non recommandé.**")
+                        
+                        # 💵 D'abord entrer les cotes (nécessaires pour le nouveau modèle)
+                        st.markdown("##### 💵 Cotes du bookmaker")
+                        
+                        # ✅ Chercher les cotes automatiques depuis l'API
+                        api_odds_info = None
+                        default_odds_a = 2.0
+                        default_odds_b = 2.0
+                        
+                        if 'api_odds' in st.session_state and st.session_state.api_odds:
+                            api_odds_info = find_fight_odds(
                                 fight['red_fighter'], 
-                                fighters_data, 
-                                model_data
-                            )
-                            
-                            fighter_b_data = get_fighter_data_with_fallback(
-                                fight['blue_url'], 
                                 fight['blue_fighter'], 
-                                fighters_data, 
-                                model_data
+                                st.session_state.api_odds
                             )
-                            
-                            # ✅ Détecter les nouveaux combattants via fallback explicite
-                            # (plus fiable que "Elo == 1500", qui génère des faux positifs).
-                            elo_a = float(fighter_a_data.get('elo_global', BASE_ELO) or BASE_ELO)
-                            elo_b = float(fighter_b_data.get('elo_global', BASE_ELO) or BASE_ELO)
-                            is_new_fighter_a = bool(fighter_a_data.get('is_new_fighter_fallback', False))
-                            is_new_fighter_b = bool(fighter_b_data.get('is_new_fighter_fallback', False))
-                            has_new_fighter = is_new_fighter_a or is_new_fighter_b
-                            
-                            fight_cols = st.columns(2)
-                            
-                            with fight_cols[0]:
-                                new_badge_a = " 🆕" if is_new_fighter_a else ""
-                                elo_display_a = f"Elo: {elo_a:.0f}" if not is_new_fighter_a else "Elo: 1500 (nouveau)"
-                                st.markdown(f"""
-                                <div class="fighter-card fighter-card-red">
-                                    <h4>🔴 {fight['red_fighter']}{new_badge_a}</h4>
-                                    <p>{elo_display_a}</p>
-                                </div>
-                                """, unsafe_allow_html=True)
-                                
-                                # 📜 Derniers combats du combattant rouge
-                                fighter_a_id = id_from_url(fight['red_url']) if fight.get('red_url') else None
-                                if fighter_a_id and not is_new_fighter_a:
-                                    recent_a = get_fighter_recent_fights(fighter_a_id, 3)
-                                    if recent_a:
-                                        history_html = "<div style='font-size: 0.85em; margin-top: 5px;'><b>📜 Derniers combats:</b><br>"
-                                        for f in recent_a:
-                                            emoji = "✅" if f['result'] == 'W' else "❌"
-                                            history_html += f"{emoji} vs {f['opponent']} ({f['date']})<br>"
-                                        history_html += "</div>"
-                                        st.markdown(history_html, unsafe_allow_html=True)
-                            
-                            with fight_cols[1]:
-                                new_badge_b = " 🆕" if is_new_fighter_b else ""
-                                elo_display_b = f"Elo: {elo_b:.0f}" if not is_new_fighter_b else "Elo: 1500 (nouveau)"
-                                st.markdown(f"""
-                                <div class="fighter-card fighter-card-blue">
-                                    <h4>🔵 {fight['blue_fighter']}{new_badge_b}</h4>
-                                    <p>{elo_display_b}</p>
-                                </div>
-                                """, unsafe_allow_html=True)
-                                
-                                # 📜 Derniers combats du combattant bleu
-                                fighter_b_id = id_from_url(fight['blue_url']) if fight.get('blue_url') else None
-                                if fighter_b_id and not is_new_fighter_b:
-                                    recent_b = get_fighter_recent_fights(fighter_b_id, 3)
-                                    if recent_b:
-                                        history_html = "<div style='font-size: 0.85em; margin-top: 5px;'><b>📜 Derniers combats:</b><br>"
-                                        for f in recent_b:
-                                            emoji = "✅" if f['result'] == 'W' else "❌"
-                                            history_html += f"{emoji} vs {f['opponent']} ({f['date']})<br>"
-                                        history_html += "</div>"
-                                        st.markdown(history_html, unsafe_allow_html=True)
-                            
-                            # ⚠️ Avertissement si nouveau combattant
-                            if has_new_fighter:
-                                new_fighters = []
-                                if is_new_fighter_a:
-                                    new_fighters.append(fight['red_fighter'])
-                                if is_new_fighter_b:
-                                    new_fighters.append(fight['blue_fighter'])
-                                st.warning(f"⚠️ **Nouveau(x) combattant(s) détecté(s)** : {', '.join(new_fighters)}. "
-                                          f"Elo par défaut (1500) = manque de données historiques. **Pari non recommandé.**")
-                            
-                            # 💵 D'abord entrer les cotes (nécessaires pour le nouveau modèle)
-                            st.markdown("##### 💵 Cotes du bookmaker")
-                            
-                            # ✅ Chercher les cotes automatiques depuis l'API
-                            api_odds_info = None
-                            default_odds_a = 2.0
-                            default_odds_b = 2.0
-                            
-                            if 'api_odds' in st.session_state and st.session_state.api_odds:
-                                api_odds_info = find_fight_odds(
-                                    fight['red_fighter'], 
-                                    fight['blue_fighter'], 
-                                    st.session_state.api_odds
-                                )
-                                if api_odds_info:
-                                    default_odds_a = api_odds_info['odds_a']
-                                    default_odds_b = api_odds_info['odds_b']
-                            
-                            # Afficher info si cotes trouvées automatiquement
                             if api_odds_info:
-                                st.success(f"🔄 Cotes auto ({api_odds_info['bookmaker']}): "
-                                          f"{api_odds_info['matched_a']} @ {api_odds_info['odds_a']:.2f} | "
-                                          f"{api_odds_info['matched_b']} @ {api_odds_info['odds_b']:.2f}")
-                            
-                            odds_cols = st.columns(2)
-                            
-                            with odds_cols[0]:
-                                odds_a = st.number_input(
-                                    f"Cote {fight['red_fighter']}",
-                                    min_value=1.01,
-                                    max_value=50.0,
-                                    value=default_odds_a,
-                                    step=0.01,
-                                    key=f"odds_a_{i}_{j}"
-                                )
-                            
-                            with odds_cols[1]:
-                                odds_b = st.number_input(
-                                    f"Cote {fight['blue_fighter']}",
-                                    min_value=1.01,
-                                    max_value=50.0,
-                                    value=default_odds_b,
-                                    step=0.01,
-                                    key=f"odds_b_{i}_{j}"
-                                )
-                            
-                            # Prédiction avec le moteur sélectionné
-                            if prediction_engine.startswith("Nouveau WF"):
-                                prediction_mode = "walkforward"
-                            elif prediction_engine.startswith("LightGBM VB"):
-                                prediction_mode = "lgbm"
-                            else:
-                                prediction_mode = "classic"
-                            prediction = predict_fight(
-                                fighter_a_data,
-                                fighter_b_data,
-                                model_data,
-                                odds_a,
-                                odds_b,
-                                mode=prediction_mode,
+                                default_odds_a = api_odds_info['odds_a']
+                                default_odds_b = api_odds_info['odds_b']
+                        
+                        # Afficher info si cotes trouvées automatiquement
+                        if api_odds_info:
+                            st.success(f"🔄 Cotes auto ({api_odds_info['bookmaker']}): "
+                                      f"{api_odds_info['matched_a']} @ {api_odds_info['odds_a']:.2f} | "
+                                      f"{api_odds_info['matched_b']} @ {api_odds_info['odds_b']:.2f}")
+                        
+                        odds_cols = st.columns(2)
+                        
+                        with odds_cols[0]:
+                            odds_a = st.number_input(
+                                f"Cote {fight['red_fighter']}",
+                                min_value=1.01,
+                                max_value=50.0,
+                                value=default_odds_a,
+                                step=0.01,
+                                key=f"odds_a_{i}_{j}"
                             )
+                        
+                        with odds_cols[1]:
+                            odds_b = st.number_input(
+                                f"Cote {fight['blue_fighter']}",
+                                min_value=1.01,
+                                max_value=50.0,
+                                value=default_odds_b,
+                                step=0.01,
+                                key=f"odds_b_{i}_{j}"
+                            )
+                        
+                        # Prédiction avec le moteur sélectionné
+                        if prediction_engine.startswith("Nouveau WF"):
+                            prediction_mode = "walkforward"
+                        elif prediction_engine.startswith("LightGBM VB"):
+                            prediction_mode = "lgbm"
+                        else:
+                            prediction_mode = "classic"
+                        prediction = predict_fight(
+                            fighter_a_data,
+                            fighter_b_data,
+                            model_data,
+                            odds_a,
+                            odds_b,
+                            mode=prediction_mode,
+                        )
+                        
+                        if prediction:
+                            # Probas marché pour affichage:
+                            # - Classique: probas implicites brutes (historique de l'app)
+                            # - WF: probas dévigées
+                            if prediction_mode == "walkforward":
+                                proba_market_a = prediction.get("proba_market")
+                                if proba_market_a is None or pd.isna(proba_market_a):
+                                    p1 = 1 / odds_a
+                                    p2 = 1 / odds_b
+                                    s = p1 + p2
+                                    proba_market_a = p1 / s if s > 0 else np.nan
+                                proba_market_b = 1 - proba_market_a
+                                edge_a = prediction.get("edge_a", prediction["proba_a"] - proba_market_a)
+                                edge_b = prediction.get("edge_b", prediction["proba_b"] - proba_market_b)
+                                model_label = prediction.get("model_version_display", "Nouveau WF (value betting)")
+                            elif prediction_mode == "lgbm":
+                                proba_market_a = prediction.get("proba_market")
+                                if proba_market_a is None or pd.isna(proba_market_a):
+                                    p1 = 1 / odds_a
+                                    p2 = 1 / odds_b
+                                    s = p1 + p2
+                                    proba_market_a = p1 / s if s > 0 else np.nan
+                                proba_market_b = 1 - proba_market_a
+                                edge_a = prediction.get("edge_a", prediction["proba_a"] - proba_market_a)
+                                edge_b = prediction.get("edge_b", prediction["proba_b"] - proba_market_b)
+                                model_label = prediction.get("model_version_display", "LightGBM VB")
+                            else:
+                                proba_market_a = 1 / odds_a
+                                proba_market_b = 1 / odds_b
+                                edge_a = prediction["proba_a"] - proba_market_a
+                                edge_b = prediction["proba_b"] - proba_market_b
+                                model_label = "mkt+phys"
                             
-                            if prediction:
-                                # Probas marché pour affichage:
-                                # - Classique: probas implicites brutes (historique de l'app)
-                                # - WF: probas dévigées
-                                if prediction_mode == "walkforward":
-                                    proba_market_a = prediction.get("proba_market")
-                                    if proba_market_a is None or pd.isna(proba_market_a):
-                                        p1 = 1 / odds_a
-                                        p2 = 1 / odds_b
-                                        s = p1 + p2
-                                        proba_market_a = p1 / s if s > 0 else np.nan
-                                    proba_market_b = 1 - proba_market_a
-                                    edge_a = prediction.get("edge_a", prediction["proba_a"] - proba_market_a)
-                                    edge_b = prediction.get("edge_b", prediction["proba_b"] - proba_market_b)
-                                    model_label = prediction.get("model_version_display", "Nouveau WF (value betting)")
-                                elif prediction_mode == "lgbm":
-                                    proba_market_a = prediction.get("proba_market")
-                                    if proba_market_a is None or pd.isna(proba_market_a):
-                                        p1 = 1 / odds_a
-                                        p2 = 1 / odds_b
-                                        s = p1 + p2
-                                        proba_market_a = p1 / s if s > 0 else np.nan
-                                    proba_market_b = 1 - proba_market_a
-                                    edge_a = prediction.get("edge_a", prediction["proba_a"] - proba_market_a)
-                                    edge_b = prediction.get("edge_b", prediction["proba_b"] - proba_market_b)
-                                    model_label = prediction.get("model_version_display", "LightGBM VB")
-                                else:
-                                    proba_market_a = 1 / odds_a
-                                    proba_market_b = 1 / odds_b
-                                    edge_a = prediction["proba_a"] - proba_market_a
-                                    edge_b = prediction["proba_b"] - proba_market_b
-                                    model_label = "mkt+phys"
+                            st.markdown(f"""
+                            <div class="card">
+                                <h5>📊 Prédiction du modèle ({model_label})</h5>
+                                <table style="width:100%; text-align:center;">
+                                    <tr>
+                                        <th></th>
+                                        <th>🔴 {fight['red_fighter']}</th>
+                                        <th>🔵 {fight['blue_fighter']}</th>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Modèle</b></td>
+                                        <td style="color: {'green' if prediction['proba_a'] > proba_market_a else 'red'};">{prediction['proba_a']:.1%}</td>
+                                        <td style="color: {'green' if prediction['proba_b'] > proba_market_b else 'red'};">{prediction['proba_b']:.1%}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Marché</b></td>
+                                        <td>{proba_market_a:.1%}</td>
+                                        <td>{proba_market_b:.1%}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Edge</b></td>
+                                        <td style="color: {'green' if edge_a > 0 else 'red'};">{edge_a*100:+.1f}%</td>
+                                        <td style="color: {'green' if edge_b > 0 else 'red'};">{edge_b*100:+.1f}%</td>
+                                    </tr>
+                                </table>
+                                <p style="margin-top: 10px;"><small>Reach diff: {prediction.get('reach_diff', 'N/A')} cm | Age diff: {prediction.get('age_diff', 'N/A')} ans</small></p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            if prediction_mode == "walkforward":
+                                wf_strategy = dict(model_data.get("wf_strategy", {}))
+                                wf_strategy["edge_threshold"] = max(
+                                    float(wf_strategy.get("edge_threshold", 0.08)),
+                                    float(strategy.get("min_edge", 0.0)),
+                                )
+                                stake_a = calculate_flat_stake_wf(
+                                    prediction['proba_a'],
+                                    proba_market_a,
+                                    odds_a,
+                                    current_bankroll,
+                                    wf_strategy
+                                )
+                                stake_b = calculate_flat_stake_wf(
+                                    prediction['proba_b'],
+                                    proba_market_b,
+                                    odds_b,
+                                    current_bankroll,
+                                    wf_strategy
+                                )
+                                # Optionnel: ignorer les nouveaux combattants en WF
+                                if bool(wf_strategy.get("skip_new_fighters", True)) and has_new_fighter:
+                                    stake_a = {**stake_a, "should_bet": False, "stake": 0.0, "reason": "WF: nouveau combattant - pari ignoré"}
+                                    stake_b = {**stake_b, "should_bet": False, "stake": 0.0, "reason": "WF: nouveau combattant - pari ignoré"}
+                            elif prediction_mode == "lgbm":
+                                lgbm_raw = model_data.get("lgbm_strategy", {})
+                                lgbm_kelly_params = {
+                                    "kelly_fraction":   float(lgbm_raw.get("kelly_fraction", 5.0)),
+                                    "max_bet_fraction": float(lgbm_raw.get("max_bet_fraction", 0.20)),
+                                    "min_bet_pct":      float(lgbm_raw.get("min_bet_pct", 0.01)),
+                                    "min_edge":         max(
+                                                            float(lgbm_raw.get("edge_threshold", 0.04)),
+                                                            float(strategy.get("min_edge", 0.0)),
+                                                        ),
+                                    "min_confidence":   0.0,
+                                }
+                                stake_a = calculate_kelly_stake(
+                                    prediction['proba_a'],
+                                    odds_a,
+                                    current_bankroll,
+                                    lgbm_kelly_params
+                                )
+                                stake_b = calculate_kelly_stake(
+                                    prediction['proba_b'],
+                                    odds_b,
+                                    current_bankroll,
+                                    lgbm_kelly_params
+                                )
+                            else:
+                                stake_a = calculate_kelly_stake(
+                                    prediction['proba_a'],
+                                    odds_a,
+                                    current_bankroll,
+                                    strategy
+                                )
                                 
+                                stake_b = calculate_kelly_stake(
+                                    prediction['proba_b'],
+                                    odds_b,
+                                    current_bankroll,
+                                    strategy
+                                )
+                            
+                            # ⚠️ Warning si données bio manquantes (mais pas bloquant)
+                            has_bio_warning = False
+                            if prediction.get('reach_diff') == 0 and prediction.get('age_diff') in [0, 0.5, None]:
+                                has_bio_warning = True
+                                st.warning("⚠️ **Données physiques incomplètes** : reach/age utilisent les médianes. L'edge est basé principalement sur les cotes du marché.")
+                            
+                            # ✅ NOUVELLE LOGIQUE: Parier sur le combattant avec edge ≥ seuil (pas juste le favori)
+                            best_bet = None
+                            
+                            # Vérifier si A a un edge suffisant
+                            if stake_a['should_bet']:
+                                best_bet = {
+                                    'fighter': fight['red_fighter'],
+                                    'stake_info': stake_a,
+                                    'odds': odds_a,
+                                    'proba': prediction['proba_a'],
+                                    'color': '🔴'
+                                }
+                            
+                            # Vérifier si B a un edge suffisant (et meilleur que A)
+                            if stake_b['should_bet']:
+                                if best_bet is None or stake_b['edge'] > best_bet['stake_info']['edge']:
+                                    best_bet = {
+                                        'fighter': fight['blue_fighter'],
+                                        'stake_info': stake_b,
+                                        'odds': odds_b,
+                                        'proba': prediction['proba_b'],
+                                        'color': '🔵'
+                                    }
+                            
+                            if best_bet:
                                 st.markdown(f"""
-                                <div class="card">
-                                    <h5>📊 Prédiction du modèle ({model_label})</h5>
-                                    <table style="width:100%; text-align:center;">
-                                        <tr>
-                                            <th></th>
-                                            <th>🔴 {fight['red_fighter']}</th>
-                                            <th>🔵 {fight['blue_fighter']}</th>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Modèle</b></td>
-                                            <td style="color: {'green' if prediction['proba_a'] > proba_market_a else 'red'};">{prediction['proba_a']:.1%}</td>
-                                            <td style="color: {'green' if prediction['proba_b'] > proba_market_b else 'red'};">{prediction['proba_b']:.1%}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Marché</b></td>
-                                            <td>{proba_market_a:.1%}</td>
-                                            <td>{proba_market_b:.1%}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Edge</b></td>
-                                            <td style="color: {'green' if edge_a > 0 else 'red'};">{edge_a*100:+.1f}%</td>
-                                            <td style="color: {'green' if edge_b > 0 else 'red'};">{edge_b*100:+.1f}%</td>
-                                        </tr>
-                                    </table>
-                                    <p style="margin-top: 10px;"><small>Reach diff: {prediction.get('reach_diff', 'N/A')} cm | Age diff: {prediction.get('age_diff', 'N/A')} ans</small></p>
+                                <div class="bet-recommendation">
+                                    <h5>✅ RECOMMANDATION DE PARI</h5>
+                                    <p><b>Parier sur:</b> {best_bet['color']} {best_bet['fighter']}</p>
+                                    <p><b>Cote:</b> {best_bet['odds']:.2f}</p>
+                                    <p><b>Mise recommandée:</b> {best_bet['stake_info']['stake']:.2f} €</p>
+                                    <p><b>Edge:</b> {best_bet['stake_info']['edge']:.1%}</p>
+                                    <p><b>EV:</b> {best_bet['stake_info']['ev']:.1%}</p>
+                                    <p><b>% Bankroll:</b> {best_bet['stake_info']['kelly_pct']:.2%}</p>
                                 </div>
                                 """, unsafe_allow_html=True)
                                 
+                                # 🔒 Bouton d'enregistrement uniquement pour utilisateurs connectés
+                                if can_access_betting():
+                                    if st.button(f"💾 Enregistrer ce pari", key=f"save_bet_{i}_{j}"):
+                                        success = add_bet(
+                                            event_name=event['name'],
+                                            fighter_red=fight['red_fighter'],
+                                            fighter_blue=fight['blue_fighter'],
+                                            pick=best_bet['fighter'],
+                                            odds=best_bet['odds'],
+                                            stake=best_bet['stake_info']['stake'],
+                                            model_probability=best_bet['proba'],
+                                            kelly_fraction=(0 if prediction_mode == "walkforward" else (model_data.get("lgbm_strategy", {}).get("kelly_fraction", 5.0) if prediction_mode == "lgbm" else strategy['kelly_fraction'])),
+                                            edge=best_bet['stake_info']['edge'],
+                                            ev=best_bet['stake_info']['ev']
+                                        )
+                                        
+                                        if success:
+                                            st.success(f"✅ Pari enregistré : {best_bet['stake_info']['stake']:.2f}€ sur {best_bet['fighter']}")
+                                        else:
+                                            st.error("❌ Erreur lors de l'enregistrement")
+                                else:
+                                    st.info("🔒 Connectez-vous pour enregistrer ce pari")
+                            else:
                                 if prediction_mode == "walkforward":
-                                    wf_strategy = dict(model_data.get("wf_strategy", {}))
-                                    wf_strategy["edge_threshold"] = max(
-                                        float(wf_strategy.get("edge_threshold", 0.08)),
-                                        float(strategy.get("min_edge", 0.0)),
+                                    min_edge_msg = max(
+                                        float(model_data.get("wf_strategy", {}).get("edge_threshold", 0.08)),
+                                        float(strategy['min_edge']),
                                     )
-                                    stake_a = calculate_flat_stake_wf(
-                                        prediction['proba_a'],
-                                        proba_market_a,
-                                        odds_a,
-                                        current_bankroll,
-                                        wf_strategy
-                                    )
-                                    stake_b = calculate_flat_stake_wf(
-                                        prediction['proba_b'],
-                                        proba_market_b,
-                                        odds_b,
-                                        current_bankroll,
-                                        wf_strategy
-                                    )
-                                    # Optionnel: ignorer les nouveaux combattants en WF
-                                    if bool(wf_strategy.get("skip_new_fighters", True)) and has_new_fighter:
-                                        stake_a = {**stake_a, "should_bet": False, "stake": 0.0, "reason": "WF: nouveau combattant - pari ignoré"}
-                                        stake_b = {**stake_b, "should_bet": False, "stake": 0.0, "reason": "WF: nouveau combattant - pari ignoré"}
                                 elif prediction_mode == "lgbm":
-                                    lgbm_raw = model_data.get("lgbm_strategy", {})
-                                    lgbm_kelly_params = {
-                                        "kelly_fraction":   float(lgbm_raw.get("kelly_fraction", 5.0)),
-                                        "max_bet_fraction": float(lgbm_raw.get("max_bet_fraction", 0.20)),
-                                        "min_bet_pct":      float(lgbm_raw.get("min_bet_pct", 0.01)),
-                                        "min_edge":         max(
-                                                                float(lgbm_raw.get("edge_threshold", 0.04)),
-                                                                float(strategy.get("min_edge", 0.0)),
-                                                            ),
-                                        "min_confidence":   0.0,
-                                    }
-                                    stake_a = calculate_kelly_stake(
-                                        prediction['proba_a'],
-                                        odds_a,
-                                        current_bankroll,
-                                        lgbm_kelly_params
-                                    )
-                                    stake_b = calculate_kelly_stake(
-                                        prediction['proba_b'],
-                                        odds_b,
-                                        current_bankroll,
-                                        lgbm_kelly_params
+                                    min_edge_msg = max(
+                                        float(model_data.get("lgbm_strategy", {}).get("edge_threshold", 0.04)),
+                                        float(strategy['min_edge']),
                                     )
                                 else:
-                                    stake_a = calculate_kelly_stake(
-                                        prediction['proba_a'],
-                                        odds_a,
-                                        current_bankroll,
-                                        strategy
-                                    )
-                                    
-                                    stake_b = calculate_kelly_stake(
-                                        prediction['proba_b'],
-                                        odds_b,
-                                        current_bankroll,
-                                        strategy
-                                    )
+                                    min_edge_msg = float(strategy['min_edge'])
+                                st.info(f"ℹ️ Aucun pari recommandé (edge < {min_edge_msg:.1%} pour les deux combattants)")
                                 
-                                # ⚠️ Warning si données bio manquantes (mais pas bloquant)
-                                has_bio_warning = False
-                                if prediction.get('reach_diff') == 0 and prediction.get('age_diff') in [0, 0.5, None]:
-                                    has_bio_warning = True
-                                    st.warning("⚠️ **Données physiques incomplètes** : reach/age utilisent les médianes. L'edge est basé principalement sur les cotes du marché.")
-                                
-                                # ✅ NOUVELLE LOGIQUE: Parier sur le combattant avec edge ≥ seuil (pas juste le favori)
-                                best_bet = None
-                                
-                                # Vérifier si A a un edge suffisant
-                                if stake_a['should_bet']:
-                                    best_bet = {
-                                        'fighter': fight['red_fighter'],
-                                        'stake_info': stake_a,
-                                        'odds': odds_a,
-                                        'proba': prediction['proba_a'],
-                                        'color': '🔴'
-                                    }
-                                
-                                # Vérifier si B a un edge suffisant (et meilleur que A)
-                                if stake_b['should_bet']:
-                                    if best_bet is None or stake_b['edge'] > best_bet['stake_info']['edge']:
-                                        best_bet = {
-                                            'fighter': fight['blue_fighter'],
-                                            'stake_info': stake_b,
-                                            'odds': odds_b,
-                                            'proba': prediction['proba_b'],
-                                            'color': '🔵'
-                                        }
-                                
-                                if best_bet:
-                                    st.markdown(f"""
-                                    <div class="bet-recommendation">
-                                        <h5>✅ RECOMMANDATION DE PARI</h5>
-                                        <p><b>Parier sur:</b> {best_bet['color']} {best_bet['fighter']}</p>
-                                        <p><b>Cote:</b> {best_bet['odds']:.2f}</p>
-                                        <p><b>Mise recommandée:</b> {best_bet['stake_info']['stake']:.2f} €</p>
-                                        <p><b>Edge:</b> {best_bet['stake_info']['edge']:.1%}</p>
-                                        <p><b>EV:</b> {best_bet['stake_info']['ev']:.1%}</p>
-                                        <p><b>% Bankroll:</b> {best_bet['stake_info']['kelly_pct']:.2%}</p>
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                                    
-                                    # 🔒 Bouton d'enregistrement uniquement pour utilisateurs connectés
-                                    if can_access_betting():
-                                        if st.button(f"💾 Enregistrer ce pari", key=f"save_bet_{i}_{j}"):
-                                            success = add_bet(
-                                                event_name=event['name'],
-                                                fighter_red=fight['red_fighter'],
-                                                fighter_blue=fight['blue_fighter'],
-                                                pick=best_bet['fighter'],
-                                                odds=best_bet['odds'],
-                                                stake=best_bet['stake_info']['stake'],
-                                                model_probability=best_bet['proba'],
-                                                kelly_fraction=(0 if prediction_mode == "walkforward" else (model_data.get("lgbm_strategy", {}).get("kelly_fraction", 5.0) if prediction_mode == "lgbm" else strategy['kelly_fraction'])),
-                                                edge=best_bet['stake_info']['edge'],
-                                                ev=best_bet['stake_info']['ev']
-                                            )
-                                            
-                                            if success:
-                                                st.success(f"✅ Pari enregistré : {best_bet['stake_info']['stake']:.2f}€ sur {best_bet['fighter']}")
-                                            else:
-                                                st.error("❌ Erreur lors de l'enregistrement")
-                                    else:
-                                        st.info("🔒 Connectez-vous pour enregistrer ce pari")
-                                else:
-                                    if prediction_mode == "walkforward":
-                                        min_edge_msg = max(
-                                            float(model_data.get("wf_strategy", {}).get("edge_threshold", 0.08)),
-                                            float(strategy['min_edge']),
-                                        )
-                                    elif prediction_mode == "lgbm":
-                                        min_edge_msg = max(
-                                            float(model_data.get("lgbm_strategy", {}).get("edge_threshold", 0.04)),
-                                            float(strategy['min_edge']),
-                                        )
-                                    else:
-                                        min_edge_msg = float(strategy['min_edge'])
-                                    st.info(f"ℹ️ Aucun pari recommandé (edge < {min_edge_msg:.1%} pour les deux combattants)")
-                                    
-                                    with st.expander("Voir les détails"):
-                                        st.write(f"**{fight['red_fighter']}**: Edge {stake_a['edge']:.1%}")
-                                        if stake_a.get('reason'):
-                                            st.write(f"  → {stake_a['reason']}")
-                                        st.write(f"**{fight['blue_fighter']}**: Edge {stake_b['edge']:.1%}")
-                                        if stake_b.get('reason'):
-                                            st.write(f"  → {stake_b['reason']}")
-                            
-                            st.markdown("---")
-                    else:
-                        st.info("Cliquez sur 'Charger les combats' pour voir les affrontements")
+                                with st.expander("Voir les détails"):
+                                    st.write(f"**{fight['red_fighter']}**: Edge {stake_a['edge']:.1%}")
+                                    if stake_a.get('reason'):
+                                        st.write(f"  → {stake_a['reason']}")
+                                    st.write(f"**{fight['blue_fighter']}**: Edge {stake_b['edge']:.1%}")
+                                    if stake_b.get('reason'):
+                                        st.write(f"  → {stake_b['reason']}")
+                        
+                        st.markdown("---")
+                else:
+                    st.warning("⚠️ Aucun combat trouvé pour cet événement")
 
 # ============================================================================
 # INTERFACE - GESTION BANKROLL

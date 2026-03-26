@@ -171,6 +171,7 @@ st.markdown("""
 # CHARGEMENT DU MODÈLE ET DES DONNÉES
 # ============================================================================
 
+@st.cache_data(ttl=60)
 def _model_file_mtime() -> float:
     """Retourne le mtime du fichier modèle actif (pour invalider le cache si le fichier change)."""
     v3_path = MODELS_DIR / "ensemble_v3.pkl"
@@ -240,12 +241,12 @@ def is_v3_active() -> bool:
     _, _, version = load_model(mtime=_model_file_mtime())
     return version == "v3"
 
-@st.cache_data
+@st.cache_data(ttl=86400)
 def load_recent_matches():
     """Charge les matchs récents pour calcul de features"""
     return pd.read_csv(MODELS_DIR / "recent_matches.csv", parse_dates=['Date'])
 
-@st.cache_data
+@st.cache_data(ttl=86400)
 def load_historical_data():
     """Charge le dataset complet pour les stats"""
     df = pd.read_csv(DATA_DIR / "atp_tennis.csv")
