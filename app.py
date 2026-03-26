@@ -36,12 +36,14 @@ except ImportError:
 # CONFIGURATION
 # ============================================================================
 
-st.set_page_config(
-    page_title="🎾 ATP Tennis Value Betting",
-    page_icon="🎾",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+if os.getenv("TENNIS_EMBED_MODE", "0") != "1":
+    _legacy_mode = os.getenv("USE_LEGACY_TENNIS_APP", "0") == "1"
+    st.set_page_config(
+        page_title="🎾 ATP Tennis Value Betting" if _legacy_mode else "djoudjou_predictor",
+        page_icon="🎾" if _legacy_mode else "🎯",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
 
 # Chemins
 BASE_DIR = Path(__file__).parent
@@ -49,6 +51,35 @@ MODELS_DIR = BASE_DIR / "models"
 DATA_DIR = BASE_DIR / "data"
 BETS_DIR = BASE_DIR / "bets"
 BETS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _is_unified_mode() -> bool:
+    return bool(st.session_state.get("unified_mode"))
+
+
+def _safe_username(value: str) -> str:
+    cleaned = re.sub(r"[^a-zA-Z0-9_.-]+", "_", str(value).strip())
+    return cleaned or "anonymous"
+
+
+def _current_tennis_storage_dir() -> Path:
+    if _is_unified_mode() and st.session_state.get("unified_username"):
+        username = _safe_username(st.session_state["unified_username"])
+        p = BETS_DIR / "users" / username / "tennis"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+    BETS_DIR.mkdir(parents=True, exist_ok=True)
+    return BETS_DIR
+
+
+def _current_bankroll_file() -> Path:
+    return _current_tennis_storage_dir() / "bankroll.json"
+
+
+def _can_access_update_tab() -> bool:
+    if not _is_unified_mode():
+        return True
+    return st.session_state.get("unified_username") == "narvall018"
 
 # ============================================================================
 # STYLES CSS
@@ -817,13 +848,13 @@ def calculate_stake(proba_model, odds, bankroll, strategy):
 # ============================================================================
 
 def get_bets_file():
-    return BETS_DIR / "bets.csv"
+    return _current_tennis_storage_dir() / "bets.csv"
 
 def compute_bankroll_from_history(initial=None):
     """Recalcule la bankroll depuis l'historique des paris.
     bankroll = initial + sum(profits clôturés) - sum(mises ouvertes)
     """
-    bankroll_file = BETS_DIR / "bankroll.json"
+    bankroll_file = _current_bankroll_file()
     if initial is None:
         if bankroll_file.exists():
             with open(bankroll_file, 'r') as f:
@@ -843,7 +874,7 @@ def compute_bankroll_from_history(initial=None):
 
 def init_bankroll(default=1000.0):
     """Initialise ou charge la bankroll (toujours recalculée depuis l'historique)."""
-    bankroll_file = BETS_DIR / "bankroll.json"
+    bankroll_file = _current_bankroll_file()
     if bankroll_file.exists():
         with open(bankroll_file, 'r') as f:
             data = json.load(f)
@@ -858,7 +889,7 @@ def init_bankroll(default=1000.0):
 
 def save_bankroll(amount):
     """Sauvegarde la bankroll courante (ne modifie pas initial_bankroll)."""
-    bankroll_file = BETS_DIR / "bankroll.json"
+    bankroll_file = _current_bankroll_file()
     if bankroll_file.exists():
         with open(bankroll_file, 'r') as f:
             data = json.load(f)
@@ -963,12 +994,14 @@ def _gh_bets_headers():
 
 def _gh_fetch_bets():
     """Télécharge bets.csv et bankroll.json depuis GitHub vers le filesystem local."""
+    if _is_unified_mode():
+        return
     owner, repo, headers = _gh_bets_headers()
     if not headers:
         return
     for gh_path, local_path in [
-        ("bets/bets.csv", BETS_DIR / "bets.csv"),
-        ("bets/bankroll.json", BETS_DIR / "bankroll.json"),
+        ("bets/bets.csv", get_bets_file()),
+        ("bets/bankroll.json", _current_bankroll_file()),
     ]:
         url = f"https://api.github.com/repos/{owner}/{repo}/contents/{gh_path}"
         try:
@@ -985,13 +1018,15 @@ def _gh_fetch_bets():
 
 def _gh_push_bets():
     """Pousse bets.csv et bankroll.json du filesystem local vers GitHub."""
+    if _is_unified_mode():
+        return
     owner, repo, headers = _gh_bets_headers()
     if not headers:
         return
     put_headers = {**headers, "Content-Type": "application/json"}
     for gh_path, local_path in [
-        ("bets/bets.csv", BETS_DIR / "bets.csv"),
-        ("bets/bankroll.json", BETS_DIR / "bankroll.json"),
+        ("bets/bets.csv", get_bets_file()),
+        ("bets/bankroll.json", _current_bankroll_file()),
     ]:
         if not local_path.exists():
             continue
@@ -1958,7 +1993,7 @@ def show_bankroll_page():
                     st.error("❌ Bankroll ne peut pas être négative")
                 else:
                     # Dépôt/retrait = ajustement de la bankroll initiale
-                    bankroll_file = BETS_DIR / "bankroll.json"
+                    bankroll_file = _current_bankroll_file()
                     if bankroll_file.exists():
                         with open(bankroll_file, 'r') as f:
                             data = json.load(f)
@@ -3196,7 +3231,7 @@ def main():
         """, unsafe_allow_html=True)
     
     # Main tabs
-    tabs = st.tabs([
+    tab_labels = [
         "🏠 Accueil",
         "📡 Événements",
         "🎾 Prédiction",
@@ -3204,32 +3239,50 @@ def main():
         "🏆 Classement Elo",
         "📊 Statistiques",
         "📅 Calendrier",
-        "🔄 Mise à jour"
-    ])
-    
-    with tabs[0]:
+    ]
+    can_update = _can_access_update_tab()
+    if can_update:
+        tab_labels.append("🔄 Mise à jour")
+
+    tabs = st.tabs(tab_labels)
+    tab_idx = 0
+
+    with tabs[tab_idx]:
         show_home_page()
-    
-    with tabs[1]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_events_page()
-    
-    with tabs[2]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_prediction_page()
-    
-    with tabs[3]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_bankroll_page()
-    
-    with tabs[4]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_rankings_page()
-    
-    with tabs[5]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_stats_page()
-    
-    with tabs[6]:
+    tab_idx += 1
+
+    with tabs[tab_idx]:
         show_calendar_page()
-    
-    with tabs[7]:
-        show_update_page()
+    tab_idx += 1
+
+    if can_update:
+        with tabs[tab_idx]:
+            show_update_page()
 
 if __name__ == "__main__":
-    main()
+    if os.getenv("USE_LEGACY_TENNIS_APP", "0") == "1":
+        main()
+    else:
+        from unified_app import main as unified_main
+
+        unified_main()
