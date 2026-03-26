@@ -200,7 +200,7 @@ def github_api_request(method, endpoint, data=None, github_config=None):
             headers["Content-Type"] = "application/json"
         
         req = urllib.request.Request(url, data=data, headers=headers, method=method)
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=15) as response:
             return json.loads(response.read().decode('utf-8'))
     except urllib.error.HTTPError as e:
         if e.code == 404:
@@ -324,12 +324,10 @@ def save_ufc_odds_cache(odds_data, message):
         pass
 
 
-def _resolve_github_repo_path(local_path):
+def _github_repo_path_candidates(local_path):
     """
-    Convertit un chemin local vers un chemin relatif au repo GitHub.
-    - Si GITHUB_BASE_PATH est défini, il est utilisé en préfixe.
-    - Sinon, on déduit automatiquement un préfixe depuis APP_DIR vs CWD
-      (ex: predictor_ufc/ quand l'app tourne depuis le repo unifié).
+    Retourne des chemins candidats sans appel réseau.
+    Le 1er est le candidat principal; les suivants servent de fallback.
     """
     p = Path(local_path).resolve()
     try:
@@ -339,26 +337,24 @@ def _resolve_github_repo_path(local_path):
 
     base_path = str(GITHUB_CONFIG.get("base_path", "") or "").strip().strip("/")
     if base_path:
-        return f"{base_path}/{rel_to_app}".strip("/")
+        return [f"{base_path}/{rel_to_app}".strip("/")]
 
+    candidates = []
     try:
         app_rel = APP_DIR.relative_to(Path.cwd().resolve()).as_posix()
     except Exception:
         app_rel = "."
-
-    candidates = []
     if app_rel and app_rel != ".":
         candidates.append(f"{app_rel}/{rel_to_app}".strip("/"))
     candidates.append(rel_to_app.strip("/"))
-
-    # Si possible, choisir le chemin qui existe déjà dans le repo distant.
-    for candidate in candidates:
-        _, sha = load_file_from_github(candidate, GITHUB_CONFIG)
-        if sha:
-            return candidate
-
-    # Sinon fallback sur le candidat lié au contexte local.
-    return candidates[0]
+    # Uniques en conservant l'ordre
+    uniq = []
+    seen = set()
+    for c in candidates:
+        if c not in seen:
+            seen.add(c)
+            uniq.append(c)
+    return uniq
 
 
 def push_local_files_to_github(local_paths, message_prefix="chore: sync ufc data"):
@@ -375,8 +371,16 @@ def push_local_files_to_github(local_paths, message_prefix="chore: sync ufc data
             errors.append(f"Fichier manquant: {p}")
             continue
 
-        gh_path = _resolve_github_repo_path(p)
-        _, sha = load_file_from_github(gh_path, GITHUB_CONFIG)
+        candidates = _github_repo_path_candidates(p)
+        gh_path = candidates[0]
+        sha = None
+        # Chercher le SHA avec fallback de chemin si nécessaire
+        for candidate in candidates:
+            _, candidate_sha = load_file_from_github(candidate, GITHUB_CONFIG)
+            if candidate_sha:
+                gh_path = candidate
+                sha = candidate_sha
+                break
         ok = save_file_to_github(
             gh_path,
             p.read_bytes(),
@@ -402,10 +406,14 @@ def pull_local_files_from_github(local_paths):
 
     for path in local_paths:
         p = Path(path)
-        gh_path = _resolve_github_repo_path(p)
-        content, _ = load_file_from_github(gh_path, GITHUB_CONFIG)
+        content = None
+        for candidate in _github_repo_path_candidates(p):
+            c, _ = load_file_from_github(candidate, GITHUB_CONFIG)
+            if c is not None:
+                content = c
+                break
         if content is None:
-            errors.append(f"Introuvable sur GitHub: {gh_path}")
+            errors.append(f"Introuvable sur GitHub: {', '.join(_github_repo_path_candidates(p))}")
             continue
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(content)
@@ -959,24 +967,24 @@ import subprocess
 
 _last_request_time = 0
 
-def make_request(url, max_retries=3):
+def make_request(url, max_retries=2):
     """Effectue une requête HTTP avec curl (plus fiable que requests pour ce site)"""
     global _last_request_time
     
-    # Rate limiting: minimum 1.5 seconde entre les requêtes
+    # Rate limiting: minimum 1.0 seconde entre les requêtes
     elapsed = time.time() - _last_request_time
-    if elapsed < 1.5:
-        time.sleep(1.5 - elapsed)
+    if elapsed < 1.0:
+        time.sleep(1.0 - elapsed)
     
     for i in range(max_retries):
         try:
             _last_request_time = time.time()
             result = subprocess.run(
                 ['curl', '-s', '-H', 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0', 
-                 '--max-time', '30', url],
+                 '--max-time', '20', url],
                 capture_output=True,
                 text=True,
-                timeout=35
+                timeout=25
             )
             if result.returncode == 0 and len(result.stdout) > 100:
                 # Créer un objet response-like
@@ -985,9 +993,9 @@ def make_request(url, max_retries=3):
                         self.text = text
                         self.status_code = 200
                 return CurlResponse(result.stdout)
-            time.sleep(2)
+            time.sleep(1)
         except Exception as e:
-            time.sleep(2)
+            time.sleep(1)
     return None
 
 def get_completed_events_urls(max_pages=1):
