@@ -387,6 +387,28 @@ def push_local_files_to_github(local_paths, message_prefix="chore: sync ufc data
     return pushed, errors
 
 
+def pull_local_files_from_github(local_paths):
+    """Charge des fichiers depuis GitHub vers le filesystem local."""
+    if not GITHUB_CONFIG.get("enabled"):
+        return 0, ["GitHub non configuré (GITHUB_TOKEN / GITHUB_REPO)"]
+
+    pulled = 0
+    errors = []
+
+    for path in local_paths:
+        p = Path(path)
+        gh_path = _resolve_github_repo_path(p)
+        content, _ = load_file_from_github(gh_path, GITHUB_CONFIG)
+        if content is None:
+            errors.append(f"Introuvable sur GitHub: {gh_path}")
+            continue
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(content)
+        pulled += 1
+
+    return pulled, errors
+
+
 def sync_ufc_data_artifacts_to_github(message_prefix="chore: sync ufc data"):
     """Synchronise les artefacts data UFC mis à jour."""
     files = [
@@ -395,6 +417,16 @@ def sync_ufc_data_artifacts_to_github(message_prefix="chore: sync ufc data"):
         INTERIM_DIR / "ratings_timeseries.parquet",
     ]
     return push_local_files_to_github(files, message_prefix=message_prefix)
+
+
+def sync_ufc_data_artifacts_from_github():
+    """Récupère les artefacts data UFC depuis GitHub."""
+    files = [
+        RAW_DIR / "appearances.parquet",
+        INTERIM_DIR / "asof_full.parquet",
+        INTERIM_DIR / "ratings_timeseries.parquet",
+    ]
+    return pull_local_files_from_github(files)
 
 # Paramètres Elo
 K_FACTOR = 24
@@ -3808,6 +3840,9 @@ def show_stats_update_page():
             f"Repo: `{gh_repo}` | Branche: `{gh_branch}` | Préfixe: `{gh_base_path or '(auto)'}`"
         )
         st.success("Les fichiers UFC mis à jour seront push automatiquement sur GitHub.")
+        startup_pulled = int(st.session_state.get("_ufc_bootstrap_sync_pulled", 0) or 0)
+        if startup_pulled > 0:
+            st.caption(f"Chargement démarrage: {startup_pulled} fichier(s) UFC récupéré(s) depuis GitHub.")
     else:
         st.warning(
             "Sync GitHub désactivée. Ajoute `GITHUB_TOKEN` et `GITHUB_REPO` dans les secrets Streamlit."
@@ -4001,7 +4036,13 @@ def show_stats_update_page():
 # ============================================================================
 
 def main():
-    
+    if GITHUB_CONFIG.get("enabled") and not st.session_state.get("_ufc_bootstrap_sync_done"):
+        pulled, _ = sync_ufc_data_artifacts_from_github()
+        st.session_state["_ufc_bootstrap_sync_done"] = True
+        st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
+        if pulled > 0:
+            st.cache_data.clear()
+
     model_data = load_model_and_data()
     fighters_data = load_fighters_data()
     
