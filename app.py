@@ -3079,28 +3079,19 @@ def show_update_page():
                 # Step 4: Clear cache
                 progress_bar.progress(90)
                 log_progress("🗑️ Vidage du cache...")
-                st.cache_data.clear()
-                st.cache_resource.clear()
-                
                 progress_bar.progress(100)
-                
-                # Summary
+
                 st.success(f"""✅ Mise à jour terminée !
-                
+
 - **{len(df_new)}** nouveaux matchs ajoutés
 - **{result['total_matches']:,}** matchs total dans le dataset
 - **{result['total_players']:,}** joueurs avec ratings Elo
 - **{result['recent_matches']}** matchs dans recent_matches.csv
                 """)
-                
-                # Show top 10 Elo
-                st.markdown("#### 🏆 Top 10 Elo Global après mise à jour")
-                top_df = pd.DataFrame(result['top_players'], columns=['Joueur', 'Elo'])
-                top_df.index = range(1, len(top_df) + 1)
-                top_df['Elo'] = top_df['Elo'].round(1)
-                st.dataframe(top_df, use_container_width=True)
-                
-                st.info("🔄 Rechargez la page pour utiliser les nouvelles données dans les prédictions.")
+
+                st.cache_data.clear()
+                st.cache_resource.clear()
+                st.rerun()
         
         except Exception as e:
             st.error(f"❌ Erreur pendant la mise à jour: {e}")
@@ -3117,24 +3108,17 @@ def show_update_page():
             progress_bar.progress(20)
             result = recalculate_all_elo(progress_callback=lambda msg: status_text.markdown(f"**{msg}**"))
             
-            progress_bar.progress(90)
-            st.cache_data.clear()
-            st.cache_resource.clear()
-            
             progress_bar.progress(100)
-            
+
             st.success(f"""✅ Recalcul terminé !
-            
+
 - **{result['total_matches']:,}** matchs traités
 - **{result['total_players']:,}** joueurs avec ratings Elo
 - **{result['recent_matches']}** matchs récents
             """)
-            
-            st.markdown("#### 🏆 Top 10 Elo Global")
-            top_df = pd.DataFrame(result['top_players'], columns=['Joueur', 'Elo'])
-            top_df.index = range(1, len(top_df) + 1)
-            top_df['Elo'] = top_df['Elo'].round(1)
-            st.dataframe(top_df, use_container_width=True)
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.rerun()
         
         except Exception as e:
             st.error(f"❌ Erreur: {e}")

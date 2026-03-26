@@ -3885,7 +3885,6 @@ def show_stats_update_page():
                     st.info(f"📊 Les ratings Elo sont en retard ({rat_date.strftime('%Y-%m-%d')} vs {app_date.strftime('%Y-%m-%d')}). Recalcul...")
                     update_progress("🎯 Recalcul des features et des ratings Elo...")
                     result = recalculate_features_and_elo(progress_callback=update_progress)
-                    st.cache_data.clear()
                     if gh_enabled:
                         update_progress("☁️ Sync GitHub des fichiers UFC...")
                         pushed, push_errors = sync_ufc_data_artifacts_to_github(
@@ -3896,6 +3895,8 @@ def show_stats_update_page():
                         if push_errors:
                             st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
                     st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants)")
+                    st.cache_data.clear()
+                    st.rerun()
                 else:
                     st.success("✅ Aucun nouveau combat à ajouter. Vos données sont à jour !")
             else:
@@ -3914,8 +3915,6 @@ def show_stats_update_page():
                 update_progress("🎯 Recalcul des features et des ratings Elo...")
                 result = recalculate_features_and_elo(progress_callback=update_progress)
                 
-                # ✅ Vider le cache pour recharger les nouvelles données
-                st.cache_data.clear()
                 if gh_enabled:
                     update_progress("☁️ Sync GitHub des fichiers UFC...")
                     pushed, push_errors = sync_ufc_data_artifacts_to_github(
@@ -3925,21 +3924,10 @@ def show_stats_update_page():
                         st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
                     if push_errors:
                         st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
-                
-                st.success("✅ Mise à jour terminée avec succès !")
-                
-                stats_cols = st.columns(3)
-                with stats_cols[0]:
-                    st.metric("📊 Combats total", result['appearances_count'])
-                with stats_cols[1]:
-                    st.metric("🥊 Combattants", result['fighters_count'])
-                with stats_cols[2]:
-                    st.metric("🆕 Nouveaux ajoutés", new_data['count'])
-                
-                st.info("💡 Rechargez la page (F5) pour voir les nouvelles données")
-                
-                if st.button("🔄 Recharger l'application", type="primary"):
-                    st.rerun()
+
+                st.success(f"✅ Mise à jour terminée ! {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants")
+                st.cache_data.clear()
+                st.rerun()
                 
         except Exception as e:
             st.error(f"❌ Erreur lors de la mise à jour : {str(e)}")
