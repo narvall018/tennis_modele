@@ -963,38 +963,36 @@ def to_float_safe(x):
 # FONCTIONS DE SCRAPING
 # ============================================================================
 
-import subprocess
-
 _last_request_time = 0
 
 def make_request(url, max_retries=2):
-    """Effectue une requête HTTP avec curl (plus fiable que requests pour ce site)"""
+    """Effectue une requête HTTP avec urllib (sans dépendance curl)"""
     global _last_request_time
-    
+
     # Rate limiting: minimum 1.0 seconde entre les requêtes
     elapsed = time.time() - _last_request_time
     if elapsed < 1.0:
         time.sleep(1.0 - elapsed)
-    
-    for i in range(max_retries):
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+    }
+
+    for _ in range(max_retries):
         try:
             _last_request_time = time.time()
-            result = subprocess.run(
-                ['curl', '-s', '-H', 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0', 
-                 '--max-time', '20', url],
-                capture_output=True,
-                text=True,
-                timeout=25
-            )
-            if result.returncode == 0 and len(result.stdout) > 100:
-                # Créer un objet response-like
-                class CurlResponse:
-                    def __init__(self, text):
-                        self.text = text
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=20) as response:
+                text = response.read().decode('utf-8', errors='replace')
+            if len(text) > 100:
+                class UrllibResponse:
+                    def __init__(self, t):
+                        self.text = t
                         self.status_code = 200
-                return CurlResponse(result.stdout)
-            time.sleep(1)
-        except Exception as e:
+                return UrllibResponse(text)
+        except Exception:
             time.sleep(1)
     return None
 
