@@ -2847,9 +2847,7 @@ def show_home_page(model_data=None):
 def show_events_page(model_data, fighters_data, current_bankroll):
     """Affiche la page des événements à venir"""
 
-    # ── Traiter le flag de rafraîchissement des cotes EN PREMIER,
-    #    avant tout rendu de widget, pour que les number_input soient
-    #    créés avec les nouvelles valeurs dès ce run.
+    # ── Rafraîchissement demandé via bouton : traité EN PREMIER avant tout widget
     if st.session_state.pop("_refresh_odds_requested", False):
         with st.spinner("Récupération des cotes..."):
             odds_data, message = fetch_mma_odds()
@@ -2858,9 +2856,9 @@ def show_events_page(model_data, fighters_data, current_bankroll):
             st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
             st.session_state.ufc_odds_message = message
             save_ufc_odds_cache(odds_data, message)
-            for key in list(st.session_state.keys()):
-                if key.startswith("odds_a_") or key.startswith("odds_b_"):
-                    del st.session_state[key]
+            # Incrémenter la version → les number_input auront de nouvelles clés
+            # et seront forcément recréés avec les nouvelles valeurs par défaut
+            st.session_state["odds_widget_version"] = st.session_state.get("odds_widget_version", 0) + 1
         else:
             st.warning(message)
 
@@ -2868,13 +2866,21 @@ def show_events_page(model_data, fighters_data, current_bankroll):
     if 'events' not in st.session_state:
         st.session_state.events = get_upcoming_events()
 
-    # Charger les cotes depuis le cache disque si dispo pour aujourd'hui
+    # Charger les cotes : cache disque si dispo, sinon fetch automatique au démarrage
     if 'api_odds' not in st.session_state:
         cache = load_ufc_odds_cache()
         if cache:
             st.session_state.api_odds = cache['odds_data']
             st.session_state.ufc_odds_fetched_at = cache.get('fetched_at', '')
             st.session_state.ufc_odds_message = cache.get('message', '')
+        elif get_odds_api_key():
+            with st.spinner("Chargement des cotes UFC..."):
+                odds_data, message = fetch_mma_odds()
+            if odds_data:
+                st.session_state.api_odds = odds_data
+                st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
+                st.session_state.ufc_odds_message = message
+                save_ufc_odds_cache(odds_data, message)
 
     st.title("📅 Événements UFC à venir")
 
@@ -3104,7 +3110,8 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                                       f"{api_odds_info['matched_b']} @ {api_odds_info['odds_b']:.2f}")
                         
                         odds_cols = st.columns(2)
-                        
+                        _ov = st.session_state.get("odds_widget_version", 0)
+
                         with odds_cols[0]:
                             odds_a = st.number_input(
                                 f"Cote {fight['red_fighter']}",
@@ -3112,9 +3119,9 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                                 max_value=50.0,
                                 value=default_odds_a,
                                 step=0.01,
-                                key=f"odds_a_{i}_{j}"
+                                key=f"odds_a_{i}_{j}_{_ov}"
                             )
-                        
+
                         with odds_cols[1]:
                             odds_b = st.number_input(
                                 f"Cote {fight['blue_fighter']}",
@@ -3122,7 +3129,7 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                                 max_value=50.0,
                                 value=default_odds_b,
                                 step=0.01,
-                                key=f"odds_b_{i}_{j}"
+                                key=f"odds_b_{i}_{j}_{_ov}"
                             )
                         
                         # Prédiction avec le moteur sélectionné
