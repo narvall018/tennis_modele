@@ -1,0 +1,33 @@
+# Données personnelles
+bets/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Environnement
+.env
+.venv/
+venv/
+ENV/
+
+# Streamlit
+.streamlit/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit secrets (ne jamais commit!)
+.streamlit/secrets.toml
