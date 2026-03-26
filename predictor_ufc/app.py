@@ -146,16 +146,33 @@ def logout_user():
 # CONFIGURATION GITHUB (pour Streamlit Cloud)
 # ============================================================================
 
+def _get_secret_or_env(key, default=""):
+    """Lit une valeur depuis Streamlit Secrets puis env vars."""
+    try:
+        if key in st.secrets and st.secrets[key] is not None:
+            return str(st.secrets[key]).strip()
+    except Exception:
+        pass
+    value = os.getenv(key, default)
+    return str(value).strip() if value is not None else ""
+
+
 def get_github_config():
     """Récupère la config GitHub depuis les secrets Streamlit"""
     try:
+        token = _get_secret_or_env("GITHUB_TOKEN", "")
+        repo = _get_secret_or_env("GITHUB_REPO", "")
+        branch = _get_secret_or_env("GITHUB_REF", "main") or "main"
+        base_path = _get_secret_or_env("GITHUB_BASE_PATH", "").strip("/")
         return {
-            "token": st.secrets.get("GITHUB_TOKEN", ""),
-            "repo": st.secrets.get("GITHUB_REPO", ""),
-            "enabled": bool(st.secrets.get("GITHUB_TOKEN", ""))
+            "token": token,
+            "repo": repo,
+            "branch": branch,
+            "base_path": base_path,
+            "enabled": bool(token and repo and "/" in repo),
         }
     except:
-        return {"token": "", "repo": "", "enabled": False}
+        return {"token": "", "repo": "", "branch": "main", "base_path": "", "enabled": False}
 
 def github_api_request(method, endpoint, data=None, github_config=None):
     """Effectue une requête à l'API GitHub"""
@@ -216,7 +233,7 @@ def save_file_to_github(file_path, content, message, github_config, sha=None):
     data = {
         "message": message,
         "content": base64.b64encode(content).decode('utf-8'),
-        "branch": "main"
+        "branch": github_config.get("branch", "main") or "main",
     }
     
     if sha:
@@ -270,6 +287,84 @@ BETS_DIR = APP_DIR / "bets"
 
 for d in [DATA_DIR, RAW_DIR, INTERIM_DIR, PROC_DIR, BETS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_github_repo_path(local_path):
+    """
+    Convertit un chemin local vers un chemin relatif au repo GitHub.
+    - Si GITHUB_BASE_PATH est défini, il est utilisé en préfixe.
+    - Sinon, on déduit automatiquement un préfixe depuis APP_DIR vs CWD
+      (ex: predictor_ufc/ quand l'app tourne depuis le repo unifié).
+    """
+    p = Path(local_path).resolve()
+    try:
+        rel_to_app = p.relative_to(APP_DIR).as_posix()
+    except Exception:
+        rel_to_app = p.name
+
+    base_path = str(GITHUB_CONFIG.get("base_path", "") or "").strip().strip("/")
+    if base_path:
+        return f"{base_path}/{rel_to_app}".strip("/")
+
+    try:
+        app_rel = APP_DIR.relative_to(Path.cwd().resolve()).as_posix()
+    except Exception:
+        app_rel = "."
+
+    candidates = []
+    if app_rel and app_rel != ".":
+        candidates.append(f"{app_rel}/{rel_to_app}".strip("/"))
+    candidates.append(rel_to_app.strip("/"))
+
+    # Si possible, choisir le chemin qui existe déjà dans le repo distant.
+    for candidate in candidates:
+        _, sha = load_file_from_github(candidate, GITHUB_CONFIG)
+        if sha:
+            return candidate
+
+    # Sinon fallback sur le candidat lié au contexte local.
+    return candidates[0]
+
+
+def push_local_files_to_github(local_paths, message_prefix="chore: sync ufc data"):
+    """Pousse des fichiers locaux vers GitHub via l'API contents."""
+    if not GITHUB_CONFIG.get("enabled"):
+        return 0, ["GitHub non configuré (GITHUB_TOKEN / GITHUB_REPO)"]
+
+    pushed = 0
+    errors = []
+
+    for path in local_paths:
+        p = Path(path)
+        if not p.exists():
+            errors.append(f"Fichier manquant: {p}")
+            continue
+
+        gh_path = _resolve_github_repo_path(p)
+        _, sha = load_file_from_github(gh_path, GITHUB_CONFIG)
+        ok = save_file_to_github(
+            gh_path,
+            p.read_bytes(),
+            f"{message_prefix}: {gh_path}",
+            GITHUB_CONFIG,
+            sha=sha,
+        )
+        if ok:
+            pushed += 1
+        else:
+            errors.append(f"Echec push: {gh_path}")
+
+    return pushed, errors
+
+
+def sync_ufc_data_artifacts_to_github(message_prefix="chore: sync ufc data"):
+    """Synchronise les artefacts data UFC mis à jour."""
+    files = [
+        RAW_DIR / "appearances.parquet",
+        INTERIM_DIR / "asof_full.parquet",
+        INTERIM_DIR / "ratings_timeseries.parquet",
+    ]
+    return push_local_files_to_github(files, message_prefix=message_prefix)
 
 # Paramètres Elo
 K_FACTOR = 24
@@ -654,7 +749,7 @@ st.markdown("""
     .section-fade-in {
         animation: fadeIn 0.5s ease-in-out;
     }
-    
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -2706,18 +2801,25 @@ def show_home_page(model_data=None):
 
 def show_events_page(model_data, fighters_data, current_bankroll):
     """Affiche la page des événements à venir"""
-    
+
+    # Pré-charger les événements depuis le cache (24h TTL) pour stabiliser le widget tree.
+    # Sans ça, les tabs intérieurs apparaissent en cours de run lors du premier clic,
+    # ce qui fait resetter les tabs extérieurs à l'index 0.
+    if 'events' not in st.session_state:
+        st.session_state.events = get_upcoming_events()
+
     st.title("📅 Événements UFC à venir")
-    
+
     # Boutons principaux
     btn_cols = st.columns([2, 2, 1])
-    
+
     with btn_cols[0]:
         if st.button("🔄 Récupérer les événements", type="primary"):
             with st.spinner("Récupération des événements..."):
+                get_upcoming_events.clear()
                 events = get_upcoming_events()
                 st.session_state.events = events
-                
+
                 if events:
                     st.success(f"✅ {len(events)} événements récupérés")
                 else:
@@ -2798,7 +2900,7 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                 st.metric("Mise min", f"{strategy['min_bet_pct']:.1%}")
         
         tabs = st.tabs([event['name'] for event in st.session_state.events])
-        
+
         for i, (event, tab) in enumerate(zip(st.session_state.events, tabs)):
             with tab:
                 st.subheader(f"🥊 {event['name']}")
@@ -3612,6 +3714,22 @@ def show_stats_update_page():
     """Affiche la page de mise à jour des statistiques"""
     
     st.title("🔄 Mise à jour des données")
+
+    gh_enabled = bool(GITHUB_CONFIG.get("enabled"))
+    gh_repo = str(GITHUB_CONFIG.get("repo", "") or "")
+    gh_branch = str(GITHUB_CONFIG.get("branch", "main") or "main")
+    gh_base_path = str(GITHUB_CONFIG.get("base_path", "") or "").strip()
+
+    st.markdown("### ☁️ Sync GitHub")
+    if gh_enabled:
+        st.caption(
+            f"Repo: `{gh_repo}` | Branche: `{gh_branch}` | Préfixe: `{gh_base_path or '(auto)'}`"
+        )
+        st.success("Les fichiers UFC mis à jour seront push automatiquement sur GitHub.")
+    else:
+        st.warning(
+            "Sync GitHub désactivée. Ajoute `GITHUB_TOKEN` et `GITHUB_REPO` dans les secrets Streamlit."
+        )
     
     # ✅ Bouton pour vider le cache
     col_cache1, col_cache2 = st.columns([3, 1])
@@ -3686,6 +3804,15 @@ def show_stats_update_page():
                     update_progress("🎯 Recalcul des features et des ratings Elo...")
                     result = recalculate_features_and_elo(progress_callback=update_progress)
                     st.cache_data.clear()
+                    if gh_enabled:
+                        update_progress("☁️ Sync GitHub des fichiers UFC...")
+                        pushed, push_errors = sync_ufc_data_artifacts_to_github(
+                            message_prefix="chore: ufc recalc from streamlit"
+                        )
+                        if pushed:
+                            st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
+                        if push_errors:
+                            st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
                     st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants)")
                 else:
                     st.success("✅ Aucun nouveau combat à ajouter. Vos données sont à jour !")
@@ -3707,6 +3834,15 @@ def show_stats_update_page():
                 
                 # ✅ Vider le cache pour recharger les nouvelles données
                 st.cache_data.clear()
+                if gh_enabled:
+                    update_progress("☁️ Sync GitHub des fichiers UFC...")
+                    pushed, push_errors = sync_ufc_data_artifacts_to_github(
+                        message_prefix="chore: ufc update from streamlit"
+                    )
+                    if pushed:
+                        st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
+                    if push_errors:
+                        st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
                 
                 st.success("✅ Mise à jour terminée avec succès !")
                 
@@ -3747,6 +3883,15 @@ def show_stats_update_page():
         try:
             with st.spinner("Recalcul en cours..."):
                 result = recalculate_features_and_elo(progress_callback=update_progress)
+            if gh_enabled:
+                update_progress("☁️ Sync GitHub des fichiers UFC...")
+                pushed, push_errors = sync_ufc_data_artifacts_to_github(
+                    message_prefix="chore: ufc manual recalc from streamlit"
+                )
+                if pushed:
+                    st.success(f"✅ GitHub: {pushed} fichier(s) UFC synchronisé(s).")
+                if push_errors:
+                    st.warning("⚠️ Sync GitHub partielle:\n- " + "\n- ".join(push_errors))
             
             st.success("✅ Recalcul terminé !")
             
@@ -3896,8 +4041,8 @@ def main():
 
         with tabs[tab_idx]:
             show_rankings_page(model_data)
-        tab_idx += 1
 
+        tab_idx += 1
         if show_update_tab:
             with tabs[tab_idx]:
                 show_stats_update_page()
@@ -3906,17 +4051,17 @@ def main():
         tabs = st.tabs([
             "🏠 Accueil",
             "📅 Événements à venir",
-            "🏆 Classement Elo"
+            "🏆 Classement Elo",
         ])
-        
+
         with tabs[0]:
             show_home_page(model_data)
-        
+
         with tabs[1]:
             # Mode lecture seule pour les visiteurs
             st.warning("🔒 **Mode visiteur** - Connectez-vous pour enregistrer des paris et gérer votre bankroll")
             show_events_page(model_data, fighters_data, 0)  # Bankroll = 0 pour visiteurs
-        
+
         with tabs[2]:
             show_rankings_page(model_data)
 

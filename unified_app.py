@@ -931,6 +931,7 @@ def current_user() -> Optional[sqlite3.Row]:
     return user
 
 
+@st.cache_data
 def fetch_events(sport: str, include_completed: bool = True) -> list[dict]:
     with db_conn() as conn:
         query = """
@@ -997,6 +998,7 @@ def create_event(
             stats_b=stats_b.strip(),
         )
         conn.commit()
+    fetch_events.clear()
     return True, "Evenement ajoute."
 
 
@@ -1055,6 +1057,7 @@ def update_event(
             ),
         )
         conn.commit()
+    fetch_events.clear()
     return True, "Evenement mis a jour."
 
 
@@ -1075,6 +1078,7 @@ def delete_event(event_id: int) -> tuple[bool, str]:
 
         conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
         conn.commit()
+    fetch_events.clear()
     return True, "Evenement supprime."
 
 
@@ -1141,6 +1145,8 @@ def place_bet(user_id: int, event_id: int, pick_side: str, stake: float) -> tupl
         recompute_user_bankroll(conn, user_id)
         conn.commit()
 
+    fetch_user_stats.clear()
+    fetch_user_bets.clear()
     return True, "Pari enregistre."
 
 
@@ -1149,7 +1155,7 @@ def apply_event_result(event_id: int, winner_side: Optional[str]) -> tuple[bool,
         return False, "Resultat invalide."
 
     with db_conn() as conn:
-        event = conn.execute("SELECT * FROM events WHERE id = ?", (event_id,)).fetchone()
+        event = conn.execute("SELECT id FROM events WHERE id = ?", (event_id,)).fetchone()
         if not event:
             return False, "Evenement introuvable."
 
@@ -1211,9 +1217,13 @@ def apply_event_result(event_id: int, winner_side: Optional[str]) -> tuple[bool,
             recompute_user_bankroll(conn, user_id)
         conn.commit()
 
+    fetch_events.clear()
+    fetch_user_stats.clear()
+    fetch_user_bets.clear()
     return True, f"Resultat applique ({len(bets)} paris mis a jour)."
 
 
+@st.cache_data
 def fetch_user_bets(user_id: int, sport: Optional[str] = None) -> pd.DataFrame:
     with db_conn() as conn:
         query = """
@@ -1249,14 +1259,8 @@ def fetch_user_bets(user_id: int, sport: Optional[str] = None) -> pd.DataFrame:
         return pd.DataFrame()
 
     df = pd.DataFrame([dict(r) for r in rows])
-    df["pick"] = df.apply(
-        lambda r: r["participant_a"] if r["pick_side"] == "a" else r["participant_b"],
-        axis=1,
-    )
-    df["match_combat"] = df.apply(
-        lambda r: f"{r['participant_a']} vs {r['participant_b']}",
-        axis=1,
-    )
+    df["pick"] = df["participant_a"].where(df["pick_side"] == "a", df["participant_b"])
+    df["match_combat"] = df["participant_a"] + " vs " + df["participant_b"]
     cols = [
         "bet_id",
         "created_at",
@@ -1276,6 +1280,7 @@ def fetch_user_bets(user_id: int, sport: Optional[str] = None) -> pd.DataFrame:
     return df[cols]
 
 
+@st.cache_data
 def fetch_user_stats(user_id: int) -> dict[str, float]:
     with db_conn() as conn:
         row = conn.execute(
@@ -1927,13 +1932,8 @@ def main() -> None:
 
     user = current_user()
     if not user:
-        render_auth_page()
-        return
-
-    user = get_user_by_id(int(user["id"]))
-    if not user:
         st.session_state.pop("user_id", None)
-        st.rerun()
+        render_auth_page()
         return
 
     username = str(user["username"])
