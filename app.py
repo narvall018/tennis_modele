@@ -851,6 +851,14 @@ def calculate_stake(proba_model, odds, bankroll, strategy):
 def get_bets_file():
     return _current_tennis_storage_dir() / "bets.csv"
 
+@st.cache_data(ttl=30)
+def _read_bets_csv(bets_path: str) -> pd.DataFrame:
+    """Lecture cachée du CSV de paris (TTL 30s, invalidée à chaque écriture)."""
+    p = Path(bets_path)
+    if not p.exists():
+        return pd.DataFrame()
+    return pd.read_csv(p)
+
 def compute_bankroll_from_history(initial=None):
     """Recalcule la bankroll depuis l'historique des paris.
     bankroll = initial + sum(profits clôturés) - sum(mises ouvertes)
@@ -864,11 +872,9 @@ def compute_bankroll_from_history(initial=None):
         else:
             initial = 1000.0
 
-    bets_file = get_bets_file()
-    if not bets_file.exists():
+    df = _read_bets_csv(str(get_bets_file()))
+    if df.empty:
         return initial
-
-    df = pd.read_csv(bets_file)
     closed_profit = df[df['status'] == 'closed']['profit'].sum()
     open_stakes   = df[df['status'] == 'open']['stake'].sum()
     return initial + closed_profit - open_stakes
@@ -932,15 +938,15 @@ def add_bet(tournament, round_name, player1, player2, pick, odds, stake,
         df = new_bet
     
     df.to_csv(bets_file, index=False)
+    _read_bets_csv.clear()
     _gh_push_bets()
     return True
 
 def get_open_bets():
     """Retourne les paris ouverts"""
-    bets_file = get_bets_file()
-    if not bets_file.exists():
-        return pd.DataFrame()
-    df = pd.read_csv(bets_file)
+    df = _read_bets_csv(str(get_bets_file()))
+    if df.empty:
+        return df
     return df[df['status'] == 'open']
 
 def close_bet(bet_id, result):
@@ -966,15 +972,13 @@ def close_bet(bet_id, result):
         df.loc[mask, 'profit'] = 0
     
     df.to_csv(bets_file, index=False)
+    _read_bets_csv.clear()
     _gh_push_bets()
     return True
 
 def get_all_bets():
     """Retourne tous les paris"""
-    bets_file = get_bets_file()
-    if not bets_file.exists():
-        return pd.DataFrame()
-    return pd.read_csv(bets_file)
+    return _read_bets_csv(str(get_bets_file()))
 
 
 # ============================================================================
@@ -3165,7 +3169,8 @@ def main():
 
     st.markdown('<div class="main-title">🎾 ATP Tennis Value Betting 🎾</div>',
                 unsafe_allow_html=True)
-    _, _, _active_ver = load_model(mtime=_model_file_mtime())
+    _mtime = _model_file_mtime()
+    _, _, _active_ver = load_model(mtime=_mtime)
     _sub = "XGBoost + LightGBM + Elo Multi-variantes — Stratégies Multi-tournois" if _active_ver == "v3" else "XGBoost + Elo Surface — Stratégie Grand Slam Late Rounds"
     st.markdown(f'<div class="sub-title">{_sub}</div>', unsafe_allow_html=True)
     
@@ -3192,10 +3197,9 @@ def main():
         st.info(strategy['description'])
         
         # Model version indicator + reload button
-        _, _, _ver = load_model(mtime=_model_file_mtime())
-        v_color = '#4CAF50' if _ver == 'v3' else '#FF9800'
+        v_color = '#4CAF50' if _active_ver == 'v3' else '#FF9800'
         st.markdown(
-            f"<span style='color:{v_color}; font-size:0.85rem;'>⚙️ Modèle actif : <b>{_ver}</b></span>",
+            f"<span style='color:{v_color}; font-size:0.85rem;'>⚙️ Modèle actif : <b>{_active_ver}</b></span>",
             unsafe_allow_html=True
         )
         if st.button("🔄 Recharger le modèle", help="Vide le cache Streamlit et recharge le modèle depuis le disque"):

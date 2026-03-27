@@ -2697,11 +2697,13 @@ def init_bankroll():
         github_bankroll_path = f"{str(user['bets_folder']).strip('/')}/bankroll.csv"
     
     if _github_sync_enabled():
-        df, sha = load_csv_from_github(github_bankroll_path, GITHUB_CONFIG)
-        if df is not None and not df.empty:
-            df.to_csv(bankroll_file, index=False)
-            return float(df.iloc[-1]["amount"])
-    
+        _gh_key = f"_bk_gh_ts_{github_bankroll_path}"
+        if time.time() - float(st.session_state.get(_gh_key, 0) or 0) >= 60.0:
+            df, _ = load_csv_from_github(github_bankroll_path, GITHUB_CONFIG)
+            if df is not None and not df.empty:
+                df.to_csv(bankroll_file, index=False)
+            st.session_state[_gh_key] = time.time()
+
     if bankroll_file.exists():
         df = pd.read_csv(bankroll_file)
         if not df.empty:
@@ -2826,15 +2828,17 @@ def get_open_bets():
     if user and user.get("bets_folder"):
         github_bets_path = f"{str(user['bets_folder']).strip('/')}/bets.csv"
     
-    # ✅ Priorité GitHub sur Streamlit Cloud
     if _github_sync_enabled():
-        df, sha = load_csv_from_github(github_bets_path, GITHUB_CONFIG)
-        if df is not None:
-            return df[df["status"] == "open"]
-    
+        _gh_key = f"_bets_gh_ts_{github_bets_path}"
+        if time.time() - float(st.session_state.get(_gh_key, 0) or 0) >= 60.0:
+            df, _ = load_csv_from_github(github_bets_path, GITHUB_CONFIG)
+            if df is not None:
+                df.to_csv(bets_file, index=False)
+            st.session_state[_gh_key] = time.time()
+
     if not bets_file.exists():
         return pd.DataFrame()
-    
+
     df = pd.read_csv(bets_file)
     return df[df["status"] == "open"]
 

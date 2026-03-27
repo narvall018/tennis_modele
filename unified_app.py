@@ -1797,6 +1797,7 @@ def _set_unified_session_context(user: sqlite3.Row) -> None:
     st.session_state["unified_username"] = username
 
 
+@st.cache_data(ttl=60)
 def _read_tennis_bankroll(username: str) -> float:
     user_dir = tennis_user_dir(username)
     bankroll_file = user_dir / "bankroll.json"
@@ -1828,6 +1829,7 @@ def _read_tennis_bankroll(username: str) -> float:
     return round(float(initial) + float(closed_profit) - float(open_stake), 2)
 
 
+@st.cache_data(ttl=60)
 def _read_ufc_bankroll(username: str) -> float:
     bankroll_file = ufc_user_dir(username) / "bankroll.csv"
     if not bankroll_file.exists():
