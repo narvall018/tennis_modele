@@ -4147,40 +4147,37 @@ def main():
                         st.success("Clé temporaire enregistrée pour cette session")
     
     # ============================================================================
-    # NAVIGATION SIDEBAR (persiste à travers les reruns et clics de boutons)
+    # NAVIGATION (directement sur la page, persiste via session_state)
     # ============================================================================
 
-    with st.sidebar:
-        st.markdown("---")
-        st.markdown("### 📍 Navigation")
+    if is_logged_in() and can_view_bankroll():
+        nav_options = [
+            "🏠 Accueil",
+            "📅 Événements à venir",
+            "💰 Gestion Bankroll",
+            "🏆 Classement Elo",
+        ]
+        if can_access_update_tab():
+            nav_options.append("🔄 Mise à jour")
+    else:
+        nav_options = [
+            "🏠 Accueil",
+            "📅 Événements à venir",
+            "🏆 Classement Elo",
+        ]
 
-        if is_logged_in() and can_view_bankroll():
-            nav_options = [
-                "🏠 Accueil",
-                "📅 Événements à venir",
-                "💰 Gestion Bankroll",
-                "🏆 Classement Elo",
-            ]
-            if can_access_update_tab():
-                nav_options.append("🔄 Mise à jour")
-        else:
-            nav_options = [
-                "🏠 Accueil",
-                "📅 Événements à venir",
-                "🏆 Classement Elo",
-            ]
+    # Valeur par défaut conservée entre reruns via session_state
+    if "ufc_nav" not in st.session_state or st.session_state["ufc_nav"] not in nav_options:
+        st.session_state["ufc_nav"] = nav_options[0]
 
-        # Valeur par défaut conservée entre reruns via session_state
-        if "ufc_nav" not in st.session_state or st.session_state["ufc_nav"] not in nav_options:
-            st.session_state["ufc_nav"] = nav_options[0]
-
-        current_page = st.radio(
-            "Section",
-            nav_options,
-            index=nav_options.index(st.session_state["ufc_nav"]),
-            key="ufc_nav",
-            label_visibility="collapsed",
-        )
+    current_page = st.radio(
+        "Navigation",
+        nav_options,
+        horizontal=True,
+        key="ufc_nav",
+        label_visibility="collapsed",
+    )
+    st.divider()
 
     # ============================================================================
     # AFFICHAGE DE LA PAGE ACTIVE
