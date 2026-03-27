@@ -133,7 +133,7 @@ def get_user_bets_folder():
 
 
 def _github_sync_enabled():
-    return GITHUB_CONFIG.get("enabled")
+    return GITHUB_CONFIG.get("enabled") and not _is_unified_mode()
 
 def logout_user():
     """Déconnecte l'utilisateur"""
@@ -2717,8 +2717,8 @@ def init_bankroll():
     })
     df.to_csv(bankroll_file, index=False)
     
-    if _github_sync_enabled():
-        save_file_to_github(github_bankroll_path, df.to_csv(index=False), 
+    if GITHUB_CONFIG.get("enabled"):
+        save_file_to_github(github_bankroll_path, df.to_csv(index=False),
                            "Init bankroll", GITHUB_CONFIG)
     
     return 1000.0
@@ -2733,7 +2733,7 @@ def update_bankroll(new_amount, action="update", note=""):
         github_bankroll_path = f"{str(user['bets_folder']).strip('/')}/bankroll.csv"
     sha = None
     
-    if _github_sync_enabled():
+    if GITHUB_CONFIG.get("enabled"):
         df, sha = load_csv_from_github(github_bankroll_path, GITHUB_CONFIG)
         if df is None:
             df = pd.DataFrame(columns=["date", "amount", "action", "note"])
@@ -2752,7 +2752,7 @@ def update_bankroll(new_amount, action="update", note=""):
     df = pd.concat([df, new_entry], ignore_index=True)
     df.to_csv(bankroll_file, index=False)
     
-    if _github_sync_enabled():
+    if GITHUB_CONFIG.get("enabled"):
         save_file_to_github(github_bankroll_path, df.to_csv(index=False),
                            f"Update bankroll: {action}", GITHUB_CONFIG, sha)
     
@@ -2768,8 +2768,8 @@ def add_bet(event_name, fighter_red, fighter_blue, pick, odds, stake,
     if user and user.get("bets_folder"):
         github_bets_path = f"{str(user['bets_folder']).strip('/')}/bets.csv"
     sha = None
-    
-    if _github_sync_enabled():
+
+    if GITHUB_CONFIG.get("enabled"):
         df, sha = load_csv_from_github(github_bets_path, GITHUB_CONFIG)
         if df is not None and not df.empty:
             next_id = int(df["bet_id"].max()) + 1
@@ -2813,10 +2813,10 @@ def add_bet(event_name, fighter_red, fighter_blue, pick, odds, stake,
     df = pd.concat([df, new_bet], ignore_index=True)
     df.to_csv(bets_file, index=False)
     
-    if _github_sync_enabled():
+    if GITHUB_CONFIG.get("enabled"):
         save_file_to_github(github_bets_path, df.to_csv(index=False),
                            f"Add bet: {pick} @ {odds}", GITHUB_CONFIG, sha)
-    
+
     return True
 
 def get_open_bets():
@@ -2852,8 +2852,7 @@ def close_bet(bet_id, result):
         github_bets_path = f"{str(user['bets_folder']).strip('/')}/bets.csv"
     sha = None
     
-    # ✅ Charger depuis GitHub si activé
-    if _github_sync_enabled():
+    if GITHUB_CONFIG.get("enabled"):
         df, sha = load_csv_from_github(github_bets_path, GITHUB_CONFIG)
         if df is None:
             return False
@@ -2886,8 +2885,7 @@ def close_bet(bet_id, result):
     # Sauvegarder localement
     df.to_csv(bets_file, index=False)
     
-    # ✅ Sync GitHub
-    if _github_sync_enabled():
+    if GITHUB_CONFIG.get("enabled"):
         save_file_to_github(github_bets_path, df.to_csv(index=False),
                            f"Close bet #{bet_id}: {result}", GITHUB_CONFIG, sha)
     
@@ -4162,6 +4160,21 @@ def show_stats_update_page():
 # APPLICATION PRINCIPALE
 # ============================================================================
 
+def _sync_user_bets_from_github():
+    """Sync initiale des fichiers paris/bankroll depuis GitHub (une fois par session)."""
+    if not GITHUB_CONFIG.get("enabled"):
+        return
+    user = get_current_user()
+    if not user or not user.get("bets_folder"):
+        return
+    bets_dir = get_user_bets_folder()
+    folder = str(user["bets_folder"]).strip("/")
+    for fname in ["bets.csv", "bankroll.csv"]:
+        df, _ = load_csv_from_github(f"{folder}/{fname}", GITHUB_CONFIG)
+        if df is not None and not df.empty:
+            df.to_csv(bets_dir / fname, index=False)
+
+
 def main():
     if GITHUB_CONFIG.get("enabled"):
         now_ts = time.time()
@@ -4173,6 +4186,11 @@ def main():
             st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
             if pulled > 0:
                 _clear_data_caches()
+
+    # Sync paris/bankroll depuis GitHub une seule fois par session
+    if "ufc_bets_synced" not in st.session_state:
+        _sync_user_bets_from_github()
+        st.session_state["ufc_bets_synced"] = True
 
     model_data = load_model_and_data()
     fighters_data = load_fighters_data()
