@@ -1157,17 +1157,29 @@ def extract_fight_details(fight_url):
     
     return fighters
 
-def compute_elo_ratings(appearances_df, K=24):
-    """Calcule les ratings Elo et retourne aussi le format ratings_timeseries"""
+def compute_elo_ratings(appearances_df, K=24, progress_callback=None,
+                        initial_elo_global=None, initial_elo_div=None):
+    """Calcule les ratings Elo et retourne aussi le format ratings_timeseries.
+
+    Si initial_elo_global/initial_elo_div sont fournis, le calcul repart de
+    ces valeurs au lieu de BASE_ELO — utile pour le calcul incrémental.
+    """
     df = appearances_df.sort_values(["event_date", "fight_id"]).copy()
-    
+
     base = BASE_ELO
-    elo_global = {}
-    elo_div = {}
+    elo_global = dict(initial_elo_global) if initial_elo_global else {}
+    elo_div = dict(initial_elo_div) if initial_elo_div else {}
     rows_out = []
     ratings_timeseries = []  # ✅ Format pour ratings_timeseries.parquet
-    
-    for event_date, event_group in df.groupby("event_date", sort=False):
+
+    event_dates = df["event_date"].unique()
+    total_events = len(event_dates)
+
+    for event_idx, (event_date, event_group) in enumerate(df.groupby("event_date", sort=False)):
+        if progress_callback and total_events > 0 and event_idx % 50 == 0:
+            pct = int(100 * event_idx / total_events)
+            progress_callback(f"🎯 Calcul Elo... {pct}% ({event_idx}/{total_events} événements)")
+
         elo_snapshot = {
             "global": dict(elo_global),
             "div": dict(elo_div)
@@ -1476,7 +1488,9 @@ def recalculate_features_and_elo(progress_callback=None):
     if progress_callback:
         progress_callback("🎯 Calcul des ratings Elo...")
     
-    appearances_with_elo, elo_global_dict, elo_div_dict, ratings_ts = compute_elo_ratings(appearances_df, K=K_FACTOR)
+    appearances_with_elo, elo_global_dict, elo_div_dict, ratings_ts = compute_elo_ratings(
+        appearances_df, K=K_FACTOR, progress_callback=progress_callback
+    )
     
     # Sauvegarder asof_full.parquet
     asof_path = INTERIM_DIR / "asof_full.parquet"
@@ -1498,6 +1512,101 @@ def recalculate_features_and_elo(progress_callback=None):
         'elo_global': elo_global_dict,
         'elo_div': elo_div_dict
     }
+
+
+def recalculate_features_and_elo_incremental(new_appearances_df, progress_callback=None):
+    """Calcul Elo incrémental : repart des Elo existants, traite seulement les nouveaux combats.
+
+    Beaucoup plus rapide que le recalcul complet : au lieu de traiter 5000+ combats,
+    on ne traite que les N nouveaux en partant des Elo connus.
+    """
+    asof_path = INTERIM_DIR / "asof_full.parquet"
+    ratings_path = INTERIM_DIR / "ratings_timeseries.parquet"
+
+    # ── 1. Charger les Elo globaux depuis ratings_timeseries ─────────────────
+    initial_elo_global = {}
+    if ratings_path.exists():
+        try:
+            rt = pd.read_parquet(ratings_path).sort_values("event_date")
+            if not rt.empty and "fighter_1_id" in rt.columns:
+                # groupby.last() → dernière valeur post par fighter — O(n)
+                last_f1 = rt.groupby("fighter_1_id")["elo_1_post"].last()
+                last_f2 = rt.groupby("fighter_2_id")["elo_2_post"].last()
+                initial_elo_global.update(last_f1.to_dict())
+                # fighter_2 écrase seulement si entrée plus récente
+                for fid, elo in last_f2.items():
+                    if fid not in initial_elo_global:
+                        initial_elo_global[fid] = elo
+                    else:
+                        # garder la valeur du combat le plus récent
+                        d1 = rt[rt["fighter_1_id"] == fid]["event_date"].max() if (rt["fighter_1_id"] == fid).any() else pd.NaT
+                        d2 = rt[rt["fighter_2_id"] == fid]["event_date"].max() if (rt["fighter_2_id"] == fid).any() else pd.NaT
+                        if pd.notna(d2) and (pd.isna(d1) or d2 > d1):
+                            initial_elo_global[fid] = elo
+        except Exception:
+            pass
+
+    # ── 2. Charger les Elo de division depuis asof_full ──────────────────────
+    # elo_div_pre du dernier combat ≈ elo_div_post (décalage max K=24 pts)
+    initial_elo_div = {}
+    if asof_path.exists():
+        try:
+            asof = pd.read_parquet(asof_path)
+            if {"fighter_id", "weight_class", "elo_div_pre", "event_date"}.issubset(asof.columns):
+                asof_sorted = asof.sort_values("event_date")
+                last_div = (
+                    asof_sorted
+                    .groupby(["fighter_id", "weight_class"])["elo_div_pre"]
+                    .last()
+                )
+                for (fid, div), elo in last_div.items():
+                    initial_elo_div[(fid, div or "Unknown")] = elo
+        except Exception:
+            pass
+
+    if progress_callback:
+        progress_callback(f"⚡ Calcul Elo incrémental ({len(new_appearances_df)} nouvelles entrées)...")
+
+    # ── 3. Calculer seulement sur les nouveaux combats ────────────────────────
+    new_elo_rows, final_elo_global, final_elo_div, new_ratings_ts = compute_elo_ratings(
+        new_appearances_df,
+        K=K_FACTOR,
+        initial_elo_global=initial_elo_global,
+        initial_elo_div=initial_elo_div,
+        progress_callback=progress_callback,
+    )
+
+    # ── 4. Appendre à asof_full.parquet ──────────────────────────────────────
+    if asof_path.exists():
+        existing_asof = pd.read_parquet(asof_path)
+        combined_asof = pd.concat([existing_asof, new_elo_rows], ignore_index=True)
+        if {"fight_id", "fighter_id"}.issubset(combined_asof.columns):
+            combined_asof = combined_asof.drop_duplicates(subset=["fight_id", "fighter_id"], keep="last")
+    else:
+        combined_asof = new_elo_rows
+    combined_asof.to_parquet(asof_path, index=False)
+
+    # ── 5. Appendre à ratings_timeseries.parquet ─────────────────────────────
+    if ratings_path.exists() and not new_ratings_ts.empty:
+        existing_rt = pd.read_parquet(ratings_path)
+        combined_rt = pd.concat([existing_rt, new_ratings_ts], ignore_index=True)
+        if "fight_id" in combined_rt.columns:
+            combined_rt = combined_rt.drop_duplicates(subset=["fight_id"], keep="last")
+    else:
+        combined_rt = new_ratings_ts
+    if not combined_rt.empty:
+        combined_rt.to_parquet(ratings_path, index=False)
+
+    if progress_callback:
+        progress_callback(f"✅ Elo mis à jour pour {len(final_elo_global)} combattants")
+
+    return {
+        "appearances_count": len(combined_asof),
+        "fighters_count": len(final_elo_global),
+        "elo_global": final_elo_global,
+        "elo_div": final_elo_div,
+    }
+
 
 # ============================================================================
 # CHARGEMENT DES DONNÉES
@@ -3935,111 +4044,139 @@ def show_stats_update_page():
     
     st.markdown("---")
     st.markdown("### 🔄 Mettre à jour les données")
-    
-    st.markdown("""
-    > 💡 **Cliquez sur le bouton ci-dessous** pour vérifier s'il y a de nouveaux événements UFC 
-    > et mettre à jour automatiquement vos données.
-    """)
-    
-    if st.button("🚀 Lancer la mise à jour", type="primary", use_container_width=True):
-        
-        progress_placeholder = st.empty()
-        
-        def update_progress(message):
-            progress_placeholder.info(message)
-        
-        try:
-            with st.spinner("🔍 Connexion à UFC Stats et recherche de nouveaux événements..."):
-                new_data = scrape_new_events(progress_callback=update_progress)
-            
-            if new_data['count'] == 0:
-                # Vérifier si ratings_timeseries est en retard par rapport à appearances
-                appearances_df = pd.read_parquet(RAW_DIR / "appearances.parquet")
-                ratings_df = pd.read_parquet(INTERIM_DIR / "ratings_timeseries.parquet")
-                app_date = pd.to_datetime(appearances_df['event_date']).max()
-                rat_date = pd.to_datetime(ratings_df['event_date']).max()
-                
-                if app_date > rat_date:
-                    st.info(f"📊 Les ratings Elo sont en retard ({rat_date.strftime('%Y-%m-%d')} vs {app_date.strftime('%Y-%m-%d')}). Recalcul...")
-                    update_progress("🎯 Recalcul des features et des ratings Elo...")
-                    result = recalculate_features_and_elo(progress_callback=update_progress)
-                    if gh_enabled:
-                        update_progress("☁️ Sync GitHub des fichiers UFC...")
-                        _push_and_report("chore: ufc recalc from streamlit")
-                    st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants) — Naviguez vers un autre onglet pour voir les données fraîches.")
-                    _clear_data_caches()
-                else:
-                    st.success("✅ Aucun nouveau combat à ajouter. Vos données sont à jour !")
-            else:
-                st.success(f"✅ {new_data['count']} nouveaux combats trouvés !")
-                
-                with st.expander(f"Voir les {new_data['count']} nouveaux combats"):
-                    for fight in new_data['new_fights'][:10]:
-                        st.write(f"🥊 {fight['red_fighter']} vs {fight['blue_fighter']} - {fight.get('event_date', 'Date inconnue')}")
-                    
-                    if len(new_data['new_fights']) > 10:
-                        st.write(f"... et {len(new_data['new_fights']) - 10} autres combats")
-                
-                update_progress("💾 Intégration des nouvelles données...")
-                update_data_files(new_data['new_appearances'])
-                
-                update_progress("🎯 Recalcul des features et des ratings Elo...")
-                result = recalculate_features_and_elo(progress_callback=update_progress)
-                
-                if gh_enabled:
-                    update_progress("☁️ Sync GitHub des fichiers UFC...")
-                    _push_and_report("chore: ufc update from streamlit")
 
-                st.success(f"✅ Mise à jour terminée ! {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants — Naviguez vers un autre onglet pour voir les données fraîches.")
-                _clear_data_caches()
-                
-        except Exception as e:
-            st.error(f"❌ Erreur lors de la mise à jour : {str(e)}")
-            st.exception(e)
-        
-        finally:
-            progress_placeholder.empty()
-    
+    # ── Résultat d'une mise à jour précédente (persisté en session_state) ──────
+    if st.session_state.get("_ufc_update_done"):
+        res = st.session_state["_ufc_update_result"]
+        st.success(res["summary"])
+        with st.expander(f"Voir les {res['new_count']} nouveaux combats", expanded=False):
+            for f in res["new_fights"][:10]:
+                st.write(f"🥊 {f['red_fighter']} vs {f['blue_fighter']} — {f.get('event_date','?')}")
+            if len(res["new_fights"]) > 10:
+                st.write(f"... et {len(res['new_fights']) - 10} autres combats")
+
+        if gh_enabled:
+            st.markdown("---")
+            st.markdown("#### ☁️ Push GitHub")
+            st.info("Les données locales sont à jour. Cliquez pour les pousser sur GitHub.")
+            push_cols = st.columns([2, 1])
+            with push_cols[0]:
+                if st.button("☁️ Pousser sur GitHub", type="primary", use_container_width=True):
+                    with st.status("Push GitHub en cours...", expanded=True) as push_status:
+                        st.write("📦 Envoi des fichiers parquet...")
+                        pushed, push_errors = sync_ufc_data_artifacts_to_github(
+                            message_prefix="chore: ufc update from streamlit"
+                        )
+                        if pushed > 0:
+                            st.write(f"✅ {pushed} fichier(s) envoyé(s)")
+                            push_status.update(label=f"✅ GitHub synchronisé ({pushed} fichiers) !", state="complete")
+                            st.session_state.pop("_ufc_update_done", None)
+                        else:
+                            st.write("❌ Aucun fichier envoyé")
+                            push_status.update(label="❌ Push GitHub échoué", state="error")
+                        if push_errors:
+                            for err in push_errors:
+                                st.warning(f"⚠️ {err}")
+            with push_cols[1]:
+                if st.button("Ignorer le push", use_container_width=True):
+                    st.session_state.pop("_ufc_update_done", None)
+        else:
+            if st.button("✔️ OK, fermer", use_container_width=True):
+                st.session_state.pop("_ufc_update_done", None)
+        st.markdown("---")
+
+    # ── Bouton principal de mise à jour ────────────────────────────────────────
+    if not st.session_state.get("_ufc_update_done"):
+        if st.button("🚀 Lancer la mise à jour", type="primary", use_container_width=True):
+            try:
+                with st.status("🔍 Recherche de nouveaux combats UFC...", expanded=True) as status:
+                    st.write("Connexion à ufcstats.com...")
+                    new_data = scrape_new_events(progress_callback=lambda m: st.write(m))
+
+                    if new_data['count'] == 0:
+                        # Vérifier si le recalcul Elo est nécessaire
+                        app_path = RAW_DIR / "appearances.parquet"
+                        rat_path = INTERIM_DIR / "ratings_timeseries.parquet"
+                        if app_path.exists() and rat_path.exists():
+                            app_date = pd.to_datetime(pd.read_parquet(app_path)['event_date']).max()
+                            rat_date = pd.to_datetime(pd.read_parquet(rat_path)['event_date']).max()
+                            if app_date > rat_date:
+                                st.write(f"📊 Ratings en retard — calcul incrémental des entrées manquantes...")
+                                # Charger seulement les appearances plus récentes que le dernier rating
+                                missing_df = pd.read_parquet(app_path)
+                                missing_df["event_date"] = pd.to_datetime(missing_df["event_date"])
+                                if "fight_id" not in missing_df.columns and "fight_url" in missing_df.columns:
+                                    missing_df["fight_id"] = missing_df["fight_url"].apply(id_from_url)
+                                if "fighter_id" not in missing_df.columns and "fighter_url" in missing_df.columns:
+                                    missing_df["fighter_id"] = missing_df["fighter_url"].apply(id_from_url)
+                                missing_df = missing_df[missing_df["event_date"] > rat_date]
+                                result = recalculate_features_and_elo_incremental(
+                                    missing_df, progress_callback=lambda m: st.write(m)
+                                )
+                                _clear_data_caches()
+                                status.update(
+                                    label=f"✅ Ratings recalculés ({result['appearances_count']} combats)",
+                                    state="complete"
+                                )
+                                st.session_state["_ufc_update_done"] = True
+                                st.session_state["_ufc_update_result"] = {
+                                    "summary": f"✅ Ratings recalculés — {result['appearances_count']} combats, {result['fighters_count']} combattants",
+                                    "new_count": 0,
+                                    "new_fights": [],
+                                }
+                            else:
+                                status.update(label="✅ Données déjà à jour !", state="complete")
+                        else:
+                            status.update(label="✅ Données déjà à jour !", state="complete")
+                    else:
+                        st.write(f"✅ {new_data['count']} nouveaux combats trouvés")
+                        st.write("💾 Intégration des nouvelles données...")
+                        new_appearances_df = pd.DataFrame(new_data['new_appearances'])
+                        update_data_files(new_data['new_appearances'])
+                        st.write("⚡ Calcul Elo incrémental (seulement les nouveaux combats)...")
+                        result = recalculate_features_and_elo_incremental(
+                            new_appearances_df,
+                            progress_callback=lambda m: st.write(m)
+                        )
+                        _clear_data_caches()
+                        status.update(
+                            label=f"✅ {new_data['count']} combats intégrés — Elo recalculé !",
+                            state="complete"
+                        )
+                        st.session_state["_ufc_update_done"] = True
+                        st.session_state["_ufc_update_result"] = {
+                            "summary": f"✅ {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants",
+                            "new_count": new_data['count'],
+                            "new_fights": new_data['new_fights'],
+                        }
+
+            except Exception as e:
+                st.error(f"❌ Erreur : {str(e)}")
+                st.exception(e)
+
     st.markdown("---")
     st.markdown("### ⚙️ Recalcul manuel complet")
-    
-    st.warning("""
-    ⚠️ Utilisez cette option uniquement si vous avez modifié manuellement les fichiers de données.
-    Cela va recalculer toutes les features et tous les Elo depuis le début.
-    """)
-    
+    st.warning("⚠️ Uniquement si vous avez modifié manuellement les fichiers de données.")
+
     if st.button("🔄 Recalculer toutes les features et Elo", use_container_width=True):
-        progress_placeholder = st.empty()
-        
-        def update_progress(message):
-            progress_placeholder.info(message)
-        
         try:
-            with st.spinner("Recalcul en cours..."):
-                result = recalculate_features_and_elo(progress_callback=update_progress)
+            with st.status("Recalcul en cours...", expanded=True) as status:
+                result = recalculate_features_and_elo(progress_callback=lambda m: st.write(m))
+                _clear_data_caches()
+                status.update(
+                    label=f"✅ Recalcul terminé — {result['appearances_count']} combats, {result['fighters_count']} combattants",
+                    state="complete"
+                )
             if gh_enabled:
-                update_progress("☁️ Sync GitHub des fichiers UFC...")
-                _push_and_report("chore: ufc manual recalc from streamlit")
-            
-            st.success("✅ Recalcul terminé !")
-            
-            stats_cols = st.columns(2)
-            with stats_cols[0]:
-                st.metric("📊 Combats total", result['appearances_count'])
-            with stats_cols[1]:
-                st.metric("🥊 Combattants", result['fighters_count'])
-            
-            st.info("💡 Rechargez la page (F5) pour voir les nouvelles données")
-            
-            if st.button("🔄 Recharger l'application maintenant", type="primary"):
-                st.rerun()
-            
+                st.session_state["_ufc_update_done"] = True
+                st.session_state["_ufc_update_result"] = {
+                    "summary": f"✅ Recalcul manuel terminé — {result['appearances_count']} combats",
+                    "new_count": 0,
+                    "new_fights": [],
+                }
         except Exception as e:
-            st.error(f"❌ Erreur lors du recalcul : {str(e)}")
+            st.error(f"❌ Erreur : {str(e)}")
             st.exception(e)
-        
-        finally:
-            progress_placeholder.empty()
     
     st.markdown("---")
     st.markdown("""
