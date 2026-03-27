@@ -3867,9 +3867,8 @@ def show_stats_update_page():
         if st.button("⬇️ Recharger les données UFC depuis GitHub", use_container_width=True):
             pulled, pull_errors = sync_ufc_data_artifacts_from_github()
             if pulled > 0:
-                st.success(f"✅ {pulled} fichier(s) UFC récupéré(s) depuis GitHub.")
+                st.success(f"✅ {pulled} fichier(s) UFC récupéré(s) depuis GitHub. Naviguez vers un autre onglet pour voir les données fraîches.")
                 _clear_data_caches()
-                st.rerun()
             else:
                 st.error("❌ Aucun fichier UFC récupéré depuis GitHub.")
             if pull_errors:
@@ -3898,8 +3897,7 @@ def show_stats_update_page():
     with col_cache2:
         if st.button("🗑️ Vider le cache", help="Force le rechargement des données"):
             st.cache_data.clear()
-            st.success("✅ Cache vidé ! Rechargez la page.")
-            st.rerun()
+            st.success("✅ Cache vidé ! Naviguez vers un autre onglet pour voir les données fraîches.")
     
     # ✅ Vérification LOCALE rapide (pas de scraping)
     st.markdown("### 📊 État des données locales")
@@ -3968,9 +3966,8 @@ def show_stats_update_page():
                     if gh_enabled:
                         update_progress("☁️ Sync GitHub des fichiers UFC...")
                         _push_and_report("chore: ufc recalc from streamlit")
-                    st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants)")
+                    st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants) — Naviguez vers un autre onglet pour voir les données fraîches.")
                     _clear_data_caches()
-                    st.rerun()
                 else:
                     st.success("✅ Aucun nouveau combat à ajouter. Vos données sont à jour !")
             else:
@@ -3993,9 +3990,8 @@ def show_stats_update_page():
                     update_progress("☁️ Sync GitHub des fichiers UFC...")
                     _push_and_report("chore: ufc update from streamlit")
 
-                st.success(f"✅ Mise à jour terminée ! {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants")
+                st.success(f"✅ Mise à jour terminée ! {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants — Naviguez vers un autre onglet pour voir les données fraîches.")
                 _clear_data_caches()
-                st.rerun()
                 
         except Exception as e:
             st.error(f"❌ Erreur lors de la mise à jour : {str(e)}")
