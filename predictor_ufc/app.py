@@ -4079,19 +4079,21 @@ def main():
     # ============================================================================
     # SIDEBAR - CONNEXION UTILISATEUR
     # ============================================================================
+    current_bankroll = 0  # valeur par défaut
+
     with st.sidebar:
         st.markdown("### 👤 Profil")
-        
+
         current_user = get_current_user()
-        
+
         if current_user:
             # Utilisateur connecté
             st.success(f"Connecté: {current_user['display_name']}")
-            
+
             if st.button("🚪 Déconnexion", use_container_width=True):
                 logout_user()
                 st.rerun()
-            
+
             # Afficher la bankroll si autorisé
             if can_view_bankroll():
                 current_bankroll = init_bankroll()
@@ -4099,11 +4101,11 @@ def main():
         else:
             # Formulaire de connexion
             st.info("🔒 Connectez-vous pour accéder aux paris et à la bankroll")
-            
+
             with st.form("login_form"):
                 password = st.text_input("Mot de passe", type="password")
                 submitted = st.form_submit_button("🔐 Connexion", use_container_width=True)
-                
+
                 if submitted and password:
                     username = authenticate_user(password)
                     if username:
@@ -4111,8 +4113,6 @@ def main():
                         st.rerun()
                     else:
                         st.error("❌ Mot de passe incorrect")
-            
-            current_bankroll = 0  # Pas de bankroll pour les visiteurs
         
         st.markdown("---")
         
@@ -4147,61 +4147,61 @@ def main():
                         st.success("Clé temporaire enregistrée pour cette session")
     
     # ============================================================================
-    # ONGLETS PRINCIPAUX
+    # NAVIGATION SIDEBAR (persiste à travers les reruns et clics de boutons)
     # ============================================================================
-    
-    # Définir les onglets selon le statut de connexion
-    if is_logged_in() and can_view_bankroll():
-        tab_labels = [
-            "🏠 Accueil",
-            "📅 Événements à venir",
-            "💰 Gestion Bankroll",
-            "🏆 Classement Elo",
-        ]
-        show_update_tab = can_access_update_tab()
-        if show_update_tab:
-            tab_labels.append("🔄 Mise à jour")
 
-        tabs = st.tabs(tab_labels)
-        tab_idx = 0
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("### 📍 Navigation")
 
-        with tabs[tab_idx]:
-            show_home_page(model_data)
-        tab_idx += 1
+        if is_logged_in() and can_view_bankroll():
+            nav_options = [
+                "🏠 Accueil",
+                "📅 Événements à venir",
+                "💰 Gestion Bankroll",
+                "🏆 Classement Elo",
+            ]
+            if can_access_update_tab():
+                nav_options.append("🔄 Mise à jour")
+        else:
+            nav_options = [
+                "🏠 Accueil",
+                "📅 Événements à venir",
+                "🏆 Classement Elo",
+            ]
 
-        with tabs[tab_idx]:
-            show_events_page(model_data, fighters_data, current_bankroll)
-        tab_idx += 1
+        # Valeur par défaut conservée entre reruns via session_state
+        if "ufc_nav" not in st.session_state or st.session_state["ufc_nav"] not in nav_options:
+            st.session_state["ufc_nav"] = nav_options[0]
 
-        with tabs[tab_idx]:
-            show_bankroll_page(current_bankroll)
-        tab_idx += 1
+        current_page = st.radio(
+            "Section",
+            nav_options,
+            index=nav_options.index(st.session_state["ufc_nav"]),
+            key="ufc_nav",
+            label_visibility="collapsed",
+        )
 
-        with tabs[tab_idx]:
-            show_rankings_page(model_data)
+    # ============================================================================
+    # AFFICHAGE DE LA PAGE ACTIVE
+    # ============================================================================
 
-        tab_idx += 1
-        if show_update_tab:
-            with tabs[tab_idx]:
-                show_stats_update_page()
-    else:
-        # Mode visiteur - accès limité
-        tabs = st.tabs([
-            "🏠 Accueil",
-            "📅 Événements à venir",
-            "🏆 Classement Elo",
-        ])
+    if current_page == "🏠 Accueil":
+        show_home_page(model_data)
 
-        with tabs[0]:
-            show_home_page(model_data)
-
-        with tabs[1]:
-            # Mode lecture seule pour les visiteurs
+    elif current_page == "📅 Événements à venir":
+        if not is_logged_in():
             st.warning("🔒 **Mode visiteur** - Connectez-vous pour enregistrer des paris et gérer votre bankroll")
-            show_events_page(model_data, fighters_data, 0)  # Bankroll = 0 pour visiteurs
+        show_events_page(model_data, fighters_data, current_bankroll)
 
-        with tabs[2]:
-            show_rankings_page(model_data)
+    elif current_page == "💰 Gestion Bankroll":
+        show_bankroll_page(current_bankroll)
+
+    elif current_page == "🏆 Classement Elo":
+        show_rankings_page(model_data)
+
+    elif current_page == "🔄 Mise à jour":
+        show_stats_update_page()
 
 if __name__ == "__main__":
     main()
