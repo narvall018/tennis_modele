@@ -4045,138 +4045,101 @@ def show_stats_update_page():
     st.markdown("---")
     st.markdown("### 🔄 Mettre à jour les données")
 
-    # ── Résultat d'une mise à jour précédente (persisté en session_state) ──────
-    if st.session_state.get("_ufc_update_done"):
-        res = st.session_state["_ufc_update_result"]
-        st.success(res["summary"])
-        with st.expander(f"Voir les {res['new_count']} nouveaux combats", expanded=False):
-            for f in res["new_fights"][:10]:
-                st.write(f"🥊 {f['red_fighter']} vs {f['blue_fighter']} — {f.get('event_date','?')}")
-            if len(res["new_fights"]) > 10:
-                st.write(f"... et {len(res['new_fights']) - 10} autres combats")
+    st.markdown("""
+    > 💡 **Cliquez sur le bouton ci-dessous** pour vérifier s'il y a de nouveaux événements UFC
+    > et mettre à jour automatiquement vos données.
+    """)
 
-        if gh_enabled:
-            st.markdown("---")
-            st.markdown("#### ☁️ Push GitHub")
-            st.info("Les données locales sont à jour. Cliquez pour les pousser sur GitHub.")
-            push_cols = st.columns([2, 1])
-            with push_cols[0]:
-                if st.button("☁️ Pousser sur GitHub", type="primary", use_container_width=True):
-                    with st.status("Push GitHub en cours...", expanded=True) as push_status:
-                        st.write("📦 Envoi des fichiers parquet...")
-                        pushed, push_errors = sync_ufc_data_artifacts_to_github(
-                            message_prefix="chore: ufc update from streamlit"
-                        )
-                        if pushed > 0:
-                            st.write(f"✅ {pushed} fichier(s) envoyé(s)")
-                            push_status.update(label=f"✅ GitHub synchronisé ({pushed} fichiers) !", state="complete")
-                            st.session_state.pop("_ufc_update_done", None)
-                        else:
-                            st.write("❌ Aucun fichier envoyé")
-                            push_status.update(label="❌ Push GitHub échoué", state="error")
-                        if push_errors:
-                            for err in push_errors:
-                                st.warning(f"⚠️ {err}")
-            with push_cols[1]:
-                if st.button("Ignorer le push", use_container_width=True):
-                    st.session_state.pop("_ufc_update_done", None)
-        else:
-            if st.button("✔️ OK, fermer", use_container_width=True):
-                st.session_state.pop("_ufc_update_done", None)
-        st.markdown("---")
+    if st.button("🚀 Lancer la mise à jour", type="primary", use_container_width=True):
 
-    # ── Bouton principal de mise à jour ────────────────────────────────────────
-    if not st.session_state.get("_ufc_update_done"):
-        if st.button("🚀 Lancer la mise à jour", type="primary", use_container_width=True):
-            try:
-                with st.status("🔍 Recherche de nouveaux combats UFC...", expanded=True) as status:
-                    st.write("Connexion à ufcstats.com...")
-                    new_data = scrape_new_events(progress_callback=lambda m: st.write(m))
+        progress_placeholder = st.empty()
 
-                    if new_data['count'] == 0:
-                        # Vérifier si le recalcul Elo est nécessaire
-                        app_path = RAW_DIR / "appearances.parquet"
-                        rat_path = INTERIM_DIR / "ratings_timeseries.parquet"
-                        if app_path.exists() and rat_path.exists():
-                            app_date = pd.to_datetime(pd.read_parquet(app_path)['event_date']).max()
-                            rat_date = pd.to_datetime(pd.read_parquet(rat_path)['event_date']).max()
-                            if app_date > rat_date:
-                                st.write(f"📊 Ratings en retard — calcul incrémental des entrées manquantes...")
-                                # Charger seulement les appearances plus récentes que le dernier rating
-                                missing_df = pd.read_parquet(app_path)
-                                missing_df["event_date"] = pd.to_datetime(missing_df["event_date"])
-                                if "fight_id" not in missing_df.columns and "fight_url" in missing_df.columns:
-                                    missing_df["fight_id"] = missing_df["fight_url"].apply(id_from_url)
-                                if "fighter_id" not in missing_df.columns and "fighter_url" in missing_df.columns:
-                                    missing_df["fighter_id"] = missing_df["fighter_url"].apply(id_from_url)
-                                missing_df = missing_df[missing_df["event_date"] > rat_date]
-                                result = recalculate_features_and_elo_incremental(
-                                    missing_df, progress_callback=lambda m: st.write(m)
-                                )
-                                _clear_data_caches()
-                                status.update(
-                                    label=f"✅ Ratings recalculés ({result['appearances_count']} combats)",
-                                    state="complete"
-                                )
-                                st.session_state["_ufc_update_done"] = True
-                                st.session_state["_ufc_update_result"] = {
-                                    "summary": f"✅ Ratings recalculés — {result['appearances_count']} combats, {result['fighters_count']} combattants",
-                                    "new_count": 0,
-                                    "new_fights": [],
-                                }
-                            else:
-                                status.update(label="✅ Données déjà à jour !", state="complete")
-                        else:
-                            status.update(label="✅ Données déjà à jour !", state="complete")
-                    else:
-                        st.write(f"✅ {new_data['count']} nouveaux combats trouvés")
-                        st.write("💾 Intégration des nouvelles données...")
-                        new_appearances_df = pd.DataFrame(new_data['new_appearances'])
-                        update_data_files(new_data['new_appearances'])
-                        st.write("⚡ Calcul Elo incrémental (seulement les nouveaux combats)...")
-                        result = recalculate_features_and_elo_incremental(
-                            new_appearances_df,
-                            progress_callback=lambda m: st.write(m)
-                        )
-                        _clear_data_caches()
-                        status.update(
-                            label=f"✅ {new_data['count']} combats intégrés — Elo recalculé !",
-                            state="complete"
-                        )
-                        st.session_state["_ufc_update_done"] = True
-                        st.session_state["_ufc_update_result"] = {
-                            "summary": f"✅ {new_data['count']} nouveaux combats | {result['appearances_count']} total | {result['fighters_count']} combattants",
-                            "new_count": new_data['count'],
-                            "new_fights": new_data['new_fights'],
-                        }
+        def update_progress(message):
+            progress_placeholder.info(message)
 
-            except Exception as e:
-                st.error(f"❌ Erreur : {str(e)}")
-                st.exception(e)
+        try:
+            with st.spinner("🔍 Connexion à UFC Stats et recherche de nouveaux événements..."):
+                new_data = scrape_new_events(progress_callback=update_progress)
+
+            if new_data['count'] == 0:
+                # Vérifier si ratings_timeseries est en retard par rapport à appearances
+                appearances_df = pd.read_parquet(RAW_DIR / "appearances.parquet")
+                ratings_df = pd.read_parquet(INTERIM_DIR / "ratings_timeseries.parquet")
+                app_date = pd.to_datetime(appearances_df['event_date']).max()
+                rat_date = pd.to_datetime(ratings_df['event_date']).max()
+
+                if app_date > rat_date:
+                    st.info(f"📊 Les ratings Elo sont en retard ({rat_date.strftime('%Y-%m-%d')} vs {app_date.strftime('%Y-%m-%d')}). Recalcul...")
+                    update_progress("🎯 Recalcul des features et des ratings Elo...")
+                    result = recalculate_features_and_elo(progress_callback=update_progress)
+                    _clear_data_caches()
+                    st.success(f"✅ Ratings recalculés ! ({result['appearances_count']} combats, {result['fighters_count']} combattants)")
+                else:
+                    st.success("✅ Aucun nouveau combat à ajouter. Vos données sont à jour !")
+            else:
+                st.success(f"✅ {new_data['count']} nouveaux combats trouvés !")
+
+                with st.expander(f"Voir les {new_data['count']} nouveaux combats"):
+                    for fight in new_data['new_fights'][:10]:
+                        st.write(f"🥊 {fight['red_fighter']} vs {fight['blue_fighter']} - {fight.get('event_date', 'Date inconnue')}")
+                    if len(new_data['new_fights']) > 10:
+                        st.write(f"... et {len(new_data['new_fights']) - 10} autres combats")
+
+                update_progress("💾 Intégration des nouvelles données...")
+                update_data_files(new_data['new_appearances'])
+
+                update_progress("🎯 Recalcul des features et des ratings Elo...")
+                result = recalculate_features_and_elo(progress_callback=update_progress)
+
+                _clear_data_caches()
+
+                st.success("✅ Mise à jour terminée avec succès !")
+
+                stats_cols = st.columns(3)
+                with stats_cols[0]:
+                    st.metric("📊 Combats total", result['appearances_count'])
+                with stats_cols[1]:
+                    st.metric("🥊 Combattants", result['fighters_count'])
+                with stats_cols[2]:
+                    st.metric("🆕 Nouveaux ajoutés", new_data['count'])
+
+                st.info("💡 Rechargez la page (F5) pour voir les nouvelles données")
+
+                if st.button("🔄 Recharger l'application", type="primary"):
+                    st.rerun()
+
+        except Exception as e:
+            st.error(f"❌ Erreur lors de la mise à jour : {str(e)}")
+            st.exception(e)
+        finally:
+            progress_placeholder.empty()
 
     st.markdown("---")
     st.markdown("### ⚙️ Recalcul manuel complet")
-    st.warning("⚠️ Uniquement si vous avez modifié manuellement les fichiers de données.")
+
+    st.warning("""
+    ⚠️ Utilisez cette option uniquement si vous avez modifié manuellement les fichiers de données.
+    Cela va recalculer toutes les features et tous les Elo depuis le début.
+    """)
 
     if st.button("🔄 Recalculer toutes les features et Elo", use_container_width=True):
+        progress_placeholder2 = st.empty()
+
+        def update_progress2(message):
+            progress_placeholder2.info(message)
+
         try:
-            with st.status("Recalcul en cours...", expanded=True) as status:
-                result = recalculate_features_and_elo(progress_callback=lambda m: st.write(m))
-                _clear_data_caches()
-                status.update(
-                    label=f"✅ Recalcul terminé — {result['appearances_count']} combats, {result['fighters_count']} combattants",
-                    state="complete"
-                )
-            if gh_enabled:
-                st.session_state["_ufc_update_done"] = True
-                st.session_state["_ufc_update_result"] = {
-                    "summary": f"✅ Recalcul manuel terminé — {result['appearances_count']} combats",
-                    "new_count": 0,
-                    "new_fights": [],
-                }
+            with st.spinner("Recalcul en cours..."):
+                result = recalculate_features_and_elo(progress_callback=update_progress2)
+            _clear_data_caches()
+            st.success(f"✅ Recalcul terminé ! {result['appearances_count']} combats | {result['fighters_count']} combattants")
+            if st.button("🔄 Recharger l'application maintenant", type="primary"):
+                st.rerun()
         except Exception as e:
-            st.error(f"❌ Erreur : {str(e)}")
+            st.error(f"❌ Erreur lors du recalcul : {str(e)}")
             st.exception(e)
+        finally:
+            progress_placeholder2.empty()
     
     st.markdown("---")
     st.markdown("""
@@ -4284,58 +4247,58 @@ def main():
                         st.success("Clé temporaire enregistrée pour cette session")
     
     # ============================================================================
-    # NAVIGATION (directement sur la page, persiste via session_state)
+    # ONGLETS PRINCIPAUX
     # ============================================================================
 
     if is_logged_in() and can_view_bankroll():
-        nav_options = [
+        tab_labels = [
             "🏠 Accueil",
             "📅 Événements à venir",
             "💰 Gestion Bankroll",
             "🏆 Classement Elo",
         ]
-        if can_access_update_tab():
-            nav_options.append("🔄 Mise à jour")
+        show_update_tab = can_access_update_tab()
+        if show_update_tab:
+            tab_labels.append("🔄 Mise à jour")
+
+        tabs = st.tabs(tab_labels)
+        tab_idx = 0
+
+        with tabs[tab_idx]:
+            show_home_page(model_data)
+        tab_idx += 1
+
+        with tabs[tab_idx]:
+            show_events_page(model_data, fighters_data, current_bankroll)
+        tab_idx += 1
+
+        with tabs[tab_idx]:
+            show_bankroll_page(current_bankroll)
+        tab_idx += 1
+
+        with tabs[tab_idx]:
+            show_rankings_page(model_data)
+        tab_idx += 1
+
+        if show_update_tab:
+            with tabs[tab_idx]:
+                show_stats_update_page()
     else:
-        nav_options = [
+        tabs = st.tabs([
             "🏠 Accueil",
             "📅 Événements à venir",
             "🏆 Classement Elo",
-        ]
+        ])
 
-    # Valeur par défaut conservée entre reruns via session_state
-    if "ufc_nav" not in st.session_state or st.session_state["ufc_nav"] not in nav_options:
-        st.session_state["ufc_nav"] = nav_options[0]
+        with tabs[0]:
+            show_home_page(model_data)
 
-    current_page = st.radio(
-        "Navigation",
-        nav_options,
-        horizontal=True,
-        key="ufc_nav",
-        label_visibility="collapsed",
-    )
-    st.divider()
-
-    # ============================================================================
-    # AFFICHAGE DE LA PAGE ACTIVE
-    # ============================================================================
-
-    if current_page == "🏠 Accueil":
-        show_home_page(model_data)
-
-    elif current_page == "📅 Événements à venir":
-        if not is_logged_in():
+        with tabs[1]:
             st.warning("🔒 **Mode visiteur** - Connectez-vous pour enregistrer des paris et gérer votre bankroll")
-        show_events_page(model_data, fighters_data, current_bankroll)
+            show_events_page(model_data, fighters_data, 0)
 
-    elif current_page == "💰 Gestion Bankroll":
-        show_bankroll_page(current_bankroll)
-
-    elif current_page == "🏆 Classement Elo":
-        show_rankings_page(model_data)
-
-    elif current_page == "🔄 Mise à jour":
-        show_stats_update_page()
+        with tabs[2]:
+            show_rankings_page(model_data)
 
 if __name__ == "__main__":
     main()
