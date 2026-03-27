@@ -133,7 +133,7 @@ def get_user_bets_folder():
 
 
 def _github_sync_enabled():
-    return GITHUB_CONFIG.get("enabled") and not _is_unified_mode()
+    return GITHUB_CONFIG.get("enabled")
 
 def logout_user():
     """Déconnecte l'utilisateur"""

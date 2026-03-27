@@ -995,14 +995,20 @@ def _gh_bets_headers():
 
 def _gh_fetch_bets():
     """Télécharge bets.csv et bankroll.json depuis GitHub vers le filesystem local."""
-    if _is_unified_mode():
-        return
     owner, repo, headers = _gh_bets_headers()
     if not headers:
         return
+    bets_file = get_bets_file()
+    bankroll_file = _current_bankroll_file()
+    try:
+        bets_gh = str(bets_file.relative_to(BASE_DIR)).replace("\\", "/")
+        bankroll_gh = str(bankroll_file.relative_to(BASE_DIR)).replace("\\", "/")
+    except ValueError:
+        bets_gh = "bets/bets.csv"
+        bankroll_gh = "bets/bankroll.json"
     for gh_path, local_path in [
-        ("bets/bets.csv", get_bets_file()),
-        ("bets/bankroll.json", _current_bankroll_file()),
+        (bets_gh, bets_file),
+        (bankroll_gh, bankroll_file),
     ]:
         url = f"https://api.github.com/repos/{owner}/{repo}/contents/{gh_path}"
         try:
@@ -1019,15 +1025,21 @@ def _gh_fetch_bets():
 
 def _gh_push_bets():
     """Pousse bets.csv et bankroll.json du filesystem local vers GitHub."""
-    if _is_unified_mode():
-        return
     owner, repo, headers = _gh_bets_headers()
     if not headers:
         return
     put_headers = {**headers, "Content-Type": "application/json"}
+    bets_file = get_bets_file()
+    bankroll_file = _current_bankroll_file()
+    try:
+        bets_gh = str(bets_file.relative_to(BASE_DIR)).replace("\\", "/")
+        bankroll_gh = str(bankroll_file.relative_to(BASE_DIR)).replace("\\", "/")
+    except ValueError:
+        bets_gh = "bets/bets.csv"
+        bankroll_gh = "bets/bankroll.json"
     for gh_path, local_path in [
-        ("bets/bets.csv", get_bets_file()),
-        ("bets/bankroll.json", _current_bankroll_file()),
+        (bets_gh, bets_file),
+        (bankroll_gh, bankroll_file),
     ]:
         if not local_path.exists():
             continue
