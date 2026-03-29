@@ -1612,7 +1612,7 @@ def recalculate_features_and_elo_incremental(new_appearances_df, progress_callba
 # CHARGEMENT DES DONNÉES
 # ============================================================================
 
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=3600)
 def load_model_and_data():
     """Charge le modèle ML et les données nécessaires"""
     data = {
@@ -1703,19 +1703,24 @@ def load_model_and_data():
     bio_path = RAW_DIR / "fighter_bio.parquet"
     if bio_path.exists():
         try:
-            bio_df = pd.read_parquet(bio_path).copy()
-            bio_df["fid"] = bio_df["fighter_url"].apply(id_from_url)
-            bio_df = bio_df[bio_df["fid"].notna() & (bio_df["fid"] != "")]
-            now = pd.Timestamp.now()
-            dob_parsed = pd.to_datetime(bio_df["dob"], errors="coerce")
-            bio_df["age_calc"] = (now - dob_parsed).dt.days / 365.25
+            bio_df = pd.read_parquet(bio_path)
             fighter_bio = {}
-            for row in bio_df[["fid", "reach_cm", "age_calc", "fighter_name"]].itertuples(index=False):
-                fighter_bio[row.fid] = {
-                    "reach_cm": row.reach_cm if pd.notna(row.reach_cm) else None,
-                    "age": float(row.age_calc) if pd.notna(row.age_calc) else None,
-                    "name": row.fighter_name if pd.notna(row.fighter_name) else "",
-                }
+            for _, row in bio_df.iterrows():
+                fighter_id = id_from_url(row.get("fighter_url", ""))
+                if fighter_id:
+                    # Calculer l'âge à partir de dob
+                    age = None
+                    if pd.notna(row.get("dob")):
+                        try:
+                            dob = pd.to_datetime(row["dob"])
+                            age = (pd.Timestamp.now() - dob).days / 365.25
+                        except:
+                            pass
+                    fighter_bio[fighter_id] = {
+                        "reach_cm": row.get("reach_cm"),
+                        "age": age,
+                        "name": row.get("fighter_name", "")
+                    }
             data["fighter_bio"] = fighter_bio
         except Exception as e:
             st.warning(f"⚠️ Erreur chargement fighter_bio: {e}")
@@ -1743,43 +1748,37 @@ def load_model_and_data():
             if 'fighter_1_id' in ratings_df.columns and 'fighter_2_id' in ratings_df.columns:
                 # ✅ Format actuel: fighter_1_id, fighter_2_id, elo_1_post, elo_2_post
                 ratings_sorted = ratings_df.sort_values('event_date')
-                # Vectorisé : groupby.last() au lieu de iterrows() O(n²)
-                cols1 = [c for c in ('elo_1_post', 'elo_1_pre') if c in ratings_sorted.columns]
-                cols2 = [c for c in ('elo_2_post', 'elo_2_pre') if c in ratings_sorted.columns]
-                if cols1:
-                    elo1 = ratings_sorted[cols1[0]]
-                    if len(cols1) > 1:
-                        elo1 = elo1.fillna(ratings_sorted[cols1[1]])
-                    elo1 = elo1.fillna(BASE_ELO)
-                    last_f1 = (ratings_sorted[['fighter_1_id']].assign(_elo=elo1)
-                               .dropna(subset=['fighter_1_id'])
-                               .groupby('fighter_1_id')['_elo'].last())
-                    elo_dict.update(last_f1.to_dict())
-                if cols2:
-                    elo2 = ratings_sorted[cols2[0]]
-                    if len(cols2) > 1:
-                        elo2 = elo2.fillna(ratings_sorted[cols2[1]])
-                    elo2 = elo2.fillna(BASE_ELO)
-                    last_f2 = (ratings_sorted[['fighter_2_id']].assign(_elo=elo2)
-                               .dropna(subset=['fighter_2_id'])
-                               .groupby('fighter_2_id')['_elo'].last())
-                    elo_dict.update(last_f2.to_dict())
-
+                for _, row in ratings_sorted.iterrows():
+                    f1_id = row.get('fighter_1_id')
+                    f1_elo = row.get('elo_1_post', row.get('elo_1_pre', BASE_ELO))
+                    f2_id = row.get('fighter_2_id')
+                    f2_elo = row.get('elo_2_post', row.get('elo_2_pre', BASE_ELO))
+                    
+                    if f1_id and pd.notna(f1_id):
+                        elo_dict[f1_id] = f1_elo
+                    if f2_id and pd.notna(f2_id):
+                        elo_dict[f2_id] = f2_elo
+            
             elif 'fa' in ratings_df.columns and 'fb' in ratings_df.columns:
-                # Ancien format : groupby.last() O(n) au lieu de boucles O(n²)
-                has_date = 'event_date' in ratings_df.columns
-                rdf = ratings_df.sort_values('event_date') if has_date else ratings_df
-                last_fa = rdf.groupby('fa')[['elo_global_fa_post'] + (['event_date'] if has_date else [])].last()
-                last_fb = rdf.groupby('fb')[['elo_global_fb_post'] + (['event_date'] if has_date else [])].last()
-                elo_dict.update(last_fa['elo_global_fa_post'].to_dict())
-                for fighter_id, row_fb in last_fb.iterrows():
+                # Ancien format (fa, fb, elo_global_fa_post, elo_global_fb_post)
+                for fighter_id in ratings_df['fa'].unique():
+                    last_fight = ratings_df[ratings_df['fa'] == fighter_id].iloc[-1]
+                    elo_dict[fighter_id] = last_fight['elo_global_fa_post']
+                
+                for fighter_id in ratings_df['fb'].unique():
                     if fighter_id not in elo_dict:
-                        elo_dict[fighter_id] = row_fb['elo_global_fb_post']
-                    elif has_date and fighter_id in last_fa.index:
-                        date_a = last_fa.loc[fighter_id, 'event_date']
-                        date_b = row_fb['event_date']
-                        if pd.notna(date_b) and (pd.isna(date_a) or date_b > date_a):
-                            elo_dict[fighter_id] = row_fb['elo_global_fb_post']
+                        last_fight = ratings_df[ratings_df['fb'] == fighter_id].iloc[-1]
+                        elo_dict[fighter_id] = last_fight['elo_global_fb_post']
+                    else:
+                        last_fight_b = ratings_df[ratings_df['fb'] == fighter_id].iloc[-1]
+                        last_fight_a = ratings_df[ratings_df['fa'] == fighter_id].iloc[-1]
+                        if 'event_date' in ratings_df.columns:
+                            date_a = last_fight_a.get('event_date')
+                            date_b = last_fight_b.get('event_date')
+                            if pd.notna(date_b) and pd.notna(date_a) and date_b > date_a:
+                                elo_dict[fighter_id] = last_fight_b['elo_global_fb_post']
+                            elif pd.notna(date_b) and pd.isna(date_a):
+                                elo_dict[fighter_id] = last_fight_b['elo_global_fb_post']
             
             data["elo_dict"] = elo_dict
             
@@ -1807,7 +1806,7 @@ def load_model_and_data():
     
     return data
 
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=3600)
 def _load_ratings_df() -> pd.DataFrame:
     """Charge ratings_timeseries.parquet une seule fois (partagé entre load_fighters_data et get_fighter_recent_fights)."""
     ratings_path = INTERIM_DIR / "ratings_timeseries.parquet"
@@ -1819,7 +1818,7 @@ def _load_ratings_df() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache_data(ttl=86400)
+@st.cache_data(ttl=3600)
 def load_fighters_data():
     """Charge les données des combattants avec Elo POST et données bio (reach, age)"""
     fighters = {}
@@ -3631,6 +3630,7 @@ def show_bankroll_page(current_bankroll):
                             new_bankroll = current_bankroll + profit
                             update_bankroll(new_bankroll, "win", f"Pari #{int(bet['bet_id'])} gagné")
                             st.success(f"✅ Pari gagné ! +{profit:.2f}€")
+                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de la clôture du pari")
@@ -3641,6 +3641,7 @@ def show_bankroll_page(current_bankroll):
                             new_bankroll = current_bankroll - bet['stake']
                             update_bankroll(new_bankroll, "loss", f"Pari #{int(bet['bet_id'])} perdu")
                             st.warning(f"❌ Pari perdu ! -{bet['stake']:.2f}€")
+                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de la clôture du pari")
@@ -3649,6 +3650,7 @@ def show_bankroll_page(current_bankroll):
                     if st.button("⚪ Annulé", key=f"void_{int(bet['bet_id'])}"):
                         if close_bet(int(bet['bet_id']), "void"):
                             st.info("⚪ Pari annulé")
+                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de l'annulation du pari")
@@ -3952,8 +3954,6 @@ def _clear_data_caches():
     load_fighters_data.clear()
     load_model_and_data.clear()
     get_fighter_recent_fights.clear()
-    # Réinitialiser le flag de chargement pour forcer le spinner au prochain accès
-    st.session_state.pop("_ufc_data_loaded", None)
 
 
 def show_stats_update_page():
@@ -4176,10 +4176,6 @@ def _sync_user_bets_from_github():
 
 
 def main():
-    # Afficher le titre immédiatement pour le feedback visuel
-    st.markdown('<div class="main-title">🥊 Combat Sports Betting App 🥊</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Modèle ML sans data leakage - Stratégies optimisées Grid Search + AG</div>', unsafe_allow_html=True)
-
     if GITHUB_CONFIG.get("enabled"):
         now_ts = time.time()
         last_sync_ts = float(st.session_state.get("_ufc_bootstrap_sync_ts", 0.0) or 0.0)
@@ -4196,15 +4192,12 @@ def main():
         _sync_user_bets_from_github()
         st.session_state["ufc_bets_synced"] = True
 
-    if "_ufc_data_loaded" not in st.session_state:
-        with st.spinner("⏳ Chargement du modèle et des données…"):
-            model_data = load_model_and_data()
-            fighters_data = load_fighters_data()
-        st.session_state["_ufc_data_loaded"] = True
-    else:
-        model_data = load_model_and_data()
-        fighters_data = load_fighters_data()
-
+    model_data = load_model_and_data()
+    fighters_data = load_fighters_data()
+    
+    st.markdown('<div class="main-title">🥊 Combat Sports Betting App 🥊</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title">Modèle ML sans data leakage - Stratégies optimisées Grid Search + AG</div>', unsafe_allow_html=True)
+    
     # ============================================================================
     # SIDEBAR - CONNEXION UTILISATEUR
     # ============================================================================
