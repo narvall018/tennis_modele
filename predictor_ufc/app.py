@@ -3631,7 +3631,6 @@ def show_bankroll_page(current_bankroll):
                             new_bankroll = current_bankroll + profit
                             update_bankroll(new_bankroll, "win", f"Pari #{int(bet['bet_id'])} gagné")
                             st.success(f"✅ Pari gagné ! +{profit:.2f}€")
-                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de la clôture du pari")
@@ -3642,7 +3641,6 @@ def show_bankroll_page(current_bankroll):
                             new_bankroll = current_bankroll - bet['stake']
                             update_bankroll(new_bankroll, "loss", f"Pari #{int(bet['bet_id'])} perdu")
                             st.warning(f"❌ Pari perdu ! -{bet['stake']:.2f}€")
-                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de la clôture du pari")
@@ -3651,7 +3649,6 @@ def show_bankroll_page(current_bankroll):
                     if st.button("⚪ Annulé", key=f"void_{int(bet['bet_id'])}"):
                         if close_bet(int(bet['bet_id']), "void"):
                             st.info("⚪ Pari annulé")
-                            time.sleep(0.5)  # Attendre sync GitHub
                             st.rerun()
                         else:
                             st.error("❌ Erreur lors de l'annulation du pari")
@@ -3955,6 +3952,8 @@ def _clear_data_caches():
     load_fighters_data.clear()
     load_model_and_data.clear()
     get_fighter_recent_fights.clear()
+    # Réinitialiser le flag de chargement pour forcer le spinner au prochain accès
+    st.session_state.pop("_ufc_data_loaded", None)
 
 
 def show_stats_update_page():
@@ -4197,7 +4196,12 @@ def main():
         _sync_user_bets_from_github()
         st.session_state["ufc_bets_synced"] = True
 
-    with st.spinner("⏳ Chargement du modèle et des données…"):
+    if "_ufc_data_loaded" not in st.session_state:
+        with st.spinner("⏳ Chargement du modèle et des données…"):
+            model_data = load_model_and_data()
+            fighters_data = load_fighters_data()
+        st.session_state["_ufc_data_loaded"] = True
+    else:
         model_data = load_model_and_data()
         fighters_data = load_fighters_data()
 
