@@ -3003,45 +3003,10 @@ def show_home_page(model_data=None):
 def show_events_page(model_data, fighters_data, current_bankroll):
     """Affiche la page des événements à venir"""
 
-    # ── Rafraîchissement demandé via bouton : traité EN PREMIER avant tout widget
-    if st.session_state.pop("_refresh_odds_requested", False):
-        with st.spinner("Récupération des cotes..."):
-            odds_data, message = fetch_mma_odds()
-        if odds_data:
-            st.session_state.api_odds = odds_data
-            st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
-            st.session_state.ufc_odds_message = message
-            save_ufc_odds_cache(odds_data, message)
-            # Incrémenter la version → les number_input auront de nouvelles clés
-            # et seront forcément recréés avec les nouvelles valeurs par défaut
-            st.session_state["odds_widget_version"] = st.session_state.get("odds_widget_version", 0) + 1
-        else:
-            st.warning(message)
-
-    # Pré-charger les événements depuis le cache (24h TTL) pour stabiliser le widget tree.
-    if 'events' not in st.session_state:
-        st.session_state.events = get_upcoming_events()
-
-    # Charger les cotes : cache disque si dispo, sinon fetch automatique au démarrage
-    if 'api_odds' not in st.session_state:
-        cache = load_ufc_odds_cache()
-        if cache:
-            st.session_state.api_odds = cache['odds_data']
-            st.session_state.ufc_odds_fetched_at = cache.get('fetched_at', '')
-            st.session_state.ufc_odds_message = cache.get('message', '')
-        elif get_odds_api_key():
-            with st.spinner("Chargement des cotes UFC..."):
-                odds_data, message = fetch_mma_odds()
-            if odds_data:
-                st.session_state.api_odds = odds_data
-                st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
-                st.session_state.ufc_odds_message = message
-                save_ufc_odds_cache(odds_data, message)
-
     st.title("📅 Événements UFC à venir")
 
     # Boutons principaux
-    btn_cols = st.columns([2, 2, 2])
+    btn_cols = st.columns([2, 2, 1])
 
     with btn_cols[0]:
         if st.button("🔄 Récupérer les événements", type="primary"):
@@ -3056,21 +3021,28 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                     st.error("❌ Aucun événement trouvé")
 
     with btn_cols[1]:
-        if st.button("💰 Rafraîchir les cotes", type="primary",
-                     help="Force un nouvel appel API (consomme votre quota)"):
-            st.session_state["_refresh_odds_requested"] = True
-            st.rerun()
+        if st.button("💰 Récupérer cotes (API)", help="Récupère automatiquement les cotes MMA depuis The Odds API"):
+            with st.spinner("Récupération des cotes..."):
+                odds_data, message = fetch_mma_odds()
+                if odds_data:
+                    st.session_state.api_odds = odds_data
+                    st.session_state.ufc_odds_fetched_at = datetime.datetime.now().strftime('%H:%M')
+                    st.session_state.ufc_odds_message = message
+                    save_ufc_odds_cache(odds_data, message)
+                    st.session_state["odds_widget_version"] = st.session_state.get("odds_widget_version", 0) + 1
+                    st.success(message)
+                else:
+                    st.warning(message)
 
-    with btn_cols[2]:
-        if st.button("🥊 Rafraîchir les combats",
-                     help="Force le rechargement des combats (utile si de nouveaux combats apparaissent quelques heures avant l'événement)"):
-            extract_fights_from_event.clear()
-            for key in list(st.session_state.keys()):
-                if key.startswith("fights_"):
-                    del st.session_state[key]
-            st.rerun()
+    # Charger les cotes depuis le cache disque au démarrage (pas d'appel réseau)
+    if 'api_odds' not in st.session_state:
+        cache = load_ufc_odds_cache()
+        if cache:
+            st.session_state.api_odds = cache['odds_data']
+            st.session_state.ufc_odds_fetched_at = cache.get('fetched_at', '')
+            st.session_state.ufc_odds_message = cache.get('message', '')
 
-    # Label timestamp (inspiré tennis)
+    # Label timestamp
     fetched_at = st.session_state.get('ufc_odds_fetched_at', '')
     odds_msg = st.session_state.get('ufc_odds_message', '')
     if fetched_at:
@@ -3085,13 +3057,13 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                 bookmaker = event_data.get('bookmaker', '')
                 fighters_str = " | ".join([f"{f}: {o:.2f}" for f, o in odds.items()])
                 st.write(f"**{event_key}** ({bookmaker}): {fighters_str}")
-    
+
     if 'events' in st.session_state and st.session_state.events:
-        
+
         st.markdown("### ⚙️ Configuration")
-        
+
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             strategy_name = st.selectbox(
                 "Stratégie de paris",
@@ -3099,9 +3071,9 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                 index=0
             )
             strategy = BETTING_STRATEGIES[strategy_name]
-            
+
             st.info(f"📝 {strategy['description']}")
-        
+
         with col2:
             model_options = ["Classique (mkt+phys)"]
             has_wf_model = model_data.get("wf_model") is not None
@@ -3129,7 +3101,7 @@ def show_events_page(model_data, fighters_data, current_bankroll):
 
         with col3:
             st.metric("💰 Bankroll actuelle", f"{current_bankroll:.2f} €")
-        
+
         with st.expander("📊 Détails de la stratégie"):
             param_cols = st.columns(3)
             with param_cols[0]:
@@ -3140,13 +3112,6 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                 st.metric("Mise max", f"{strategy['max_bet_fraction']:.0%}")
             with param_cols[2]:
                 st.metric("Mise min", f"{strategy['min_bet_pct']:.1%}")
-        
-        # Pré-charger les combats pour tous les événements avant de créer les tabs
-        # (stabilise le widget tree + évite un bouton inutile)
-        for i, event in enumerate(st.session_state.events):
-            if f"fights_{i}" not in st.session_state:
-                with st.spinner(f"Chargement des combats — {event['name']}..."):
-                    st.session_state[f"fights_{i}"] = extract_fights_from_event(event['url'])
 
         tabs = st.tabs([event['name'] for event in st.session_state.events])
 
@@ -3154,7 +3119,22 @@ def show_events_page(model_data, fighters_data, current_bankroll):
             with tab:
                 st.subheader(f"🥊 {event['name']}")
 
-                fights = st.session_state.get(f"fights_{i}", [])
+                # Bouton manuel pour charger les combats (comme l'original)
+                if st.button(f"Charger les combats", key=f"load_fights_{i}"):
+                    with st.spinner("Récupération des combats..."):
+                        fights = extract_fights_from_event(event['url'])
+                        st.session_state[f"fights_{i}"] = fights
+
+                        if fights:
+                            st.success(f"✅ {len(fights)} combats chargés")
+                        else:
+                            st.warning("⚠️ Aucun combat trouvé")
+
+                if f"fights_{i}" in st.session_state:
+                    fights = st.session_state[f"fights_{i}"]
+                else:
+                    fights = []
+
                 if fights:
                     st.markdown("---")
                     st.markdown("### 🎯 Recommandations de paris")
@@ -3519,7 +3499,10 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                         
                         st.markdown("---")
                 else:
-                    st.warning("⚠️ Aucun combat trouvé pour cet événement")
+                    if f"fights_{i}" in st.session_state:
+                        st.warning("⚠️ Aucun combat trouvé pour cet événement")
+                    else:
+                        st.info("Cliquez sur 'Charger les combats' pour voir les affrontements")
 
 # ============================================================================
 # INTERFACE - GESTION BANKROLL
@@ -4176,20 +4159,27 @@ def _sync_user_bets_from_github():
 
 
 def main():
-    if GITHUB_CONFIG.get("enabled"):
-        now_ts = time.time()
-        last_sync_ts = float(st.session_state.get("_ufc_bootstrap_sync_ts", 0.0) or 0.0)
-        # Limiter les appels API: max 1 pull / 60s / session.
-        if now_ts - last_sync_ts >= 60.0:
-            pulled, _ = sync_ufc_data_artifacts_from_github()
-            st.session_state["_ufc_bootstrap_sync_ts"] = now_ts
-            st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
-            if pulled > 0:
-                _clear_data_caches()
+    # GitHub sync uniquement en mode standalone (pas en mode unifié)
+    if _github_sync_enabled():
+        try:
+            now_ts = time.time()
+            last_sync_ts = float(st.session_state.get("_ufc_bootstrap_sync_ts", 0.0) or 0.0)
+            # Limiter les appels API: max 1 pull / 60s / session.
+            if now_ts - last_sync_ts >= 60.0:
+                pulled, _ = sync_ufc_data_artifacts_from_github()
+                st.session_state["_ufc_bootstrap_sync_ts"] = now_ts
+                st.session_state["_ufc_bootstrap_sync_pulled"] = int(pulled)
+                if pulled > 0:
+                    _clear_data_caches()
+        except Exception:
+            pass  # Ne pas bloquer l'app si GitHub est injoignable
 
     # Sync paris/bankroll depuis GitHub une seule fois par session
     if "ufc_bets_synced" not in st.session_state:
-        _sync_user_bets_from_github()
+        try:
+            _sync_user_bets_from_github()
+        except Exception:
+            pass
         st.session_state["ufc_bets_synced"] = True
 
     model_data = load_model_and_data()
