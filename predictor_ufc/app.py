@@ -1704,16 +1704,16 @@ def load_model_and_data():
     if bio_path.exists():
         try:
             bio_df = pd.read_parquet(bio_path).copy()
-            bio_df["_fighter_id"] = bio_df["fighter_url"].apply(id_from_url)
-            bio_df = bio_df[bio_df["_fighter_id"].notna() & (bio_df["_fighter_id"] != "")]
+            bio_df["fid"] = bio_df["fighter_url"].apply(id_from_url)
+            bio_df = bio_df[bio_df["fid"].notna() & (bio_df["fid"] != "")]
             now = pd.Timestamp.now()
             dob_parsed = pd.to_datetime(bio_df["dob"], errors="coerce")
-            bio_df["_age"] = (now - dob_parsed).dt.days / 365.25
+            bio_df["age_calc"] = (now - dob_parsed).dt.days / 365.25
             fighter_bio = {}
-            for row in bio_df[["_fighter_id", "reach_cm", "_age", "fighter_name"]].itertuples(index=False):
-                fighter_bio[row._fighter_id] = {
+            for row in bio_df[["fid", "reach_cm", "age_calc", "fighter_name"]].itertuples(index=False):
+                fighter_bio[row.fid] = {
                     "reach_cm": row.reach_cm if pd.notna(row.reach_cm) else None,
-                    "age": float(row._age) if pd.notna(row._age) else None,
+                    "age": float(row.age_calc) if pd.notna(row.age_calc) else None,
                     "name": row.fighter_name if pd.notna(row.fighter_name) else "",
                 }
             data["fighter_bio"] = fighter_bio
