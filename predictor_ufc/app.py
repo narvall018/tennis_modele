@@ -4199,7 +4199,8 @@ def main():
 
     with st.spinner("⏳ Chargement du modèle et des données…"):
         model_data = load_model_and_data()
-    
+        fighters_data = load_fighters_data()
+
     # ============================================================================
     # SIDEBAR - CONNEXION UTILISATEUR
     # ============================================================================
@@ -4293,9 +4294,7 @@ def main():
         tab_idx += 1
 
         with tabs[tab_idx]:
-            if "_ufc_fighters_data" not in st.session_state:
-                st.session_state["_ufc_fighters_data"] = load_fighters_data()
-            show_events_page(model_data, st.session_state["_ufc_fighters_data"], current_bankroll)
+            show_events_page(model_data, fighters_data, current_bankroll)
         tab_idx += 1
 
         with tabs[tab_idx]:
@@ -4321,9 +4320,7 @@ def main():
 
         with tabs[1]:
             st.warning("🔒 **Mode visiteur** - Connectez-vous pour enregistrer des paris et gérer votre bankroll")
-            if "_ufc_fighters_data" not in st.session_state:
-                st.session_state["_ufc_fighters_data"] = load_fighters_data()
-            show_events_page(model_data, st.session_state["_ufc_fighters_data"], 0)
+            show_events_page(model_data, fighters_data, 0)
 
         with tabs[2]:
             show_rankings_page(model_data)
