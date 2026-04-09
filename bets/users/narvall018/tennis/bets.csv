@@ -27,3 +27,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1775573143,2026-04-07 14:45,Monte-Carlo,Quarterfinals,Felix Auger-Aliassime,Marin Cilic,Auger-Aliassime F.,1.38,20.03846612908293,0.6533333333333332,0.030382513661202,-0.0984000000000002,closed,win,7.614617129051512
 1775663223,2026-04-08 15:47,Monte-Carlo,Quarterfinals,Zizou Bergs,Alexander Zverev,Zverev A.,1.24,40.38151694332793,0.88,0.0735483870967741,0.0911999999999999,closed,win,9.691564066398705
 1775726481,2026-04-09 09:21,Monte-Carlo,Quarterfinals,Alexander Blockx,Alex de Minaur,De Minaur A.,1.33,49.80588670874943,0.8125,0.0606203007518797,0.0806249999999999,closed,win,16.435942613887317
+1775764202,2026-04-09 19:50,Monte-Carlo,Quarterfinals,Valentin Vacherot,Alex de Minaur,De Minaur A.,1.39,53.13133788993013,0.7962962962962963,0.07687183586464152,0.10685185185185175,open,,0.0
