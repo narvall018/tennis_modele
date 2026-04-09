@@ -18,3 +18,4 @@ bet_id,date,event,fighter_red,fighter_blue,pick,odds,stake,model_probability,kel
 17,2026-03-25 01:44,UFC Fight Night: Adesanya vs. Pyfer,Terrance McKinney,Kyle Nelson,Terrance McKinney,1.6,31.265342287853365,0.6624315622952642,2.75,0.0374315622952642,0.0598904996724227,closed,win,18.75920537271202,60.00000000000001
 18,2026-03-25 01:45,UFC Fight Night: Adesanya vs. Pyfer,Ignacio Bahamondes,Tofiq Musayev,Ignacio Bahamondes,1.35,59.66327211542852,0.7901245790506236,2.75,0.0493838383098829,0.0666681817183418,closed,loss,-59.66327211542852,-100.0
 19,2026-03-25 01:46,UFC Fight Night: Adesanya vs. Pyfer,Casey O'Neill,Gabriella Fernandes,Casey O'Neill,2.05,31.988198007467872,0.5401129499588055,2.75,0.052308071910025,0.1072315474155511,closed,win,33.58760790784126,105.0
+20,2026-04-09 17:17,UFC 327: Prochazka vs. Ulberg,Jiri Prochazka,Carlos Ulberg,Jiri Prochazka,1.93,23.273327635671585,0.5542451126276458,2.75,0.03611039760173895,0.06969306737135628,open,,0.0,0.0
