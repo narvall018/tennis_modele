@@ -28,4 +28,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1775663223,2026-04-08 15:47,Monte-Carlo,Quarterfinals,Zizou Bergs,Alexander Zverev,Zverev A.,1.24,40.38151694332793,0.88,0.0735483870967741,0.0911999999999999,closed,win,9.691564066398705
 1775726481,2026-04-09 09:21,Monte-Carlo,Quarterfinals,Alexander Blockx,Alex de Minaur,De Minaur A.,1.33,49.80588670874943,0.8125,0.0606203007518797,0.0806249999999999,closed,win,16.435942613887317
 1775764202,2026-04-09 19:50,Monte-Carlo,Quarterfinals,Valentin Vacherot,Alex de Minaur,De Minaur A.,1.39,53.13133788993013,0.7962962962962963,0.0768718358646415,0.1068518518518517,open,,0.0
-1775764222,2026-04-09 19:50,Monte-Carlo,Quarterfinals,Joao Fonseca,Alexander Zverev,Zverev A.,1.67,50.47477099543362,0.8125,0.2136976047904191,0.35687500000000005,open,,0.0
+1775764222,2026-04-09 19:50,Monte-Carlo,Quarterfinals,Joao Fonseca,Alexander Zverev,Zverev A.,1.67,50.47477099543362,0.8125,0.2136976047904191,0.356875,closed,win,33.818096566940525
