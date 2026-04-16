@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import io
 import copy
+from typing import Optional
 
 # ── Import modules v3 (si disponibles) ──────────────────────────────────────
 _SRC_DIR = Path(__file__).parent
@@ -260,77 +261,446 @@ def load_historical_data():
 # 🔐 Clé API encodée (même clé que l'app UFC)
 _ENCODED_API_KEY = "ZTBjY2M1ZDI2NzM2YTc4ZDI3MTI1NzAzNmE4MzEzYjc="
 
-# Mapping tournois ATP connus → métadonnées (enrichi)
-# Les tournois NON listés ici seront quand même récupérés dynamiquement
+# ─────────────────────────────────────────────────────────────────────────────
+# Mapping exhaustif des tournois ATP  →  (surface, série, best_of)
+#
+# POURQUOI UN DICTIONNAIRE ET PAS L'API ?
+#   The Odds API retourne uniquement key + title (ex: "tennis_atp_munich" /
+#   "ATP Munich"). Il n'y a aucun champ surface dans la réponse. Le dictionnaire
+#   est la seule source fiable. Il est maintenu manuellement mais les surfaces
+#   ATP ne changent quasiment jamais.
+#
+# ARCHITECTURE : deux niveaux
+#   1. TENNIS_SPORT_KEYS  : lookup direct par clé API exacte (prioritaire)
+#   2. TOURNAMENT_KEYWORD_MAP + infer_tournament_info() : fallback par mots-clés
+#      extraits du titre/clé pour les tournois inconnus ou mal nommés.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Niveau 1 — clés API exactes connues
 TENNIS_SPORT_KEYS = {
-    # Grand Slams
-    'tennis_atp_aus_open_singles': {'name': 'Australian Open', 'series': 'Grand Slam', 'surface': 'Hard', 'best_of': 5},
-    'tennis_atp_french_open': {'name': 'French Open', 'series': 'Grand Slam', 'surface': 'Clay', 'best_of': 5},
-    'tennis_atp_wimbledon': {'name': 'Wimbledon', 'series': 'Grand Slam', 'surface': 'Grass', 'best_of': 5},
-    'tennis_atp_us_open': {'name': 'US Open', 'series': 'Grand Slam', 'surface': 'Hard', 'best_of': 5},
-    # Masters 1000
-    'tennis_atp_indian_wells': {'name': 'Indian Wells', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_miami_open': {'name': 'Miami Open', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_monte_carlo_masters': {'name': 'Monte-Carlo', 'series': 'Masters 1000', 'surface': 'Clay', 'best_of': 3},
-    'tennis_atp_madrid_open': {'name': 'Madrid Open', 'series': 'Masters 1000', 'surface': 'Clay', 'best_of': 3},
-    'tennis_atp_italian_open': {'name': 'Italian Open', 'series': 'Masters 1000', 'surface': 'Clay', 'best_of': 3},
-    'tennis_atp_canadian_open': {'name': 'Canadian Open', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_cincinnati_open': {'name': 'Cincinnati Open', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_shanghai_masters': {'name': 'Shanghai Masters', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_paris_masters': {'name': 'Paris Masters', 'series': 'Masters 1000', 'surface': 'Hard', 'best_of': 3},
-    # ATP 500
-    'tennis_atp_dubai': {'name': 'Dubai', 'series': 'ATP500', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_qatar_open': {'name': 'Qatar Open', 'series': 'ATP500', 'surface': 'Hard', 'best_of': 3},
-    'tennis_atp_china_open': {'name': 'China Open', 'series': 'ATP500', 'surface': 'Hard', 'best_of': 3},
+    # ── Grand Slams ───────────────────────────────────────────────────────────
+    'tennis_atp_aus_open_singles': {'name': 'Australian Open', 'series': 'Grand Slam',   'surface': 'Hard',  'best_of': 5},
+    'tennis_atp_french_open':      {'name': 'French Open',     'series': 'Grand Slam',   'surface': 'Clay',  'best_of': 5},
+    'tennis_atp_wimbledon':        {'name': 'Wimbledon',       'series': 'Grand Slam',   'surface': 'Grass', 'best_of': 5},
+    'tennis_atp_us_open':          {'name': 'US Open',         'series': 'Grand Slam',   'surface': 'Hard',  'best_of': 5},
+    # ── Masters 1000 — Hard ───────────────────────────────────────────────────
+    'tennis_atp_indian_wells':     {'name': 'Indian Wells',    'series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_miami_open':       {'name': 'Miami Open',      'series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_canadian_open':    {'name': 'Canadian Open',   'series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_cincinnati_open':  {'name': 'Cincinnati Open', 'series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_shanghai_masters': {'name': 'Shanghai Masters','series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_paris_masters':    {'name': 'Paris Masters',   'series': 'Masters 1000', 'surface': 'Hard',  'best_of': 3},
+    # ── Masters 1000 — Clay ───────────────────────────────────────────────────
+    'tennis_atp_monte_carlo_masters': {'name': 'Monte-Carlo',  'series': 'Masters 1000', 'surface': 'Clay',  'best_of': 3},
+    'tennis_atp_madrid_open':      {'name': 'Madrid Open',     'series': 'Masters 1000', 'surface': 'Clay',  'best_of': 3},
+    'tennis_atp_italian_open':     {'name': 'Italian Open',    'series': 'Masters 1000', 'surface': 'Clay',  'best_of': 3},
+    # ── ATP 500 — Hard ────────────────────────────────────────────────────────
+    'tennis_atp_rotterdam':        {'name': 'Rotterdam',       'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_dubai':            {'name': 'Dubai',           'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_qatar_open':       {'name': 'Qatar Open',      'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_acapulco':         {'name': 'Acapulco',        'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_washington':       {'name': 'Washington',      'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_china_open':       {'name': 'China Open',      'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_tokyo':            {'name': 'Tokyo',           'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_vienna':           {'name': 'Vienna',          'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    'tennis_atp_basel':            {'name': 'Basel',           'series': 'ATP500',       'surface': 'Hard',  'best_of': 3},
+    # ── ATP 500 — Clay ────────────────────────────────────────────────────────
+    'tennis_atp_barcelona_open':   {'name': 'Barcelona Open',  'series': 'ATP500',       'surface': 'Clay',  'best_of': 3},
+    'tennis_atp_munich':           {'name': 'Munich Open',     'series': 'ATP500',       'surface': 'Clay',  'best_of': 3},
+    'tennis_atp_hamburg':          {'name': 'Hamburg',         'series': 'ATP500',       'surface': 'Clay',  'best_of': 3},
+    # ── ATP 500 — Grass ───────────────────────────────────────────────────────
+    'tennis_atp_halle':            {'name': 'Halle',           'series': 'ATP500',       'surface': 'Grass', 'best_of': 3},
+    'tennis_atp_queens':           {'name': "Queen's Club",    'series': 'ATP500',       'surface': 'Grass', 'best_of': 3},
+}
+
+# Niveau 2 — mots-clés extraits du titre/clé API → (surface, série)
+# Utilisé uniquement quand le tournoi n'est pas dans TENNIS_SPORT_KEYS.
+# Ordre : du plus spécifique au plus général (premier match gagne).
+TOURNAMENT_KEYWORD_MAP = [
+    # ── Grand Slams ──────────────────────────────────────────────────────────
+    ('aus_open',       'Hard',  'Grand Slam',   5),
+    ('french_open',    'Clay',  'Grand Slam',   5),
+    ('roland',         'Clay',  'Grand Slam',   5),
+    ('wimbledon',      'Grass', 'Grand Slam',   5),
+    ('us_open',        'Hard',  'Grand Slam',   5),
+    # ── Masters 1000 ─────────────────────────────────────────────────────────
+    ('indian_wells',   'Hard',  'Masters 1000', 3),
+    ('miami',          'Hard',  'Masters 1000', 3),
+    ('monte_carlo',    'Clay',  'Masters 1000', 3),
+    ('monte carlo',    'Clay',  'Masters 1000', 3),
+    ('madrid',         'Clay',  'Masters 1000', 3),
+    ('italian',        'Clay',  'Masters 1000', 3),
+    ('rome',           'Clay',  'Masters 1000', 3),
+    ('canadian',       'Hard',  'Masters 1000', 3),
+    ('cincinnati',     'Hard',  'Masters 1000', 3),
+    ('shanghai',       'Hard',  'Masters 1000', 3),
+    ('paris_masters',  'Hard',  'Masters 1000', 3),
+    # ── ATP 500 — Clay ───────────────────────────────────────────────────────
+    ('barcelona',      'Clay',  'ATP500',       3),
+    ('munich',         'Clay',  'ATP500',       3),
+    ('hamburg',        'Clay',  'ATP500',       3),
+    # ── ATP 500 — Grass ──────────────────────────────────────────────────────
+    ('halle',          'Grass', 'ATP500',       3),
+    ('queens',         'Grass', 'ATP500',       3),
+    ("queen's",        'Grass', 'ATP500',       3),
+    # ── ATP 500 — Hard ───────────────────────────────────────────────────────
+    ('rotterdam',      'Hard',  'ATP500',       3),
+    ('dubai',          'Hard',  'ATP500',       3),
+    ('qatar',          'Hard',  'ATP500',       3),
+    ('acapulco',       'Hard',  'ATP500',       3),
+    ('washington',     'Hard',  'ATP500',       3),
+    ('beijing',        'Hard',  'ATP500',       3),
+    ('china_open',     'Hard',  'ATP500',       3),
+    ('tokyo',          'Hard',  'ATP500',       3),
+    ('vienna',         'Hard',  'ATP500',       3),
+    ('basel',          'Hard',  'ATP500',       3),
+    # ── ATP 250 — Clay ───────────────────────────────────────────────────────
+    ('cordoba',        'Clay',  'ATP250',       3),
+    ('buenos_aires',   'Clay',  'ATP250',       3),
+    ('buenos aires',   'Clay',  'ATP250',       3),
+    ('rio',            'Clay',  'ATP250',       3),
+    ('santiago',       'Clay',  'ATP250',       3),
+    ('estoril',        'Clay',  'ATP250',       3),
+    ('houston',        'Clay',  'ATP250',       3),
+    ('marrakech',      'Clay',  'ATP250',       3),
+    ('belgrade',       'Clay',  'ATP250',       3),
+    ('istanbul',       'Clay',  'ATP250',       3),
+    ('cagliari',       'Clay',  'ATP250',       3),
+    ('lyon',           'Clay',  'ATP250',       3),
+    ('geneva',         'Clay',  'ATP250',       3),
+    ('bastad',         'Clay',  'ATP250',       3),
+    ('gstaad',         'Clay',  'ATP250',       3),
+    ('kitzbuhel',      'Clay',  'ATP250',       3),
+    ('kitzbühel',      'Clay',  'ATP250',       3),
+    ('umag',           'Clay',  'ATP250',       3),
+    ('bucharest',      'Clay',  'ATP250',       3),
+    ('parma',          'Clay',  'ATP250',       3),
+    ('chile',          'Clay',  'ATP250',       3),
+    # ── ATP 250 — Grass ──────────────────────────────────────────────────────
+    ('eastbourne',     'Grass', 'ATP250',       3),
+    ('s_hertogenbosch','Grass', 'ATP250',       3),
+    ('hertogenbosch',  'Grass', 'ATP250',       3),
+    ('mallorca',       'Grass', 'ATP250',       3),
+    ('newport',        'Grass', 'ATP250',       3),
+    ('stuttgart',      'Grass', 'ATP250',       3),
+    # ── ATP 250 — Hard (les plus courants) ───────────────────────────────────
+    ('adelaide',       'Hard',  'ATP250',       3),
+    ('auckland',       'Hard',  'ATP250',       3),
+    ('doha',           'Hard',  'ATP250',       3),
+    ('pune',           'Hard',  'ATP250',       3),
+    ('montpellier',    'Hard',  'ATP250',       3),
+    ('dallas',         'Hard',  'ATP250',       3),
+    ('delray',         'Hard',  'ATP250',       3),
+    ('sofia',          'Hard',  'ATP250',       3),
+    ('metz',           'Hard',  'ATP250',       3),
+    ('chengdu',        'Hard',  'ATP250',       3),
+    ('zhuhai',         'Hard',  'ATP250',       3),
+    ('stockholm',      'Hard',  'ATP250',       3),
+    ('antwerp',        'Hard',  'ATP250',       3),
+    ('florence',       'Hard',  'ATP250',       3),
+    ('almaty',         'Hard',  'ATP250',       3),
+    ('los_cabos',      'Hard',  'ATP250',       3),
+    ('atlanta',        'Hard',  'ATP250',       3),
+]
+
+TOURNAMENT_NAME_STOPWORDS = {
+    'atp', 'wta', 'open', 'presented', 'by', 'the', 'bank', 'cup',
+    'championship', 'championships', 'tour', 'tennis', 'mens', 'men',
+    'singles', 'masters', 'international', 'classic', 'trophy', 'and',
+}
+SURFACE_OPTIONS = ["Hard", "Clay", "Grass"]
+
+SERIES_CANONICAL_MAP = {
+    'international': 'ATP250',
+    'atp250': 'ATP250',
+    'international gold': 'ATP500',
+    'atp500': 'ATP500',
+    'masters': 'Masters 1000',
+    'masters 1000': 'Masters 1000',
+    'grand slam': 'Grand Slam',
 }
 
 
-def infer_tournament_info(sport_key, sport_title):
-    """Infère les métadonnées d'un tournoi ATP non listé dans TENNIS_SPORT_KEYS.
-    
-    Utilise le nom et la clé pour deviner la surface, le type de tournoi, etc.
-    """
-    # Déjà connu ?
-    if sport_key in TENNIS_SPORT_KEYS:
-        return TENNIS_SPORT_KEYS[sport_key]
-    
-    title_lower = sport_title.lower() if sport_title else sport_key.lower()
-    key_lower = sport_key.lower()
-    
-    # Détecter la série
-    if 'grand slam' in title_lower or any(gs in key_lower for gs in ['aus_open', 'french_open', 'wimbledon', 'us_open']):
-        series = 'Grand Slam'
-        best_of = 5
-    elif 'masters' in title_lower or 'masters' in key_lower:
-        series = 'Masters 1000'
-        best_of = 3
+def normalize_tournament_lookup(value: str) -> str:
+    """Normalise un libellé de tournoi pour les rapprochements."""
+    if not value:
+        return ""
+    text = unicodedata.normalize('NFKD', str(value))
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    text = text.lower().replace('&', ' and ')
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def tokenize_tournament_lookup(value: str) -> list[str]:
+    """Extrait les tokens discriminants d'un nom de tournoi."""
+    tokens = []
+    for tok in normalize_tournament_lookup(value).split():
+        if tok in TOURNAMENT_NAME_STOPWORDS:
+            continue
+        if len(tok) == 1 and not tok.isdigit():
+            continue
+        tokens.append(tok)
+    return tokens
+
+
+@st.cache_data(ttl=86400)
+def load_tournament_reference():
+    """Construit un référentiel local des tournois à partir de l'historique ATP."""
+    data_file = DATA_DIR / "atp_tennis.csv"
+    if not data_file.exists():
+        return []
+
+    try:
+        df = pd.read_csv(
+            data_file,
+            usecols=["Tournament", "Series", "Surface", "Best of"],
+            low_memory=False,
+        )
+    except Exception:
+        return []
+
+    if df.empty:
+        return []
+
+    df = df.dropna(subset=["Tournament", "Surface"])
+    if df.empty:
+        return []
+
+    series_norm = (
+        df["Series"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .map(SERIES_CANONICAL_MAP)
+        .fillna(df["Series"].astype(str).str.strip())
+    )
+    df = df.assign(
+        SeriesCanonical=series_norm,
+        BestOfNumeric=pd.to_numeric(df["Best of"], errors="coerce"),
+    )
+
+    catalog = []
+    for tournament, group in df.groupby("Tournament", sort=True):
+        normalized = normalize_tournament_lookup(tournament)
+        tokens = tokenize_tournament_lookup(tournament)
+        if not normalized or not tokens:
+            continue
+
+        surface_mode = group["Surface"].dropna().mode()
+        if surface_mode.empty:
+            continue
+
+        series_mode = group["SeriesCanonical"].dropna().mode()
+        best_of_mode = group["BestOfNumeric"].dropna().mode()
+
+        catalog.append({
+            "name": str(tournament).strip(),
+            "normalized": normalized,
+            "tokens": tokens,
+            "surface": str(surface_mode.iloc[0]).strip(),
+            "series": str(series_mode.iloc[0]).strip() if not series_mode.empty else "ATP250",
+            "best_of": int(best_of_mode.iloc[0]) if not best_of_mode.empty else 3,
+        })
+
+    return catalog
+
+
+def find_tournament_reference_match(sport_key: str, sport_title: str, min_score: float = 0.74) -> Optional[dict]:
+    """Trouve le meilleur match dans l'historique local des tournois."""
+    catalog = load_tournament_reference()
+    if not catalog:
+        return None
+
+    candidates = []
+    clean_title = (sport_title or "").replace("ATP ", "").replace("WTA ", "").strip()
+    if clean_title:
+        candidates.append(clean_title)
+
+    key_title = (
+        sport_key
+        .replace("tennis_atp_", "")
+        .replace("tennis_wta_", "")
+        .replace("_", " ")
+        .strip()
+        .title()
+    )
+    if key_title and key_title not in candidates:
+        candidates.append(key_title)
+
+    best_match = None
+    best_score = 0.0
+
+    for candidate in candidates:
+        candidate_norm = normalize_tournament_lookup(candidate)
+        candidate_tokens = set(tokenize_tournament_lookup(candidate))
+        if not candidate_norm:
+            continue
+
+        for ref in catalog:
+            score = 0.0
+            ref_tokens = set(ref["tokens"])
+
+            if candidate_norm == ref["normalized"]:
+                score = 1.0
+            elif len(candidate_norm) >= 6 and (
+                candidate_norm in ref["normalized"] or ref["normalized"] in candidate_norm
+            ):
+                score = 0.93
+            elif candidate_tokens and ref_tokens:
+                overlap = candidate_tokens & ref_tokens
+                if overlap:
+                    score = len(overlap) / max(len(candidate_tokens), len(ref_tokens))
+                    if overlap == candidate_tokens or overlap == ref_tokens:
+                        score += 0.12
+
+            if score > best_score:
+                best_score = score
+                best_match = (candidate, ref)
+
+    if not best_match or best_score < min_score:
+        return None
+
+    candidate, ref = best_match
+    return {
+        "candidate": candidate,
+        "reference": ref,
+        "confidence": round(best_score, 2),
+    }
+
+
+def infer_tournament_info_from_history(sport_key: str, sport_title: str) -> Optional[dict]:
+    """Fallback sur l'historique local quand la clé API exacte est inconnue."""
+    match = find_tournament_reference_match(sport_key, sport_title)
+    if not match:
+        return None
+
+    clean_title = (sport_title or "").replace("ATP ", "").replace("WTA ", "").strip()
+    ref = match["reference"]
+    return {
+        "name": clean_title or ref["name"],
+        "series": ref["series"],
+        "surface": ref["surface"],
+        "best_of": ref["best_of"],
+        "source": "history",
+        "matched_on": f"{match['candidate']} -> {ref['name']}",
+        "confidence": match["confidence"],
+    }
+
+
+def get_tournament_surface_review(sport_key: str, sport_title: str, inferred_info: dict) -> dict:
+    """Détermine si la surface doit être confirmée par l'utilisateur."""
+    review = {
+        "status": "ok",
+        "needs_user_choice": False,
+        "message": "",
+        "suggested_surface": inferred_info.get("surface", "Hard"),
+        "reference_surface": None,
+        "reference_name": "",
+        "confidence": inferred_info.get("confidence", 0.0),
+    }
+
+    ref_match = find_tournament_reference_match(sport_key, sport_title)
+    ref = ref_match["reference"] if ref_match else None
+    ref_surface = ref["surface"] if ref else None
+    ref_name = ref["name"] if ref else ""
+
+    review["reference_surface"] = ref_surface
+    review["reference_name"] = ref_name
+    if ref_match:
+        review["confidence"] = max(review["confidence"], ref_match["confidence"])
+
+    in_exact_dictionary = sport_key in TENNIS_SPORT_KEYS
+    inferred_surface = inferred_info.get("surface", "Hard")
+
+    if in_exact_dictionary:
+        if ref_surface and ref_surface != inferred_surface:
+            review["status"] = "mismatch"
+            review["needs_user_choice"] = True
+            review["message"] = (
+                f"Mismatch detecte: dictionnaire={inferred_surface}, historique={ref_surface} ({ref_name})."
+            )
+        return review
+
+    review["status"] = "not_in_dictionary"
+    review["needs_user_choice"] = True
+    if ref_surface:
+        if ref_surface != inferred_surface:
+            review["status"] = "mismatch"
+            review["message"] = (
+                f"Absent du dictionnaire exact: inference={inferred_surface}, historique={ref_surface} ({ref_name})."
+            )
+            review["suggested_surface"] = ref_surface
+        else:
+            review["message"] = (
+                f"Absent du dictionnaire exact: surface suggeree {ref_surface} via historique ({ref_name})."
+            )
+            review["suggested_surface"] = ref_surface
     else:
-        series = 'ATP'
-        best_of = 3
-    
-    # Détecter la surface par mots-clés dans le titre/clé
-    clay_keywords = ['french', 'roland', 'rome', 'italian', 'madrid', 'monte_carlo',
-                     'monte carlo', 'barcelona', 'hamburg', 'buenos_aires', 'rio',
-                     'chile', 'santiago', 'cordoba', 'bastad', 'gstaad', 'kitzbuhel',
-                     'umag', 'bucharest', 'lyon', 'geneva', 'parma', 'marrakech']
-    grass_keywords = ['wimbledon', 'halle', 'queens', 'queen', 'eastbourne', 'stuttgart_grass',
-                      's_hertogenbosch', 'mallorca', 'newport']
-    
-    surface = 'Hard'  # Default
-    for kw in clay_keywords:
-        if kw in key_lower or kw in title_lower:
-            surface = 'Clay'
-            break
-    if surface == 'Hard':
-        for kw in grass_keywords:
-            if kw in key_lower or kw in title_lower:
-                surface = 'Grass'
-                break
-    
-    # Nom lisible
-    name = sport_title.replace('ATP ', '').replace('WTA ', '') if sport_title else sport_key.replace('tennis_atp_', '').replace('_', ' ').title()
-    
-    return {'name': name, 'series': series, 'surface': surface, 'best_of': best_of}
+        review["message"] = (
+            f"Absent du dictionnaire exact: surface suggeree {inferred_surface} via {inferred_info.get('source', 'fallback')}."
+        )
+
+    return review
+
+
+def infer_tournament_info(sport_key: str, sport_title: str) -> dict:
+    """Infère surface + série d'un tournoi depuis sa clé/son titre API.
+
+    Stratégie :
+      1. Lookup direct dans TENNIS_SPORT_KEYS (exact, prioritaire).
+      2. Fallback sur l'historique local des tournois ATP.
+      3. Parcours de TOURNAMENT_KEYWORD_MAP : premier mot-clé trouvé dans
+         la clé ou le titre API gagne → retourne surface + série cohérentes.
+      4. Fallback : Hard / ATP250 (conservateur, jamais silencieusement faux
+         pour une surface clay/grass).
+    """
+    # Niveau 1 — lookup exact
+    if sport_key in TENNIS_SPORT_KEYS:
+        info = dict(TENNIS_SPORT_KEYS[sport_key])
+        info.update({
+            'source': 'exact_key',
+            'matched_on': sport_key,
+            'confidence': 1.0,
+        })
+        return info
+
+    history_info = infer_tournament_info_from_history(sport_key, sport_title)
+    if history_info:
+        return history_info
+
+    key_lower   = sport_key.lower()
+    title_lower = sport_title.lower() if sport_title else key_lower
+
+    # Niveau 3 — mots-clés
+    for keyword, surface, series, best_of in TOURNAMENT_KEYWORD_MAP:
+        if keyword in key_lower or keyword in title_lower:
+            name = (sport_title.replace('ATP ', '').replace('WTA ', '').strip()
+                    if sport_title else
+                    sport_key.replace('tennis_atp_', '').replace('_', ' ').title())
+            return {
+                'name': name,
+                'series': series,
+                'surface': surface,
+                'best_of': best_of,
+                'source': 'keyword',
+                'matched_on': keyword,
+                'confidence': 0.8,
+            }
+
+    # Niveau 4 — fallback conservateur
+    name = (sport_title.replace('ATP ', '').replace('WTA ', '').strip()
+            if sport_title else
+            sport_key.replace('tennis_atp_', '').replace('_', ' ').title())
+    return {
+        'name': name,
+        'series': 'ATP250',
+        'surface': 'Hard',
+        'best_of': 3,
+        'source': 'default',
+        'matched_on': 'hard_default',
+        'confidence': 0.0,
+    }
 
 def _decode_api_key():
     """Décode la clé API"""
@@ -1722,17 +2092,89 @@ def show_events_page():
         st.info("📭 Aucun match ATP en cours. Cliquez sur 🔄 pour vérifier.")
         return
 
+    surface_overrides = dict(st.session_state.get("events_surface_overrides", {}))
+    tournament_contexts = {}
+    review_items = []
+
+    for sport_key in events_data.keys():
+        info = events_info.get(sport_key, {})
+        sport_title = info.get('title', sport_key)
+        inferred_info = infer_tournament_info(sport_key, sport_title)
+        review = get_tournament_surface_review(sport_key, sport_title, inferred_info)
+        selected_surface = surface_overrides.get(sport_key, review["suggested_surface"])
+        if selected_surface not in SURFACE_OPTIONS:
+            selected_surface = review["suggested_surface"] if review["suggested_surface"] in SURFACE_OPTIONS else "Hard"
+
+        tournament_contexts[sport_key] = {
+            "title": sport_title,
+            "info": inferred_info,
+            "review": review,
+            "surface_used": selected_surface,
+        }
+
+        if review["needs_user_choice"]:
+            review_items.append({
+                "sport_key": sport_key,
+                "title": sport_title,
+                "info": inferred_info,
+                "review": review,
+                "selected_surface": selected_surface,
+            })
+
+    if review_items:
+        st.warning(
+            "Certaines surfaces doivent etre confirmees avant prediction. "
+            "Choisissez la surface a utiliser dans la liste ci-dessous."
+        )
+        with st.expander("Verifier / choisir la surface des tournois", expanded=True):
+            for item in review_items:
+                sport_key = item["sport_key"]
+                inferred_info = item["info"]
+                review = item["review"]
+                source_label = {
+                    "history": "historique local",
+                    "keyword": "mots-cles",
+                    "default": "fallback par defaut",
+                    "exact_key": "dictionnaire exact",
+                }.get(inferred_info.get("source"), inferred_info.get("source", "inconnu"))
+                st.caption(
+                    f"{item['title']} | surface detectee: {inferred_info.get('surface', 'Hard')} | "
+                    f"source: {source_label} | {review['message']}"
+                )
+                selected_surface = st.selectbox(
+                    f"Surface pour {item['title']}",
+                    SURFACE_OPTIONS,
+                    index=SURFACE_OPTIONS.index(item["selected_surface"]),
+                    key=f"surface_override_{sport_key}",
+                )
+                surface_overrides[sport_key] = selected_surface
+                tournament_contexts[sport_key]["surface_used"] = selected_surface
+
+        st.session_state["events_surface_overrides"] = surface_overrides
+
     # ── Traitement de tous les matchs ──────────────────────────────────────
     # On calcule les prédictions une seule fois pour tous les matchs
     all_processed = []  # liste de dicts avec toutes les infos
+    manual_surface_warnings = []
 
     for sport_key, events in events_data.items():
-        info = events_info.get(sport_key, {})
-        t_info = info.get('info', {}) or infer_tournament_info(sport_key, info.get('title', sport_key))
+        info = tournament_contexts.get(sport_key, {})
+        t_info = info.get('info', {}) or infer_tournament_info(sport_key, sport_key)
+        review = info.get('review', {})
         tournament_name = t_info.get('name', sport_key)
         series = t_info.get('series', 'ATP')
-        surface = t_info.get('surface', 'Hard')
+        surface = info.get('surface_used', t_info.get('surface', 'Hard'))
         best_of = t_info.get('best_of', 3)
+        inference_source = 'manual_override' if surface != t_info.get('surface', surface) else t_info.get('source', 'unknown')
+        surface_label = f"{surface} (choisie)" if review.get("needs_user_choice") else surface
+
+        if review.get("needs_user_choice"):
+            manual_surface_warnings.append({
+                'sport_key': sport_key,
+                'title': tournament_contexts.get(sport_key, {}).get('title', sport_key),
+                'surface': surface,
+                'auto_surface': t_info.get('surface', 'Hard'),
+            })
 
         for event in events:
             home = event['home']
@@ -1780,12 +2222,22 @@ def show_events_page():
                 'bookmaker': bookmaker, 'time_str': time_str,
                 'tournament_name': tournament_name, 'series': series,
                 'surface': surface, 'best_of': best_of,
+                'surface_source': inference_source,
+                'surface_label': surface_label,
+                'surface_auto': t_info.get('surface', surface),
                 'event_id': event.get('event_id', ''),
                 'all_bookmakers': event.get('all_bookmakers', []),
                 'pred': pred,
                 'stake_info': stake_info,
                 'has_bet': pred is not None and pred.get('best_bet') is not None,
             })
+
+    if manual_surface_warnings:
+        labels = [
+            f"{item['title']} (`{item['sport_key']}`) -> {item['surface']}"
+            for item in manual_surface_warnings
+        ]
+        st.info("Predictions calculees avec la surface choisie pour : " + ", ".join(sorted(set(labels))) + ".")
 
     # ── Résumé global ──────────────────────────────────────────────────────
     n_total = len(all_processed)
@@ -1839,7 +2291,7 @@ def show_events_page():
                         <span style="color:{conf_color}; font-weight:bold;">{conf_label}</span>
                     </div>
                     <div style="margin-top:4px; color:#aaa; font-size:0.85rem;">
-                        {m['tournament_name']} | {m['series']} | {m['surface']} | ⏰ {m['time_str']}
+                        {m['tournament_name']} | {m['series']} | {m['surface_label']} | ⏰ {m['time_str']}
                     </div>
                     <hr style="margin:8px 0; border-color:#444;">
                     <div style="display:flex; gap:24px; flex-wrap:wrap;">
@@ -1896,10 +2348,11 @@ def show_events_page():
         for tourn_name, group in groupby(sorted_matches, key=lambda x: x['tournament_name']):
             group = list(group)
             surf = group[0]['surface']
+            surf_label = group[0].get('surface_label', surf)
             series = group[0]['series']
             surf_em = get_surface_emoji(surf)
             gs_badge = ' 🏆' if series == 'Grand Slam' else ''
-            st.markdown(f"#### {surf_em} {tourn_name}{gs_badge} — {series} | {surf}")
+            st.markdown(f"#### {surf_em} {tourn_name}{gs_badge} — {series} | {surf_label}")
 
             for m in group:
                 pred = m['pred']
