@@ -63,4 +63,5 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1777106638,2026-04-25 08:43,Madrid Open,Quarterfinals,Nicolai Budkov Kjaer,Denis Shapovalov,Shapovalov D.,1.66,40.02549815142087,0.7385321100917431,0.1361224715375262,0.2259633027522936,closed,loss,-40.02549815142087
 1777106661,2026-04-25 08:44,Madrid Open,Quarterfinals,Cameron Norrie,Thiago Agustin Tirante,Norrie C.,1.79,29.94274631775212,0.6629213483146067,0.1042621304375117,0.1866292134831459,open,,0.0
 1777106681,2026-04-25 08:44,Madrid Open,Quarterfinals,Dino Prizmic,Tomas Martin Etcheverry,Etcheverry T.,1.92,29.221668742369776,0.6933333333333334,0.1725,0.3311999999999999,open,,0.0
-1777144867,2026-04-25 19:21,Madrid Open,Quarterfinals,Adolfo Daniel Vallejo,Flavio Cobolli,Cobolli F.,1.64,44.09524836435014,0.7385321100917431,0.12877601253076754,0.2111926605504586,open,,0.0
+1777144867,2026-04-25 19:21,Madrid Open,Quarterfinals,Adolfo Daniel Vallejo,Flavio Cobolli,Cobolli F.,1.64,44.09524836435014,0.7385321100917431,0.1287760125307675,0.2111926605504586,open,,0.0
+1777144882,2026-04-25 19:21,Madrid Open,Quarterfinals,Alexander Blockx,Felix Auger-Aliassime,Auger-Aliassime F.,1.43,18.21778831950792,0.7385321100917431,0.03923141079104375,0.05610091743119261,open,,0.0
