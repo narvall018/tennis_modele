@@ -65,4 +65,5 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1777106681,2026-04-25 08:44,Madrid Open,Quarterfinals,Dino Prizmic,Tomas Martin Etcheverry,Etcheverry T.,1.92,29.221668742369776,0.6933333333333334,0.1725,0.3311999999999999,closed,win,26.88393524298019
 1777144867,2026-04-25 19:21,Madrid Open,Quarterfinals,Adolfo Daniel Vallejo,Flavio Cobolli,Cobolli F.,1.64,44.09524836435014,0.7385321100917431,0.1287760125307675,0.2111926605504586,open,,0.0
 1777144882,2026-04-25 19:21,Madrid Open,Quarterfinals,Alexander Blockx,Felix Auger-Aliassime,Auger-Aliassime F.,1.43,18.21778831950792,0.7385321100917431,0.0392314107910437,0.0561009174311926,open,,0.0
-1777244527,2026-04-26 23:02,Madrid Open,Quarterfinals,Stefanos Tsitsipas,Daniel Merida Aguilar,Tsitsipas S.,1.47,46.46475252486355,0.8235294117647058,0.14325730292116845,0.21058823529411752,open,,0.0
+1777244527,2026-04-26 23:02,Madrid Open,Quarterfinals,Stefanos Tsitsipas,Daniel Merida Aguilar,Tsitsipas S.,1.47,46.46475252486355,0.8235294117647058,0.1432573029211684,0.2105882352941175,open,,0.0
+1777244541,2026-04-26 23:02,Madrid Open,Quarterfinals,Daniil Medvedev,Nicolai Budkov Kjaer,Medvedev D.,1.34,44.14151489862037,0.8636363636363636,0.1173677069199458,0.15727272727272745,open,,0.0
