@@ -73,3 +73,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1777592689,2026-04-30 23:44,Madrid Open,Quarterfinals,Alexander Blockx,Alexander Zverev,Zverev A.,1.28,24.280984925754705,0.8125,0.03125,0.04,closed,win,6.798675779211318
 1777852311,2026-05-03 23:51,Italian Open,Quarterfinals,Zsombor Piros,Henrique Rocha,Rocha H.,2.22,51.33000213304541,0.7385321100917431,0.2880816596412927,0.6395412844036699,closed,void,0.0
 1777899817,2026-05-04 13:03,Italian Open,Quarterfinals,Pablo Llamas Ruiz,Henrique Rocha,Rocha H.,2.06,39.01080162111452,0.6933333333333334,0.2078964401294498,0.4282666666666668,closed,win,41.35144971838139
+1777914536,2026-05-04 17:08,Italian Open,Quarterfinals,Daniel Merida Aguilar,Marcelo Tomas Barrios Vera,Merida Aguilar D.,1.58,16.019272385689344,0.6629213483146067,0.030009955909543473,0.04741573033707858,open,,0.0
