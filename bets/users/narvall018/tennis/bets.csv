@@ -81,3 +81,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1778009418,2026-05-05 19:30,Italian Open,Quarterfinals,Thiago Agustin Tirante,Gianluca Cadenasso,Tirante T.A.,1.55,12.813236357302552,0.6666666666666666,0.021505376344086,0.0333333333333332,open,,0.0
 1778009438,2026-05-05 19:30,Italian Open,Quarterfinals,Matteo Arnaldi,Jaume Munar,Munar J.,2.29,33.65610083184804,0.6933333333333334,0.2566521106259097,0.5877333333333334,closed,loss,-33.65610083184804
 1778009482,2026-05-05 19:31,Italian Open,Quarterfinals,Marcos Giron,Marin Cilic,Cilic M.,1.66,19.24932545893348,0.6592592592592592,0.0568496207050422,0.0943703703703702,open,,0.0
+1778145060,2026-05-07 09:11,Italian Open,Quarterfinals,Nikoloz Basilashvili,Daniel Merida Aguilar,Merida Aguilar D.,1.67,39.424854725270976,0.7385321100917431,0.13972971488216224,0.23334862385321098,open,,0.0
