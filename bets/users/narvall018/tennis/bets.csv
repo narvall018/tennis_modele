@@ -100,4 +100,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1778398655,2026-05-10 07:37,Italian Open,Quarterfinals,Learner Tien,Alexander Bublik,Bublik A.,1.51,34.76777331682115,0.7385321100917431,0.076280454462604,0.1151834862385321,closed,loss,-34.76777331682115
 1778398667,2026-05-10 07:37,Italian Open,Quarterfinals,Matteo Arnaldi,Rafael Jodar,Jodar R.,1.31,22.863082117277905,0.8125,0.0491412213740458,0.064375,closed,win,7.087555456356152
 1778495716,2026-05-11 10:35,Italian Open,Quarterfinals,Frances Tiafoe,Andrea Pellegrino,Tiafoe F.,1.48,33.3837624237979,0.84375,0.1680743243243243,0.24875,open,,0.0
-1778495727,2026-05-11 10:35,Italian Open,Quarterfinals,Pablo Llamas Ruiz,Daniil Medvedev,Medvedev D.,1.48,31.714574302608003,0.8125,0.13682432432432434,0.2024999999999999,open,,0.0
+1778495727,2026-05-11 10:35,Italian Open,Quarterfinals,Pablo Llamas Ruiz,Daniil Medvedev,Medvedev D.,1.48,31.714574302608003,0.8125,0.1368243243243243,0.2024999999999999,closed,win,15.22299566525184
