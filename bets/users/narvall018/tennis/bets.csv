@@ -103,3 +103,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1778495727,2026-05-11 10:35,Italian Open,Quarterfinals,Pablo Llamas Ruiz,Daniil Medvedev,Medvedev D.,1.48,31.714574302608003,0.8125,0.1368243243243243,0.2024999999999999,closed,win,15.22299566525184
 1778747838,2026-05-14 08:37,Italian Open,Quarterfinals,Martin Landaluce,Daniil Medvedev,Medvedev D.,1.35,32.4757240858706,0.8125,0.0717592592592593,0.096875,closed,win,11.366503430054712
 1779025953,2026-05-17 13:52,Hamburg Open,Quarterfinals,Tommy Paul,Ethan Quinn,Paul T.,1.36,33.04404925737333,0.8235294117647058,0.088235294117647,0.1200000000000001,closed,win,11.895857732654402
+1779037542,2026-05-17 17:05,Hamburg Open,Quarterfinals,Miomir Kecmanovic,Karen Khachanov,Khachanov K.,1.72,33.63884214400605,0.7385321100917431,0.1571367612545338,0.27027522935779813,open,,0.0
