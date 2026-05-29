@@ -141,3 +141,4 @@ bet_id,date,tournament,round,player_1,player_2,pick,odds,stake,model_prob,edge,e
 1779916924,2026-05-27 21:22,French Open,Quarterfinals,Raphael Collignon,Ben Shelton,Shelton B.,1.5,29.772140834977325,0.8125,0.1458333333333333,0.21875,closed,loss,-29.772140834977325
 1779916944,2026-05-27 21:22,French Open,Quarterfinals,Felix Auger-Aliassime,Roman Andres Burruchaga,Auger-Aliassime F.,1.39,28.283533793228457,0.84375,0.1243255395683452,0.1728124999999998,closed,win,11.030578179359097
 1779916968,2026-05-27 21:22,French Open,Quarterfinals,Matteo Arnaldi,Stefanos Tsitsipas,Tsitsipas S.,1.57,26.86935710356704,0.7385321100917431,0.1015894349325075,0.1594954128440366,closed,loss,-26.86935710356704
+1780068790,2026-05-29 15:33,French Open,Quarterfinals,Karen Khachanov,Jesper De Jong,Khachanov K.,2.07,29.678802561868366,0.8235294117647058,0.3404376243250923,0.7047058823529411,open,,0.0
