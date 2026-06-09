@@ -18,6 +18,8 @@ import base64
 import io
 import urllib.request
 import urllib.error
+import urllib.parse
+import http.cookiejar
 import hashlib
 
 # ============================================================================
@@ -965,27 +967,76 @@ def to_float_safe(x):
 
 _last_request_time = 0
 
-def make_request(url, max_retries=2):
-    """Effectue une requête HTTP avec urllib (sans dépendance curl)"""
+# Opener partagé avec gestion des cookies : nécessaire pour conserver le cookie
+# posé par ufcstats.com après résolution de son défi anti-bot.
+_cookie_jar = http.cookiejar.CookieJar()
+_opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(_cookie_jar))
+
+_SCRAPE_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+}
+
+
+def _solve_ufcstats_challenge(html, page_url):
+    """Franchit le défi proof-of-work JS de ufcstats.com (page « Checking your browser… »).
+
+    Le serveur sert une page de défi qui demande de trouver un entier n tel que
+    sha256(nonce + ':' + n) commence par `target` zéros hexadécimaux, puis de POSTer
+    (nonce, n) sur /__c. Le serveur répond alors avec un cookie de validation qui
+    débloque les pages suivantes. Retourne True si le défi a été résolu.
+    """
+    m_nonce = re.search(r'nonce\s*=\s*"([0-9a-fA-F]+)"', html)
+    if not m_nonce:
+        return False
+    nonce = m_nonce.group(1)
+    m_target = re.search(r'target\s*=\s*new Array\((\d+)\+1\)', html)
+    tlen = int(m_target.group(1)) if m_target else 2
+    target = '0' * tlen
+
+    n = 0
+    while n < 50_000_000:  # garde-fou : un PoW de quelques zéros se résout en <1s
+        if hashlib.sha256(f'{nonce}:{n}'.encode()).hexdigest()[:tlen] == target:
+            break
+        n += 1
+    else:
+        return False
+
+    try:
+        post_url = urllib.parse.urljoin(page_url, '/__c')
+        data = urllib.parse.urlencode({'nonce': nonce, 'n': n}).encode()
+        req = urllib.request.Request(
+            post_url, data=data,
+            headers={**_SCRAPE_HEADERS, 'Content-Type': 'application/x-www-form-urlencoded'},
+        )
+        _opener.open(req, timeout=20)
+        return True
+    except Exception:
+        return False
+
+
+def make_request(url, max_retries=3):
+    """Effectue une requête HTTP, en franchissant le défi anti-bot d'ufcstats si besoin."""
     global _last_request_time
 
-    # Rate limiting: minimum 1.0 seconde entre les requêtes
-    elapsed = time.time() - _last_request_time
-    if elapsed < 1.0:
-        time.sleep(1.0 - elapsed)
-
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-    }
-
     for _ in range(max_retries):
+        # Rate limiting: minimum 1.0 seconde entre les requêtes
+        elapsed = time.time() - _last_request_time
+        if elapsed < 1.0:
+            time.sleep(1.0 - elapsed)
         try:
             _last_request_time = time.time()
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=20) as response:
+            req = urllib.request.Request(url, headers=_SCRAPE_HEADERS)
+            with _opener.open(req, timeout=20) as response:
                 text = response.read().decode('utf-8', errors='replace')
+
+            # Page de défi anti-bot : résoudre le PoW (pose le cookie) puis réessayer.
+            if 'Checking your browser' in text or ('/__c' in text and 'nonce' in text):
+                if not _solve_ufcstats_challenge(text, url):
+                    time.sleep(1)
+                continue
+
             if len(text) > 100:
                 class UrllibResponse:
                     def __init__(self, t):
