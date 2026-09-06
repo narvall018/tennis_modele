@@ -13,6 +13,7 @@ table that looks like a failure.
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from dataclasses import dataclass
@@ -92,6 +93,38 @@ def recommendation_score(
     return float(expected_value * confidence)
 
 
+def _model_error(root: Path, model_dir: Path, error: Exception) -> str:
+    """Turn an unpickling failure into something the user can act on.
+
+    A serialised scikit-learn estimator only reloads under the version that fit
+    it. The raw AttributeError names a private attribute and tells nobody
+    anything, so the versions are compared and the fix is stated.
+    """
+    import sklearn
+
+    trained_with = "inconnue"
+    metadata_path = model_dir / "metadata.json"
+    if metadata_path.exists():
+        try:
+            trained_with = json.loads(metadata_path.read_text(encoding="utf-8")).get(
+                "sklearn_version", "inconnue"
+            )
+        except (OSError, ValueError):
+            pass
+    if trained_with not in ("inconnue", sklearn.__version__):
+        return (
+            f"Modèle inutilisable: entraîné avec scikit-learn {trained_with}, "
+            f"exécuté sous {sklearn.__version__}. Un modèle sérialisé n'est pas "
+            "portable entre versions. Épinglez `scikit-learn=="
+            f"{trained_with}` dans requirements.txt, ou réentraînez depuis la page "
+            "Mise à jour."
+        )
+    return (
+        f"Modèle illisible sous scikit-learn {sklearn.__version__}: {error}. "
+        "Réentraînez-le depuis la page Mise à jour."
+    )
+
+
 def _devig_row(prices: np.ndarray) -> np.ndarray:
     inverse = 1.0 / prices
     total = inverse.sum()
@@ -123,11 +156,15 @@ def football_predictions(root: Path, price_source: str = "market_average") -> Sp
             "Aucune rencontre à venir publiée pour les divisions suivies.",
         )
 
-    model = joblib.load(model_path)
     states = pd.read_parquet(states_path)
     features = features_for_fixtures(fixtures, states)
     matrix = features[FEATURE_COLUMNS].to_numpy(dtype=float)
-    probabilities = model.predict_proba(matrix)
+    try:
+        probabilities = joblib.load(model_path).predict_proba(matrix)
+    except Exception as error:  # noqa: BLE001 - version mismatch is the usual cause
+        return SportPredictions(
+            "Football", False, pd.DataFrame(), meta, _model_error(root, model_dir, error)
+        )
 
     columns = FIXTURE_PRICE_GROUPS[price_source]
     prices = fixtures[list(columns)].to_numpy(dtype=float)
@@ -435,6 +472,7 @@ def ufc_predictions(root: Path, events: int = 3) -> SportPredictions:
         "fetched_at_utc": result["fetched_at_utc"],
         "events": ", ".join(event["name"] for event in result["events"]),
         "model_available": result.get("model_available", False),
+        "model_note": result.get("model_note", ""),
         "prices": prices_note,
         "remaining_requests": remaining,
         "note": result["note"],

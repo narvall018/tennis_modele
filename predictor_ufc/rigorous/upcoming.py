@@ -225,6 +225,30 @@ def features_for_upcoming(
     return pd.DataFrame(rows)
 
 
+def _model_version_note(base_dir: Path, error: Exception) -> str:
+    """Explain an unpickling failure in terms someone can act on."""
+    import json
+
+    import sklearn
+
+    trained_with = "inconnue"
+    metadata = base_dir.parent / "models" / "ufc" / "metadata.json"
+    if metadata.exists():
+        try:
+            trained_with = json.loads(metadata.read_text(encoding="utf-8")).get(
+                "sklearn_version", "inconnue"
+            )
+        except (OSError, ValueError):
+            pass
+    if trained_with not in ("inconnue", sklearn.__version__):
+        return (
+            f"Probabilités indisponibles: modèle entraîné avec scikit-learn "
+            f"{trained_with}, exécuté sous {sklearn.__version__}. Épinglez "
+            f"`scikit-learn=={trained_with}` ou réentraînez depuis la page Mise à jour."
+        )
+    return f"Probabilités indisponibles ({error}); réentraînez le modèle UFC."
+
+
 def collect_upcoming(base_dir: Path, limit: int = 4) -> dict[str, Any]:
     """Fetch the next cards and return them with fighter recognition flags."""
     # Resolve first: Path(".").parent is Path("."), which would silently look
@@ -265,16 +289,24 @@ def collect_upcoming(base_dir: Path, limit: int = 4) -> dict[str, Any]:
 
     rows = []
     probabilities = None
+    model_note = ""
     model_path = base_dir.parent / "models" / "ufc" / "ufc_descriptor_model.joblib"
     if model_path.exists():
         import joblib
 
-        model = joblib.load(model_path)
         matrix = descriptors[STATS_FEATURES].to_numpy(dtype=float)
         usable = descriptors["both_known"].to_numpy()
-        probabilities = np.full(len(descriptors), np.nan)
-        if usable.any():
-            probabilities[usable] = model.predict_proba(matrix[usable])[:, 1]
+        try:
+            model = joblib.load(model_path)
+            probabilities = np.full(len(descriptors), np.nan)
+            if usable.any():
+                probabilities[usable] = model.predict_proba(matrix[usable])[:, 1]
+        except Exception as error:  # noqa: BLE001 - version mismatch is the usual cause
+            # A serialised estimator only reloads under the version that fit it.
+            # The card itself is still worth showing, so the failure is reported
+            # rather than allowed to take the whole page down.
+            probabilities = None
+            model_note = _model_version_note(base_dir, error)
 
     for index, fight in enumerate(fights):
         rows.append({
@@ -304,7 +336,8 @@ def collect_upcoming(base_dir: Path, limit: int = 4) -> dict[str, Any]:
         "source": UPCOMING_EVENTS_URL,
         "events": [{"name": name, "date": str(date.date())} for name, date, _ in events],
         "fights": frame,
-        "model_available": model_path.exists(),
+        "model_available": model_path.exists() and probabilities is not None,
+        "model_note": model_note,
         "note": (
             "Cartes programmées lues sans clé d'API. Les cotes, elles, exigent une clé "
             "The Odds API: sans elle aucun écart au marché ne peut être calculé."

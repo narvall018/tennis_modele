@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
+import sklearn
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss
@@ -101,6 +102,9 @@ def main() -> int:
         "evaluation_matches": int(holdout.sum()),
         "evaluation_seasons": [int(season) for season in evaluation_seasons],
         "result_order": RESULT_ORDER,
+        # A serialised estimator only reloads under the version that
+        # produced it; recording it turns a crash into a clear message.
+        "sklearn_version": sklearn.__version__,
         "winner": result.winner,
         "comparison": result.comparison,
         "features": FEATURE_COLUMNS,

@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
+import sklearn
 import numpy as np
 import pandas as pd
 
@@ -95,6 +96,9 @@ def main() -> int:
         "winner": result.winner,
         "features": STATS_FEATURES,
         "uses_odds": False,
+        # A serialised estimator only reloads under the version that
+        # produced it; recording it turns a crash into a clear message.
+        "sklearn_version": sklearn.__version__,
         "development_years": list(DEVELOPMENT_YEARS),
         "evaluation_years": list(EVALUATION_YEARS),
         "comparison": result.comparison,

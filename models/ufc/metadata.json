@@ -121,6 +121,7 @@
   ],
   "fights_used": 4958,
   "honest_note": "Modèle de descripteurs purs, sans cote. Il ne prétend pas battre le marché: les trois phases rigoureuses de ce paquet ont toutes été rejetées. Ses probabilités sont une opinion calibrée.",
+  "sklearn_version": "1.6.1",
   "trained_at_utc": "2026-09-06T21:53:12.403431+00:00",
   "uses_odds": false,
   "winner": "gradient_boosting_calibre"

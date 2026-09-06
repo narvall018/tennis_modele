@@ -311,6 +311,8 @@ def _render_ufc(block) -> None:
         unsafe_allow_html=True,
     )
     st.caption(block.meta["prices"])
+    if block.meta.get("model_note"):
+        st.error(block.meta["model_note"])
     if priced < len(frame):
         st.info(
             f"{len(frame) - priced} combats sans prix: les bookmakers ne cotent une "
