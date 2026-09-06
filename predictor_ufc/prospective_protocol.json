@@ -1,0 +1,23 @@
+{
+  "protocol_version": "1.0.0",
+  "frozen_before_prospective_evaluation": true,
+  "created_at": "2026-09-02",
+  "scope": "MMA moneylines collected raw; UFC status requires explicit event matching",
+  "collection_horizons_days_before_event": [14, 7, 3, 1],
+  "historical_bookmaker_priority": ["Pinnacle", "BetOnline.ag"],
+  "maximum_snapshot_age_days": 3,
+  "primary_model_target": "fight_winner_probability",
+  "primary_market_diagnostic": "out_of_sample_log_loss_against_devigged_market",
+  "primary_economic_diagnostic": "closing_line_value_before_real-money ROI",
+  "manual_prefight_fields": [
+    "official_weight_lbs",
+    "weight_miss_lbs",
+    "short_notice_days",
+    "camp_change_flag",
+    "injury_disclosure_flag",
+    "source_url",
+    "observed_at_utc"
+  ],
+  "manual_data_rule": "Every observation must have a source URL and observed_at earlier than commence_time",
+  "real_money_status": "NO_BET_UNTIL_PROSPECTIVE_GATE_PASSES"
+}

@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-09-02T15:32:23.318132+00:00",
+  "protocol_sha256": "75ddecd21b70e0dccc64ab212591aba7334623ba9c29f6ea0c000fd696d689ce",
+  "data_sha256": "015fde1652b34d5267b1218d2f15fbf30f1cf9603d0541cd4b081aaad8a9d4a7",
+  "selected_primary_candidate": "structural_market_residual",
+  "paper_tracking_approved": false,
+  "real_money_approved": false,
+  "status": "PHASE4_REJECTED_NO_BET",
+  "new_pristine_period_starts": "2026-09-03"
+}

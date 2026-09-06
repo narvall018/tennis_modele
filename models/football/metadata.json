@@ -1,0 +1,43 @@
+{
+  "evaluation_matches": 8236,
+  "evaluation_seasons": [
+    2025,
+    2026
+  ],
+  "features": [
+    "elo_diff",
+    "elo_home",
+    "elo_away",
+    "home_matches_played",
+    "away_matches_played",
+    "goals_for_diff",
+    "goals_against_diff",
+    "shots_for_diff",
+    "shots_against_diff",
+    "target_for_diff",
+    "target_against_diff",
+    "corners_for_diff",
+    "points_diff",
+    "home_venue_points",
+    "away_venue_points",
+    "home_rest_days",
+    "away_rest_days",
+    "rest_diff",
+    "division_rank"
+  ],
+  "honest_note": "Le modèle n'utilise pas la cote. Il ne bat pas le marché: le test conditionnel gelé donne -0,00080 de log-loss. Ses probabilités sont une opinion calibrée, pas un avantage démontré.",
+  "model_log_loss_on_unseen_seasons": 1.0198482679469323,
+  "result_order": [
+    "H",
+    "D",
+    "A"
+  ],
+  "trained_at_utc": "2026-09-06T20:14:16.834051+00:00",
+  "training_matches": 180514,
+  "versus_market": {
+    "market_log_loss": 1.0002530772501956,
+    "matches_compared": 8230,
+    "model_log_loss": 1.0200067644852646,
+    "model_minus_market": -0.019753687235068984
+  }
+}

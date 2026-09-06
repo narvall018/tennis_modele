@@ -1,0 +1,209 @@
+{
+  "generated_at_utc": "2026-09-06T12:17:11.303807+00:00",
+  "provenance": {
+    "dataset": "https://www.kaggle.com/datasets/mdabbert/ultimate-ufc-dataset",
+    "version": 181,
+    "last_updated": "2026-04-01T23:37:51.8Z",
+    "license": "Attribution 4.0 International (CC BY 4.0)",
+    "csv_sha256": "deb1cd9a7014c08a538875e2b585e6f51fbf8f7a6d3f981eb684db1bd7242dc5",
+    "rows": 7177
+  },
+  "matching": {
+    "secondary_rows": 6924,
+    "matched_fights": 6654,
+    "unmatched_secondary_rows": 270,
+    "coverage_of_secondary": 0.9610051993067591,
+    "date_min": "2010-03-21",
+    "date_max": "2026-03-28"
+  },
+  "agreement": {
+    "tolerance_probability_points": 0.015,
+    "legacy_bit_identical_rate": 1.0,
+    "independence_verdict": "sources_are_not_independent: les prix legacy sont bit-a-bit ceux de la compilation secondaire, donc aucune corroboration independante n'existe pour cette periode",
+    "overall": {
+      "fights": 6136,
+      "agreement_rate": 0.9804432855280313,
+      "median_probability_gap": 0.0,
+      "p95_probability_gap": 1.1102230246251565e-16,
+      "gap_above_5_points": 18,
+      "mean_signed_gap": -2.9535869366428284e-05
+    },
+    "by_primary_temporal_quality": {
+      "legacy_unverified": {
+        "fights": 5957,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -2.1619249766076574e-18
+      },
+      "timestamped_pre_event": {
+        "fights": 179,
+        "agreement_rate": 0.329608938547486,
+        "median_probability_gap": 0.022144196847229014,
+        "p95_probability_gap": 0.07213230917068673,
+        "gap_above_5_points": 18,
+        "mean_signed_gap": -0.0010124698012982743
+      }
+    },
+    "by_year": {
+      "2010": {
+        "fights": 206,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -1.616829647512364e-18
+      },
+      "2011": {
+        "fights": 284,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": 4.6910832026415064e-18
+      },
+      "2012": {
+        "fights": 324,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": 2.05596856412066e-18
+      },
+      "2013": {
+        "fights": 356,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -1.5593020008780288e-19
+      },
+      "2014": {
+        "fights": 463,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": 3.8965710907470395e-18
+      },
+      "2015": {
+        "fights": 433,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -6.730566835198697e-18
+      },
+      "2016": {
+        "fights": 450,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -5.0576826677368245e-18
+      },
+      "2017": {
+        "fights": 409,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -6.243307962439756e-18
+      },
+      "2018": {
+        "fights": 438,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -5.449724892566407e-18
+      },
+      "2019": {
+        "fights": 459,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -3.87005847363889e-18
+      },
+      "2020": {
+        "fights": 406,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -1.914177628664063e-18
+      },
+      "2021": {
+        "fights": 472,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -3.5282511375799465e-18
+      },
+      "2022": {
+        "fights": 477,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": -7.273473693823091e-18
+      },
+      "2023": {
+        "fights": 412,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": 3.233659295024728e-18
+      },
+      "2024": {
+        "fights": 368,
+        "agreement_rate": 1.0,
+        "median_probability_gap": 0.0,
+        "p95_probability_gap": 1.1102230246251565e-16,
+        "gap_above_5_points": 0,
+        "mean_signed_gap": 5.2795931877555e-19
+      },
+      "2025": {
+        "fights": 111,
+        "agreement_rate": 0.2882882882882883,
+        "median_probability_gap": 0.023395199452044657,
+        "p95_probability_gap": 0.07470648997173279,
+        "gap_above_5_points": 12,
+        "mean_signed_gap": -0.005229656374811401
+      },
+      "2026": {
+        "fights": 68,
+        "agreement_rate": 0.39705882352941174,
+        "median_probability_gap": 0.01861988088951061,
+        "p95_probability_gap": 0.05725130802693279,
+        "gap_above_5_points": 6,
+        "mean_signed_gap": 0.0058714671054658
+      }
+    }
+  },
+  "primary_lines_without_a_second_opinion": 220,
+  "fights_priced_only_by_the_secondary_source": 518,
+  "artifacts": {
+    "data/rigorous/raw/ufc_secondary_odds_source.parquet": {
+      "bytes": 692965,
+      "sha256": "d8637007be11ef5536e3046cc67bb287a267f50151d53d9b9147fff40d37afc9"
+    },
+    "data/rigorous/processed/secondary_moneyline_quotes.parquet": {
+      "bytes": 447286,
+      "sha256": "47196897baf0fd57b786c07d701f41433f9dcb5a3a4f01f950ef89c9e07a3214"
+    },
+    "data/rigorous/processed/moneyline_cross_check.parquet": {
+      "bytes": 192908,
+      "sha256": "a437e942f15729ff3f8c54bd651a407b11bde46b149329f254573f073d2b6650"
+    }
+  },
+  "usage_rules": [
+    "La source secondaire n'est pas horodatee: elle n'ameliore pas la qualite temporelle.",
+    "Elle ne remplace jamais la ligne primaire et n'est jamais choisie parce qu'elle paie mieux.",
+    "Son seul role est de corroborer ou de signaler une ligne legacy avant toute conclusion economique."
+  ]
+}

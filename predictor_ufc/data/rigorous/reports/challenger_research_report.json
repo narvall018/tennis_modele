@@ -1,0 +1,339 @@
+{
+  "protocol": {
+    "protocol_version": "2.0.0",
+    "frozen_before_challenger_returns": true,
+    "created_for_research_date": "2026-09-02",
+    "disclosure": "La phase 1 a deja expose les resultats agreges 2022-2024; cette fenetre est une confirmation interne, pas un holdout pristine.",
+    "model_selection": [
+      "2015-01-01",
+      "2018-12-31"
+    ],
+    "rule_selection": [
+      "2019-01-01",
+      "2021-12-31"
+    ],
+    "internal_confirmation": [
+      "2022-01-01",
+      "2024-12-31"
+    ],
+    "pristine_economic_holdout": [
+      "2025-09-13",
+      "2026-08-29"
+    ],
+    "candidate_selection_metric": "lowest_walk_forward_log_loss",
+    "threshold_selection_metric": "highest_event_cluster_bootstrap_95pct_lower_bound",
+    "candidates": {
+      "structural_logit": {
+        "family": "logistic",
+        "feature_set": "structural",
+        "C": 0.05
+      },
+      "elastic_net_interactions": {
+        "family": "elastic_net",
+        "feature_set": "engineered",
+        "C": 0.05,
+        "l1_ratio": 0.2
+      },
+      "hist_gradient_boosting": {
+        "family": "hist_gbm",
+        "feature_set": "engineered",
+        "learning_rate": 0.03,
+        "max_iter": 180,
+        "max_leaf_nodes": 8,
+        "min_samples_leaf": 80,
+        "l2_regularization": 5.0
+      },
+      "xgboost_shallow": {
+        "family": "xgboost",
+        "feature_set": "engineered",
+        "n_estimators": 180,
+        "max_depth": 2,
+        "learning_rate": 0.03,
+        "min_child_weight": 30,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "reg_alpha": 1.0,
+        "reg_lambda": 10.0
+      },
+      "small_mlp": {
+        "family": "mlp",
+        "feature_set": "engineered",
+        "hidden_layer_sizes": [
+          24,
+          12
+        ],
+        "alpha": 0.05,
+        "learning_rate_init": 0.001,
+        "early_stopping": true,
+        "max_iter": 500
+      }
+    },
+    "nonlinear_calibration": {
+      "method": "sigmoid_on_last_complete_training_year",
+      "base_model_excludes_calibration_year": true
+    },
+    "bet_rule": {
+      "edge_threshold_candidates": [
+        0.03,
+        0.05,
+        0.08
+      ],
+      "minimum_decimal_odds": 1.25,
+      "maximum_decimal_odds": 4.0,
+      "minimum_selection_bets": 100,
+      "one_side_maximum_per_fight": true
+    },
+    "staking": {
+      "method": "one_tenth_kelly",
+      "kelly_divisor": 10.0,
+      "maximum_fraction_per_bet": 0.0025,
+      "maximum_event_exposure": 0.02,
+      "minimum_stake": 0.0,
+      "simultaneous_event_settlement": true
+    },
+    "confirmation_gate": {
+      "model_log_loss_must_beat_market": true,
+      "minimum_bets": 100,
+      "positive_roi": true,
+      "positive_years_minimum": 2,
+      "years_total": 3,
+      "maximum_drawdown": 0.15,
+      "cluster_bootstrap_confidence": 0.975,
+      "roi_lower_bound_must_exceed": 0.0,
+      "bootstrap_samples": 10000
+    }
+  },
+  "model_selection": {
+    "structural_logit": {
+      "n": 1765,
+      "log_loss": 0.6155806984822568,
+      "market_log_loss": 0.6169284651737198,
+      "log_loss_improvement": 0.0013477666914629705,
+      "brier": 0.2139845484371618,
+      "market_brier": 0.2147068251245173,
+      "auc": 0.7177527945522292
+    },
+    "elastic_net_interactions": {
+      "n": 1765,
+      "log_loss": 0.615730923744615,
+      "market_log_loss": 0.6169284651737198,
+      "log_loss_improvement": 0.001197541429104776,
+      "brier": 0.21403425604531476,
+      "market_brier": 0.2147068251245173,
+      "auc": 0.7179570859565719
+    },
+    "hist_gradient_boosting": {
+      "n": 1765,
+      "log_loss": 0.6278497289381392,
+      "market_log_loss": 0.6169284651737198,
+      "log_loss_improvement": -0.010921263764419376,
+      "brier": 0.21931437940844536,
+      "market_brier": 0.2147068251245173,
+      "auc": 0.6994089682641655
+    },
+    "xgboost_shallow": {
+      "n": 1765,
+      "log_loss": 0.6237650933360585,
+      "market_log_loss": 0.6169284651737198,
+      "log_loss_improvement": -0.006836628162338654,
+      "brier": 0.21745230390103262,
+      "market_brier": 0.2147068251245173,
+      "auc": 0.7054015161248876
+    },
+    "small_mlp": {
+      "n": 1765,
+      "log_loss": 0.634434558353288,
+      "market_log_loss": 0.6169284651737198,
+      "log_loss_improvement": -0.017506093179568194,
+      "brier": 0.2224579513743136,
+      "market_brier": 0.2147068251245173,
+      "auc": 0.6869420531928562
+    }
+  },
+  "selected_model": "structural_logit",
+  "threshold_selection": {
+    "0.03": {
+      "bets": 375,
+      "events": 123,
+      "wins": 205,
+      "win_rate": 0.5466666666666666,
+      "average_odds": 2.040711751900384,
+      "average_edge": 0.07571270130123088,
+      "profit_units": 14.733295207474916,
+      "roi": 0.039288787219933105,
+      "roi_bootstrap_0.95": {
+        "low": -0.06158310850954303,
+        "median": 0.03946471135990885,
+        "high": 0.14428208104259582
+      },
+      "positive_years": 3,
+      "yearly": {
+        "2019": {
+          "bets": 122,
+          "wins": 68,
+          "profit_units": 1.7641738191178344,
+          "roi": 0.014460441140310119
+        },
+        "2020": {
+          "bets": 112,
+          "wins": 61,
+          "profit_units": 4.1415965718045875,
+          "roi": 0.03697854081968382
+        },
+        "2021": {
+          "bets": 141,
+          "wins": 76,
+          "profit_units": 8.827524816552497,
+          "roi": 0.06260655898264182
+        }
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1032.6753655036218,
+      "return": 0.03267536550362182,
+      "max_drawdown": 0.0306034727504648,
+      "total_staked": 937.6013251998338
+    },
+    "0.05": {
+      "bets": 227,
+      "events": 109,
+      "wins": 116,
+      "win_rate": 0.5110132158590308,
+      "average_odds": 2.1125972688171295,
+      "average_edge": 0.09890038145086592,
+      "profit_units": -1.6480462281137331,
+      "roi": -0.007260115542351247,
+      "roi_bootstrap_0.95": {
+        "low": -0.1489264333505276,
+        "median": -0.008932834188991174,
+        "high": 0.13671081834611645
+      },
+      "positive_years": 1,
+      "yearly": {
+        "2019": {
+          "bets": 76,
+          "wins": 43,
+          "profit_units": 6.843317488620192,
+          "roi": 0.09004365116605516
+        },
+        "2020": {
+          "bets": 64,
+          "wins": 32,
+          "profit_units": -1.6417683191973498,
+          "roi": -0.02565262998745859
+        },
+        "2021": {
+          "bets": 87,
+          "wins": 41,
+          "profit_units": -6.8495953975365715,
+          "roi": -0.07873098158088013
+        }
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 995.2654270485739,
+      "return": -0.004734572951426097,
+      "max_drawdown": 0.04586495780337821,
+      "total_staked": 574.4753017786539
+    },
+    "0.08": {
+      "bets": 108,
+      "events": 77,
+      "wins": 49,
+      "win_rate": 0.4537037037037037,
+      "average_odds": 2.303202570193502,
+      "average_edge": 0.1380041088940015,
+      "profit_units": -1.42632164220249,
+      "roi": -0.013206681872245277,
+      "roi_bootstrap_0.95": {
+        "low": -0.22138665717339737,
+        "median": -0.015226302336497022,
+        "high": 0.20749071446632403
+      },
+      "positive_years": 1,
+      "yearly": {
+        "2019": {
+          "bets": 37,
+          "wins": 17,
+          "profit_units": 0.8451346801346793,
+          "roi": 0.02284147784147782
+        },
+        "2020": {
+          "bets": 32,
+          "wins": 14,
+          "profit_units": -1.5656843826100453,
+          "roi": -0.048927636956563915
+        },
+        "2021": {
+          "bets": 39,
+          "wins": 18,
+          "profit_units": -0.7057719397271234,
+          "roi": -0.018096716403259574
+        }
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 995.9758532564878,
+      "return": -0.004024146743512258,
+      "max_drawdown": 0.02966045204905598,
+      "total_staked": 270.5646444904305
+    }
+  },
+  "selected_threshold": 0.03,
+  "confirmation_probability": {
+    "n": 1257,
+    "log_loss": 0.5935376387316518,
+    "market_log_loss": 0.5942348341580422,
+    "log_loss_improvement": 0.0006971954263904623,
+    "brier": 0.20378455677816545,
+    "market_brier": 0.20391162163010718,
+    "auc": 0.7473771662757535
+  },
+  "confirmation_bets": {
+    "bets": 313,
+    "events": 113,
+    "wins": 172,
+    "win_rate": 0.549520766773163,
+    "average_odds": 2.028052099990397,
+    "average_edge": 0.08981654593225602,
+    "profit_units": -1.889113182390238,
+    "roi": -0.006035505375048684,
+    "roi_bootstrap_0.975": {
+      "low": -0.1284124373794285,
+      "median": -0.006383177560054418,
+      "high": 0.1190020705546193
+    },
+    "positive_years": 1,
+    "yearly": {
+      "2022": {
+        "bets": 130,
+        "wins": 64,
+        "profit_units": -11.583291765442937,
+        "roi": -0.08910224434956104
+      },
+      "2023": {
+        "bets": 90,
+        "wins": 57,
+        "profit_units": 13.79533634262519,
+        "roi": 0.15328151491805767
+      },
+      "2024": {
+        "bets": 93,
+        "wins": 51,
+        "profit_units": -4.101157759572491,
+        "roi": -0.04409847053303754
+      }
+    },
+    "initial_bankroll": 1000.0,
+    "final_bankroll": 993.2843179828586,
+    "return": -0.0067156820171413445,
+    "max_drawdown": 0.031127958685817247,
+    "total_staked": 768.7725125626215
+  },
+  "confirmation_gate_checks": {
+    "model_log_loss_beats_market": true,
+    "minimum_bets": true,
+    "positive_roi": false,
+    "positive_years": false,
+    "maximum_drawdown": true,
+    "positive_adjusted_bootstrap_lower_bound": false
+  },
+  "approved_for_pristine_holdout": false
+}

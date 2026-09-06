@@ -1,0 +1,59 @@
+{
+  "generated_at_utc": "2026-09-06T12:07:38.437726+00:00",
+  "fights": 8846,
+  "decisive_fights": 8692,
+  "events": 788,
+  "fighters_in_fights": 2739,
+  "fighter_profiles": 4592,
+  "date_min": "1994-03-11",
+  "date_max": "2026-09-05",
+  "duplicate_fight_ids": 0,
+  "invalid_result_rows": 0,
+  "stats_coverage": {
+    "p1_sig_lnd": 1.0,
+    "p2_sig_lnd": 1.0,
+    "p1_td_lnd": 1.0,
+    "p2_td_lnd": 1.0,
+    "p1_ctrl_secs": 0.9796518200316527,
+    "p2_ctrl_secs": 0.9796518200316527
+  },
+  "odds_snapshot_rows_matched": 106807,
+  "odds_fights_matched": 6563,
+  "selected_line_fights": 6356,
+  "selected_line_protocols": {
+    "legacy_unverified_single_line": 6040,
+    "pinnacle_else_betonline_at_Tminus24h_max_age14d": 316
+  },
+  "selected_line_sources": {
+    "zewnetrzne": 6040,
+    "Pinnacle": 285,
+    "BetOnline.ag": 31
+  },
+  "prefight_rankings": {
+    "fights_with_at_least_one_division_rank": 2008,
+    "fights_with_two_division_ranks": 1254,
+    "future_or_same_day_snapshots": 0,
+    "maximum_allowed_snapshot_age_days": 14
+  },
+  "line_trajectory_fights": 199,
+  "line_trajectory_complete_t14_to_t1": 12,
+  "method_props_fights": 5329,
+  "method_props_temporal_quality": {
+    "legacy_unverified": 5329
+  },
+  "official_latest_completed_event": "2026-09-05",
+  "secondary_source_latest_event": "2026-08-08",
+  "direct_ufcstats_supplemental_fights": 52,
+  "odds_matching": {
+    "odds_input_rows": 202352,
+    "odds_matched_rows": 106807,
+    "odds_matched_fights": 6563,
+    "fight_key_collisions_excluded": 0,
+    "coverage_fights": 0.7419172507347954,
+    "temporal_quality": {
+      "timestamped_pre_event": 70294,
+      "post_event_or_unknown": 30473,
+      "legacy_unverified": 6040
+    }
+  }
+}

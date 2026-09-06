@@ -1,0 +1,21 @@
+{
+  "created_at_utc": "2026-09-02T14:20:10.662461+00:00",
+  "protocol_sha256": "8b26f32bfe64e1de29ba3ad704b46b1d0be33af9e2a4b8dc25e3d0ddaa2fa6d1",
+  "selected_model": "structural_logit",
+  "selected_model_spec": {
+    "family": "logistic",
+    "feature_set": "structural",
+    "C": 0.05
+  },
+  "selected_threshold": 0.03,
+  "confirmation_gate_checks": {
+    "model_log_loss_beats_market": true,
+    "minimum_bets": true,
+    "positive_roi": false,
+    "positive_years": false,
+    "maximum_drawdown": true,
+    "positive_adjusted_bootstrap_lower_bound": false
+  },
+  "approved_for_pristine_holdout": false,
+  "status": "CHALLENGER_REJECTED_NO_BET"
+}

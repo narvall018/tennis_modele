@@ -1,0 +1,123 @@
+{
+  "what_this_is": "Le marché méthode de victoire est le seul marché UFC jamais modélisé ici. Les prix restent legacy_unverified: aucun résultat ne peut être une preuve économique, seulement un motif de collecter des prix horodatés.",
+  "verdict": "AVENUE_FERMEE",
+  "why": "Le marché porte un biais réel et constant en faveur des décisions, mais il reste inférieur à la marge, et aucun modèle ne bat le pouvoir discriminant du marché: il n'existe donc aucun moyen de sélectionner les combats où le biais suffirait.",
+  "overround": {
+    "median_six_way": 1.2228416191460965,
+    "margin_points": 0.22284161914609646,
+    "comparison": "le moneyline UFC tourne autour de 1,03-1,05"
+  },
+  "calibration": {
+    "fights": 4826,
+    "years": [
+      2012,
+      2024
+    ],
+    "median_overround": 1.2228416191460965,
+    "by_outcome": {
+      "f1_ko": {
+        "market_probability": 0.19041384540936943,
+        "realised_frequency": 0.18296726067136346,
+        "bias_points": -0.007446584738005968,
+        "roi_backing_every_one": -0.2105574565534996,
+        "n": 4826
+      },
+      "f2_ko": {
+        "market_probability": 0.15659354672694434,
+        "realised_frequency": 0.14442602569415666,
+        "bias_points": -0.012167521032787676,
+        "roi_backing_every_one": -0.25199012130877346,
+        "n": 4826
+      },
+      "f1_sub": {
+        "market_probability": 0.12185131385706971,
+        "realised_frequency": 0.10982179859096561,
+        "bias_points": -0.012029515266104102,
+        "roi_backing_every_one": -0.3539865591322491,
+        "n": 4826
+      },
+      "f2_sub": {
+        "market_probability": 0.09458017681128571,
+        "realised_frequency": 0.06775797762121841,
+        "bias_points": -0.0268221991900673,
+        "roi_backing_every_one": -0.5112641278818737,
+        "n": 4826
+      },
+      "f1_dec": {
+        "market_probability": 0.23822892666338732,
+        "realised_frequency": 0.2867799419809366,
+        "bias_points": 0.04855101531754927,
+        "roi_backing_every_one": -0.0055888483824472505,
+        "n": 4826
+      },
+      "f2_dec": {
+        "market_probability": 0.1983321905319435,
+        "realised_frequency": 0.2082469954413593,
+        "bias_points": 0.009914804909415792,
+        "roi_backing_every_one": -0.18335618550487773,
+        "n": 4826
+      }
+    },
+    "decisions_pooled": {
+      "n": 9652,
+      "roi_backing_every_decision": -0.09447251694366252,
+      "roi_by_year": {
+        "2012": -0.12868628990057562,
+        "2013": -0.12420387812339484,
+        "2014": -0.10533710395099076,
+        "2015": -0.098592242520367,
+        "2016": -0.0679560216846653,
+        "2017": -0.09219402439073164,
+        "2018": -0.17855170502591428,
+        "2019": -0.07868323921825518,
+        "2020": -0.1290925123254796,
+        "2021": -0.12284019380009381,
+        "2022": -0.14214692597119713,
+        "2023": -0.011385691538562963,
+        "2024": 0.058397287042979716
+      },
+      "positive_years": 1,
+      "total_years": 13
+    }
+  },
+  "discrimination_probe": {
+    "development_last_year": 2018,
+    "training_fights": 4856,
+    "priced_fights": 2378,
+    "realised_decision_rate": 0.4462520593080725,
+    "market_mean_decision_probability": 0.43524883894539346,
+    "candidates": {
+      "logistic": {
+        "n": 1694,
+        "model_log_loss": 0.6738872139307227,
+        "market_log_loss": 0.6548337023730514,
+        "gain_vs_market": -0.01905351155767132
+      },
+      "logistic_plus_market": {
+        "n": 1694,
+        "model_log_loss": 0.6558257288733101,
+        "market_log_loss": 0.6548337023730514,
+        "gain_vs_market": -0.000992026500258758
+      },
+      "hist_gradient_boosting": {
+        "n": 1694,
+        "model_log_loss": 0.6858572324392503,
+        "market_log_loss": 0.6548337023730514,
+        "gain_vs_market": -0.031023530066198957
+      },
+      "hist_gradient_boosting_plus_market": {
+        "n": 1694,
+        "model_log_loss": 0.6888090329927641,
+        "market_log_loss": 0.6548337023730514,
+        "gain_vs_market": -0.033975330619712696
+      }
+    },
+    "best_gain_vs_market": -0.000992026500258758,
+    "market_discrimination_beaten": false
+  },
+  "limitations": [
+    "Les prix props sont non horodatés et d'origine unique (voir odds_cross_check.json).",
+    "Le biais en faveur des décisions a été mesuré sur l'échantillon complet: il est connu, donc il ne peut plus servir de découverte à valider sur ces mêmes années.",
+    "Seules les années jusqu'à 2018 ont été lues par la sonde de discrimination."
+  ]
+}

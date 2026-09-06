@@ -219,7 +219,11 @@ class FeatureBuilder:
         """
         df = elo_history.copy()
         df["Date"] = pd.to_datetime(df["Date"])
-        df = df.sort_values("Date").reset_index(drop=True)
+        df["_round_order"] = df.get("Round", pd.Series(index=df.index, dtype=object)).map(
+            ROUND_MAP
+        ).fillna(3)
+        sort_cols = [column for column in ["Date", "Tournament", "_round_order", "Player_1"] if column in df]
+        df = df.sort_values(sort_cols, kind="mergesort").drop(columns="_round_order").reset_index(drop=True)
 
         n = len(df)
         player_states: Dict[str, PlayerState] = defaultdict(PlayerState)
@@ -235,6 +239,7 @@ class FeatureBuilder:
             surface = str(row.get("Surface", "Hard"))
             series = str(row.get("Series", "ATP250"))
             round_name = str(row.get("Round", "1st Round"))
+            status = str(row.get("Status", "completed") or "completed").strip().lower()
             label = int(row.get("label", 1))
             winner = p1 if label == 1 else p2
             loser = p2 if label == 1 else p1
@@ -335,12 +340,17 @@ class FeatureBuilder:
                 "_surface": surface, "_series": series, "_round": round_name,
                 "_tournament": str(row.get("Tournament", "")),
                 "_label": label,
+                "_status": status,
+                "odds_p1": pd.to_numeric(row.get("odds_p1", np.nan), errors="coerce"),
+                "odds_p2": pd.to_numeric(row.get("odds_p2", np.nan), errors="coerce"),
+                "_source_row_id": row.get("source_row_id", i),
             }
             records.append(record)
 
             # Mise à jour des états APRÈS avoir lu les features
-            s1.update(match_date, label == 1, surface, p2, series)
-            s2.update(match_date, label == 0, surface, p1, series)
+            if status == "completed":
+                s1.update(match_date, label == 1, surface, p2, series)
+                s2.update(match_date, label == 0, surface, p1, series)
 
         return pd.DataFrame(records)
 

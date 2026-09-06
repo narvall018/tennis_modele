@@ -1,0 +1,19 @@
+{
+  "model": "market_logistic",
+  "model_weight": 0.7000000000000001,
+  "rule": {
+    "max_odds": 4.0,
+    "min_edge": 0.005,
+    "min_ev": 0.0,
+    "min_odds": 1.75,
+    "min_probability": 0.5
+  },
+  "stake_plan": {
+    "flat_fraction": 0.0025,
+    "kelly_divisor": 1.0,
+    "kind": "flat",
+    "max_bet_fraction": 0.0025,
+    "max_daily_fraction": 0.02,
+    "name": "flat_0_25pct"
+  }
+}

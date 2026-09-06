@@ -9,3 +9,35 @@ build/
 .env
 .venv/
 venv/
+
+# Données et artefacts régénérables. Tout ce qui suit se reconstruit avec les
+# scripts du dépôt; les y versionner ferait grossir l'historique de centaines de
+# mégaoctets pour des fichiers qui changent à chaque mise à jour.
+data/processed/
+data/raw/
+data/football/
+data/interim/
+data/*.csv.gz
+predictor_ufc/data/rigorous/raw/
+predictor_ufc/data/rigorous/processed/
+predictor_ufc/data/interim/
+predictor_ufc/data/raw/
+
+# Modèles entraînés et états figés. Ils dépendent de la version de scikit-learn
+# et de pandas qui les a produits, donc les partager par git est trompeur:
+# chacun doit les régénérer avec son propre interpréteur.
+*.joblib
+*.pkl
+*.parquet
+models/**/*.csv.gz
+models/**/*.csv
+
+# Les rapports, protocoles et audits qualité restent versionnés: ce sont les
+# preuves de ce qui a été mesuré, ils sont petits et ils doivent être relisibles.
+!models/**/*.json
+!models/**/*.md
+!data/quality/*.json
+!data/data_manifest.json
+
+catboost_info/
+*.png

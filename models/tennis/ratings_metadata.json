@@ -1,0 +1,19 @@
+{
+  "exported_at_utc": "2026-09-06T21:51:56.430416+00:00",
+  "honest_note": "Ratings Elo purs, sans cote. Ils fournissent une opinion affichable à côté du prix; ils ne le battent pas.",
+  "key": "player_key = nom complet, sans accent ni casse",
+  "tours": [
+    {
+      "last_match": "2026-09-05",
+      "matches": 79705,
+      "players": 2797,
+      "tour": "atp"
+    },
+    {
+      "last_match": "2026-08-30",
+      "matches": 72006,
+      "players": 2589,
+      "tour": "wta"
+    }
+  ]
+}

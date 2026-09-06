@@ -1,0 +1,127 @@
+{
+  "comparison": [
+    {
+      "auc": 0.6418275240747287,
+      "brier": 0.23481746606811774,
+      "log_loss": 0.6620840960766894,
+      "model": "gradient_boosting_calibre",
+      "n": 1180
+    },
+    {
+      "auc": 0.6383919719293405,
+      "brier": 0.23505053707245502,
+      "log_loss": 0.6621466526911046,
+      "model": "logistique_forte",
+      "n": 1180
+    },
+    {
+      "auc": 0.6376764115075909,
+      "brier": 0.23526748007016332,
+      "log_loss": 0.6625983612666588,
+      "model": "logistique_douce",
+      "n": 1180
+    },
+    {
+      "auc": 0.6386146865184394,
+      "brier": 0.23526707508876468,
+      "log_loss": 0.6630758526317772,
+      "model": "foret_aleatoire_calibre",
+      "n": 1180
+    },
+    {
+      "auc": 0.6394150221708781,
+      "brier": 0.23541844584787655,
+      "log_loss": 0.6633820838757446,
+      "model": "foret_aleatoire",
+      "n": 1180
+    },
+    {
+      "auc": 0.6337623822127197,
+      "brier": 0.2361215164636758,
+      "log_loss": 0.6643714165302977,
+      "model": "xgboost_calibre",
+      "n": 1180
+    },
+    {
+      "auc": 0.6292635475129247,
+      "brier": 0.23682186680066358,
+      "log_loss": 0.6659017982898832,
+      "model": "gradient_boosting_profond_calibre",
+      "n": 1180
+    },
+    {
+      "auc": 0.6369780935056426,
+      "brier": 0.23708176838634834,
+      "log_loss": 0.6670692838429769,
+      "model": "gradient_boosting",
+      "n": 1180
+    },
+    {
+      "auc": 0.6382497219659807,
+      "brier": 0.23804310366379236,
+      "log_loss": 0.6695398117740621,
+      "model": "xgboost",
+      "n": 1180
+    },
+    {
+      "auc": 0.620569057328172,
+      "brier": 0.2458786543836861,
+      "log_loss": 0.6895183936917737,
+      "model": "gradient_boosting_profond",
+      "n": 1180
+    }
+  ],
+  "development_years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021
+  ],
+  "evaluation": {
+    "auc": 0.6420144316377299,
+    "brier": 0.2342712649344231,
+    "log_loss": 0.6604370247249473,
+    "n": 1605,
+    "periods": [
+      "2022",
+      "2023",
+      "2024",
+      "2025",
+      "2026"
+    ]
+  },
+  "evaluation_years": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "features": [
+    "elo_diff",
+    "experience_diff",
+    "career_win_rate_diff",
+    "recent_win_rate_diff",
+    "sig_landed_pm_diff",
+    "sig_absorbed_pm_diff",
+    "sig_accuracy_diff",
+    "td_landed_p15_diff",
+    "td_accuracy_diff",
+    "sub_attempts_p15_diff",
+    "ctrl_share_diff",
+    "kd_p15_diff",
+    "layoff_days_diff",
+    "reach_diff",
+    "height_diff",
+    "age_diff",
+    "stance_matchup"
+  ],
+  "fights_used": 4958,
+  "honest_note": "Modèle de descripteurs purs, sans cote. Il ne prétend pas battre le marché: les trois phases rigoureuses de ce paquet ont toutes été rejetées. Ses probabilités sont une opinion calibrée.",
+  "trained_at_utc": "2026-09-06T21:53:12.403431+00:00",
+  "uses_odds": false,
+  "winner": "gradient_boosting_calibre"
+}

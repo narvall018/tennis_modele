@@ -155,6 +155,10 @@ def load_atp_data(cfg: dict) -> pd.DataFrame:
         else:
             df["Winner"] = df["Player_1"]  # fallback
 
+    if "Status" not in df.columns:
+        df["Status"] = "completed"
+    df["Status"] = df["Status"].fillna("completed").astype(str).str.lower()
+
     # Colonnes optionnelles
     for col in ["Rank_1", "Rank_2", "Pts_1", "Pts_2"]:
         if col not in df.columns:
@@ -167,6 +171,13 @@ def load_atp_data(cfg: dict) -> pd.DataFrame:
             df[target_col] = df[odd_col].apply(lambda x: float(x) if float(x) > 1.0 else np.nan)
         else:
             df[target_col] = np.nan
+
+    # Une paire de cotes doit représenter un marché cohérent. Les quelques
+    # lignes à marge impossible sont conservées dans la source et signalées par
+    # le rapport qualité, mais ne doivent pas entrer dans un backtest.
+    overround = 1.0 / df["odds_p1"] + 1.0 / df["odds_p2"]
+    invalid_market = overround.lt(0.95) | overround.gt(1.25)
+    df.loc[invalid_market, ["odds_p1", "odds_p2"]] = np.nan
 
     df["Source"] = "ATP"
     log(f"✅ ATP : {len(df):,} matchs chargés ({df['Date'].min().year}–{df['Date'].max().year})")
@@ -264,16 +275,9 @@ def run_pipeline(
     cb("ÉTAPE 3 : Construction des features (v3 — 48 features)")
     cb("=" * 60)
 
-    # Ajouter colonnes Rank/Pts depuis df_all si disponibles
+    # Le moteur Elo transporte désormais les métadonnées pré-match par
+    # identifiant de ligne. Aucun merge ambigu sur date/joueurs n'est requis.
     elo_history_merged = elo_history.copy()
-    # Merge ranking + cotes réelles depuis df_all
-    extra_cols = [c for c in df_all.columns if c in ["Rank_1", "Rank_2", "Pts_1", "Pts_2", "odds_p1", "odds_p2", "Best_of"]]
-    if extra_cols:
-        df_extra = df_all[["Date", "Player_1", "Player_2"] + extra_cols].copy()
-        df_extra["Date"] = pd.to_datetime(df_extra["Date"])
-        elo_history_merged = elo_history_merged.merge(
-            df_extra, on=["Date", "Player_1", "Player_2"], how="left"
-        )
     cb(f"Cotes réelles disponibles : {(elo_history_merged.get('odds_p1', pd.Series()) > 1).sum():,} matchs")
 
     builder = FeatureBuilder(feature_cols=FEATURE_COLS_V3)
@@ -286,6 +290,10 @@ def run_pipeline(
     feature_df = feature_df.dropna(subset=FEATURE_COLS_V3).reset_index(drop=True)
     cb(f"✅ Features : {len(feature_df):,} matchs ({n_before - len(feature_df)} supprimés pour NaN)")
 
+    # Les statuts non terminés restent présents pour un backtest de règlement,
+    # mais ne servent jamais de labels de performance sportive.
+    model_feature_df = feature_df[feature_df.get("_status", "completed").eq("completed")].copy()
+
     # -----------------------------------------------------------------------
     # 4. Split train / hold-out calibration / test final
     # -----------------------------------------------------------------------
@@ -294,17 +302,18 @@ def run_pipeline(
     cb("=" * 60)
 
     feature_df["_year"] = pd.to_datetime(feature_df["_date"]).dt.year
-    years = sorted(feature_df["_year"].unique())
+    model_feature_df["_year"] = pd.to_datetime(model_feature_df["_date"]).dt.year
+    years = sorted(model_feature_df["_year"].unique())
 
     test_year = years[-1]
     cal_year = years[-2]
-    train_mask = feature_df["_year"] < cal_year
-    cal_mask = feature_df["_year"] == cal_year
-    test_mask = feature_df["_year"] == test_year
+    train_mask = model_feature_df["_year"] < cal_year
+    cal_mask = model_feature_df["_year"] == cal_year
+    test_mask = model_feature_df["_year"] == test_year
 
-    df_train = feature_df[train_mask]
-    df_cal = feature_df[cal_mask]
-    df_test = feature_df[test_mask]
+    df_train = model_feature_df[train_mask]
+    df_cal = model_feature_df[cal_mask]
+    df_test = model_feature_df[test_mask]
 
     X_train = df_train[FEATURE_COLS_V3].values.astype(np.float32)
     y_train = df_train["_label"].values.astype(int)

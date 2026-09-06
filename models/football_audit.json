@@ -1,0 +1,1422 @@
+{
+  "asian_handicap": {
+    "bet365_close": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 53872,
+      "overround_median": 1.039136302294197,
+      "sides": {
+        "away": {
+          "n": 53872,
+          "profitable": false,
+          "push_rate": 0.06940525690525691,
+          "roi": -0.0314661493911494,
+          "roi_ci_90": [
+            -0.03785518658851694,
+            -0.025028528873363324
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 53872,
+          "profitable": false,
+          "push_rate": 0.06940525690525691,
+          "roi": -0.047459134615384625,
+          "roi_ci_90": [
+            -0.05374353621373233,
+            -0.04128770948954133
+          ],
+          "significant": true
+        }
+      }
+    },
+    "bet365_open": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 53569,
+      "overround_median": 1.039136302294197,
+      "sides": {
+        "away": {
+          "n": 53569,
+          "profitable": false,
+          "push_rate": 0.07015251358061565,
+          "roi": -0.03280804383132036,
+          "roi_ci_90": [
+            -0.03914803701496968,
+            -0.026511367870275835
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 53569,
+          "profitable": false,
+          "push_rate": 0.07015251358061565,
+          "roi": -0.046403673766544105,
+          "roi_ci_90": [
+            -0.0527399313396803,
+            -0.04002103549855821
+          ],
+          "significant": true
+        }
+      }
+    },
+    "market_average_close": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 53947,
+      "overround_median": 1.046448087431694,
+      "sides": {
+        "away": {
+          "n": 53947,
+          "profitable": false,
+          "push_rate": 0.06943852299479118,
+          "roi": -0.04105749346580904,
+          "roi_ci_90": [
+            -0.04773593680275637,
+            -0.034544233148874656
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 53947,
+          "profitable": false,
+          "push_rate": 0.06943852299479118,
+          "roi": -0.05550597252859289,
+          "roi_ci_90": [
+            -0.0618773072995526,
+            -0.04937067084103765
+          ],
+          "significant": true
+        }
+      }
+    },
+    "market_average_open": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 53764,
+      "overround_median": 1.0488552963084674,
+      "sides": {
+        "away": {
+          "n": 53764,
+          "profitable": false,
+          "push_rate": 0.07028866899784242,
+          "roi": -0.04390734320363069,
+          "roi_ci_90": [
+            -0.0503366055422733,
+            -0.03754735244832543
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 53764,
+          "profitable": false,
+          "push_rate": 0.07028866899784242,
+          "roi": -0.056226482404583,
+          "roi_ci_90": [
+            -0.06259768002792464,
+            -0.04975471744226276
+          ],
+          "significant": true
+        }
+      }
+    },
+    "pinnacle_close": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 48585,
+      "overround_median": 1.026315789473684,
+      "sides": {
+        "away": {
+          "n": 48585,
+          "profitable": false,
+          "push_rate": 0.0691571472676752,
+          "roi": -0.02111089636719153,
+          "roi_ci_90": [
+            -0.028203929635412416,
+            -0.01425773751722092
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 48585,
+          "profitable": false,
+          "push_rate": 0.0691571472676752,
+          "roi": -0.040433084285273244,
+          "roi_ci_90": [
+            -0.04720026266379623,
+            -0.03333479074519647
+          ],
+          "significant": true
+        }
+      }
+    },
+    "pinnacle_open": {
+      "available": true,
+      "line_median": -0.25,
+      "matches": 48397,
+      "overround_median": 1.029087472435157,
+      "sides": {
+        "away": {
+          "n": 48397,
+          "profitable": false,
+          "push_rate": 0.07000433911192842,
+          "roi": -0.026664299440047945,
+          "roi_ci_90": [
+            -0.033947178752240945,
+            -0.01984323948007801
+          ],
+          "significant": true
+        },
+        "home": {
+          "n": 48397,
+          "profitable": false,
+          "push_rate": 0.07000433911192842,
+          "roi": -0.04168801371985868,
+          "roi_ci_90": [
+            -0.04870452898352255,
+            -0.03438236020785098
+          ],
+          "significant": true
+        }
+      }
+    }
+  },
+  "calibration_1x2": {
+    "available": true,
+    "bands": {
+      "0.00-0.15": {
+        "average_odds": 10.422212246176334,
+        "calibration_gap": -0.010760858015601019,
+        "hit_rate": 0.0961528423030746,
+        "market_probability": 0.10691370031867561,
+        "n": 19157,
+        "profitable": false,
+        "roi": -0.16836526596022344,
+        "roi_ci_90": [
+          -0.20167610460035454,
+          -0.1376752783925751
+        ],
+        "significant": true
+      },
+      "0.15-0.30": {
+        "average_odds": 4.029571450117427,
+        "calibration_gap": -0.0035135242234995423,
+        "hit_rate": 0.244547067230693,
+        "market_probability": 0.24806059145419254,
+        "n": 139237,
+        "profitable": false,
+        "roi": -0.05893572398141299,
+        "roi_ci_90": [
+          -0.06554591612224737,
+          -0.05251016540082086
+        ],
+        "significant": true
+      },
+      "0.30-0.45": {
+        "average_odds": 2.737258102780194,
+        "calibration_gap": 0.002221864846502053,
+        "hit_rate": 0.3625549317095765,
+        "market_probability": 0.3603330668630744,
+        "n": 88519,
+        "profitable": false,
+        "roi": -0.034778004722150056,
+        "roi_ci_90": [
+          -0.03961204355640949,
+          -0.02983235232744168
+        ],
+        "significant": true
+      },
+      "0.45-0.60": {
+        "average_odds": 1.9013226478684813,
+        "calibration_gap": 0.002684514195901655,
+        "hit_rate": 0.5167099745298309,
+        "market_probability": 0.5140254603339293,
+        "n": 38869,
+        "profitable": false,
+        "roi": -0.03322800689495486,
+        "roi_ci_90": [
+          -0.04050476619332706,
+          -0.026105870708664315
+        ],
+        "significant": true
+      },
+      "0.60-0.75": {
+        "average_odds": 1.4711778554612256,
+        "calibration_gap": 0.01899448236686796,
+        "hit_rate": 0.6807448098737248,
+        "market_probability": 0.6617503275068568,
+        "n": 14017,
+        "profitable": false,
+        "roi": -0.009527787686380811,
+        "roi_ci_90": [
+          -0.020180233416042855,
+          0.0012244071834628676
+        ],
+        "significant": false
+      },
+      "0.75-1.00": {
+        "average_odds": 1.1998523344191097,
+        "calibration_gap": 0.02781564242081891,
+        "hit_rate": 0.8375678610206297,
+        "market_probability": 0.8097522185998108,
+        "n": 4605,
+        "profitable": false,
+        "roi": -0.0007097937024973032,
+        "roi_ci_90": [
+          -0.01185865394444168,
+          0.010395156747868693
+        ],
+        "significant": false
+      }
+    },
+    "matches": 101468,
+    "overround_median": 1.0276527823429729
+  },
+  "calibration_asian_handicap": {
+    "available": false
+  },
+  "calibration_over_under_25": {
+    "available": true,
+    "bands": {
+      "0.15-0.30": {
+        "average_odds": 3.6206022052586935,
+        "calibration_gap": -0.010502764977290635,
+        "hit_rate": 0.2586938083121289,
+        "market_probability": 0.26919657328941954,
+        "n": 1179,
+        "profitable": false,
+        "roi": -0.10345835453774387,
+        "roi_ci_90": [
+          -0.1750789580697341,
+          -0.028120758186564516
+        ],
+        "significant": true
+      },
+      "0.30-0.45": {
+        "average_odds": 2.4336705553306586,
+        "calibration_gap": -0.005170578747990595,
+        "hit_rate": 0.3947300629301145,
+        "market_probability": 0.3999006416781051,
+        "n": 27173,
+        "profitable": false,
+        "roi": -0.06001983586648512,
+        "roi_ci_90": [
+          -0.07010457548922774,
+          -0.04892310890667257
+        ],
+        "significant": true
+      },
+      "0.45-0.60": {
+        "average_odds": 1.869372668579627,
+        "calibration_gap": 0.0006908381822543497,
+        "hit_rate": 0.5210365853658536,
+        "market_probability": 0.5203457471835993,
+        "n": 55760,
+        "profitable": false,
+        "roi": -0.04176636298421809,
+        "roi_ci_90": [
+          -0.044705915219791885,
+          -0.039084017687402495
+        ],
+        "significant": true
+      },
+      "0.60-0.75": {
+        "average_odds": 1.504966029388529,
+        "calibration_gap": 0.00821234304628915,
+        "hit_rate": 0.6500237004266077,
+        "market_probability": 0.6418113573803186,
+        "n": 12658,
+        "profitable": false,
+        "roi": -0.030709053562964123,
+        "roi_ci_90": [
+          -0.040451637595040744,
+          -0.020736146145685017
+        ],
+        "significant": true
+      }
+    },
+    "matches": 48503,
+    "overround_median": 1.034655686647135
+  },
+  "cross_league": {
+    "1x2_leg0": {
+      "available": true,
+      "confirmed_in_majority": false,
+      "countries": {
+        "Belgium": {
+          "average_odds": 2.6284080022541563,
+          "calibration_gap": -0.00018066240935488143,
+          "hit_rate": 0.44604113834883063,
+          "market_probability": 0.4462218007581855,
+          "n": 3549,
+          "profitable": false,
+          "roi": -0.04929061707523247,
+          "roi_ci_90": [
+            -0.08270932724047093,
+            -0.016878974854660406
+          ],
+          "significant": true
+        },
+        "England": {
+          "average_odds": 2.5904486315419333,
+          "calibration_gap": 0.0022449522538401934,
+          "hit_rate": 0.42978960323507004,
+          "market_probability": 0.42754465098122985,
+          "n": 34126,
+          "profitable": false,
+          "roi": -0.0359527398464514,
+          "roi_ci_90": [
+            -0.04663458355934575,
+            -0.02460583656214372
+          ],
+          "significant": true
+        },
+        "France": {
+          "average_odds": 2.605558302430985,
+          "calibration_gap": 0.0003406216090637848,
+          "hit_rate": 0.4335599505562423,
+          "market_probability": 0.4332193289471785,
+          "n": 9708,
+          "profitable": false,
+          "roi": -0.043901586320560376,
+          "roi_ci_90": [
+            -0.06356074755904037,
+            -0.02370516902656193
+          ],
+          "significant": true
+        },
+        "Germany": {
+          "average_odds": 2.6630009763241396,
+          "calibration_gap": -0.002964259287164761,
+          "hit_rate": 0.43617280937271175,
+          "market_probability": 0.4391370686598765,
+          "n": 8194,
+          "profitable": false,
+          "roi": -0.03411889187210154,
+          "roi_ci_90": [
+            -0.05685030327997459,
+            -0.010082623722705741
+          ],
+          "significant": true
+        },
+        "Greece": {
+          "average_odds": 3.0047555976032805,
+          "calibration_gap": 0.002610844853535743,
+          "hit_rate": 0.45474613686534215,
+          "market_probability": 0.4521352920118064,
+          "n": 3171,
+          "profitable": false,
+          "roi": -0.0713121412803532,
+          "roi_ci_90": [
+            -0.10777850894918664,
+            -0.03568630710713537
+          ],
+          "significant": true
+        },
+        "Italy": {
+          "average_odds": 2.673678692859841,
+          "calibration_gap": -0.009029621354733397,
+          "hit_rate": 0.423970532678504,
+          "market_probability": 0.4330001540332374,
+          "n": 10588,
+          "profitable": false,
+          "roi": -0.08061207026822818,
+          "roi_ci_90": [
+            -0.10179187301419308,
+            -0.06055651629152782
+          ],
+          "significant": true
+        },
+        "Netherlands": {
+          "average_odds": 2.9509061648923,
+          "calibration_gap": -0.007461486716309418,
+          "hit_rate": 0.4530824461500371,
+          "market_probability": 0.46054393286634654,
+          "n": 4039,
+          "profitable": false,
+          "roi": -0.066166773953949,
+          "roi_ci_90": [
+            -0.10383486025449218,
+            -0.028133756885727643
+          ],
+          "significant": true
+        },
+        "Portugal": {
+          "average_odds": 3.298257386079118,
+          "calibration_gap": 0.008372452969301725,
+          "hit_rate": 0.4411617426139209,
+          "market_probability": 0.43278928964461916,
+          "n": 3994,
+          "profitable": false,
+          "roi": -0.049581772658988485,
+          "roi_ci_90": [
+            -0.08702028847909253,
+            -0.010261503842190765
+          ],
+          "significant": true
+        },
+        "Scotland": {
+          "average_odds": 2.9379766444232605,
+          "calibration_gap": 0.0014800010660991347,
+          "hit_rate": 0.4242135367016206,
+          "market_probability": 0.42273353563552146,
+          "n": 8392,
+          "profitable": false,
+          "roi": -0.04802399904671116,
+          "roi_ci_90": [
+            -0.07383342942954137,
+            -0.022193900352358624
+          ],
+          "significant": true
+        },
+        "Spain": {
+          "average_odds": 2.5832111878208535,
+          "calibration_gap": 0.006953402028639144,
+          "hit_rate": 0.45353159851301117,
+          "market_probability": 0.446578196484372,
+          "n": 11298,
+          "profitable": false,
+          "roi": -0.023807806691449822,
+          "roi_ci_90": [
+            -0.04325345118459056,
+            -0.004401070665518143
+          ],
+          "significant": true
+        },
+        "Turkey": {
+          "average_odds": 2.5656951689725567,
+          "calibration_gap": 0.010150147222952544,
+          "hit_rate": 0.45316398276253117,
+          "market_probability": 0.4430138355395786,
+          "n": 4409,
+          "profitable": false,
+          "roi": -0.03499995463823997,
+          "roi_ci_90": [
+            -0.06587896279160702,
+            -0.005215882658333056
+          ],
+          "significant": true
+        }
+      },
+      "countries_examined": 11,
+      "leg": 0,
+      "profitable_countries": []
+    },
+    "1x2_leg1": {
+      "available": true,
+      "confirmed_in_majority": false,
+      "countries": {
+        "Belgium": {
+          "average_odds": 4.080552268244576,
+          "calibration_gap": 0.0007613001157520949,
+          "hit_rate": 0.2465483234714004,
+          "market_probability": 0.2457870233556483,
+          "n": 3549,
+          "profitable": false,
+          "roi": -0.05174792899408285,
+          "roi_ci_90": [
+            -0.10033036032679014,
+            -0.0024447786194187037
+          ],
+          "significant": true
+        },
+        "England": {
+          "average_odds": 3.757956689913849,
+          "calibration_gap": -0.005583221076489342,
+          "hit_rate": 0.25939166617828047,
+          "market_probability": 0.2649748872547698,
+          "n": 34126,
+          "profitable": false,
+          "roi": -0.06540855066518197,
+          "roi_ci_90": [
+            -0.07795961399906277,
+            -0.052263587500356076
+          ],
+          "significant": true
+        },
+        "France": {
+          "average_odds": 3.6335465595385252,
+          "calibration_gap": -0.0031014129322660677,
+          "hit_rate": 0.2764730119489081,
+          "market_probability": 0.2795744248811742,
+          "n": 9708,
+          "profitable": false,
+          "roi": -0.06009081170168933,
+          "roi_ci_90": [
+            -0.08643459014159402,
+            -0.03353503989562376
+          ],
+          "significant": true
+        },
+        "Germany": {
+          "average_odds": 4.054586282645838,
+          "calibration_gap": 0.008800761752972341,
+          "hit_rate": 0.26128874786429096,
+          "market_probability": 0.2524879861113186,
+          "n": 8194,
+          "profitable": false,
+          "roi": -0.007637710519892616,
+          "roi_ci_90": [
+            -0.038038556329771434,
+            0.02273018335833818
+          ],
+          "significant": false
+        },
+        "Greece": {
+          "average_odds": 3.988085777357301,
+          "calibration_gap": 0.0014081627936905483,
+          "hit_rate": 0.2661620939766635,
+          "market_probability": 0.26475393118297297,
+          "n": 3171,
+          "profitable": false,
+          "roi": -0.07636947335225483,
+          "roi_ci_90": [
+            -0.12389696161106165,
+            -0.030107807503048856
+          ],
+          "significant": true
+        },
+        "Italy": {
+          "average_odds": 3.658179070646014,
+          "calibration_gap": 0.014272182078421791,
+          "hit_rate": 0.291839818662637,
+          "market_probability": 0.2775676365842152,
+          "n": 10588,
+          "profitable": false,
+          "roi": 0.00110695126558367,
+          "roi_ci_90": [
+            -0.024157236527042034,
+            0.026613664914519556
+          ],
+          "significant": false
+        },
+        "Netherlands": {
+          "average_odds": 4.727657836098045,
+          "calibration_gap": 0.014119970300813134,
+          "hit_rate": 0.23941569695469175,
+          "market_probability": 0.22529572665387862,
+          "n": 4039,
+          "profitable": false,
+          "roi": 0.022554345134934373,
+          "roi_ci_90": [
+            -0.025367482820642814,
+            0.07224866206962151
+          ],
+          "significant": false
+        },
+        "Portugal": {
+          "average_odds": 4.253382573860792,
+          "calibration_gap": -0.007926077493719569,
+          "hit_rate": 0.24486730095142714,
+          "market_probability": 0.2527933784451467,
+          "n": 3994,
+          "profitable": false,
+          "roi": -0.10449023535302956,
+          "roi_ci_90": [
+            -0.14967068626527824,
+            -0.0591998980414855
+          ],
+          "significant": true
+        },
+        "Scotland": {
+          "average_odds": 4.06061248808389,
+          "calibration_gap": -0.0062820347788738184,
+          "hit_rate": 0.24428026692087704,
+          "market_probability": 0.25056230169975086,
+          "n": 8392,
+          "profitable": false,
+          "roi": -0.06973608198284081,
+          "roi_ci_90": [
+            -0.1004511698759876,
+            -0.03994919590194571
+          ],
+          "significant": true
+        },
+        "Spain": {
+          "average_odds": 3.7563887413701536,
+          "calibration_gap": 0.002957186747850782,
+          "hit_rate": 0.28004956629491945,
+          "market_probability": 0.27709237954706867,
+          "n": 11298,
+          "profitable": false,
+          "roi": -0.03770285006195788,
+          "roi_ci_90": [
+            -0.06305188354175265,
+            -0.01138562532552097
+          ],
+          "significant": true
+        },
+        "Turkey": {
+          "average_odds": 3.9175277840780223,
+          "calibration_gap": 0.0009959316289468445,
+          "hit_rate": 0.2583352234066682,
+          "market_probability": 0.25733929177772136,
+          "n": 4409,
+          "profitable": false,
+          "roi": -0.057816375595373115,
+          "roi_ci_90": [
+            -0.09557140092663906,
+            -0.019753341151352247
+          ],
+          "significant": true
+        }
+      },
+      "countries_examined": 11,
+      "leg": 1,
+      "profitable_countries": []
+    },
+    "1x2_leg2": {
+      "available": true,
+      "confirmed_in_majority": false,
+      "countries": {
+        "Belgium": {
+          "average_odds": 4.308996900535361,
+          "calibration_gap": -0.0005806377063972135,
+          "hit_rate": 0.30741053817976893,
+          "market_probability": 0.30799117588616615,
+          "n": 3549,
+          "profitable": false,
+          "roi": -0.05529399830938293,
+          "roi_ci_90": [
+            -0.10623618336243759,
+            -0.004607264825574391
+          ],
+          "significant": true
+        },
+        "England": {
+          "average_odds": 3.8741247142940867,
+          "calibration_gap": 0.003338268822649093,
+          "hit_rate": 0.3108187305866495,
+          "market_probability": 0.3074804617640004,
+          "n": 34126,
+          "profitable": false,
+          "roi": -0.04033632421027956,
+          "roi_ci_90": [
+            -0.055920035654856655,
+            -0.02473295933248045
+          ],
+          "significant": true
+        },
+        "France": {
+          "average_odds": 4.310307993407499,
+          "calibration_gap": 0.002760791323202394,
+          "hit_rate": 0.2899670374948496,
+          "market_probability": 0.2872062461716472,
+          "n": 9708,
+          "profitable": false,
+          "roi": -0.04333617634940256,
+          "roi_ci_90": [
+            -0.06972355637964546,
+            -0.01750428721284914
+          ],
+          "significant": true
+        },
+        "Germany": {
+          "average_odds": 4.201702465218451,
+          "calibration_gap": -0.00583650246580758,
+          "hit_rate": 0.3025384427629973,
+          "market_probability": 0.3083749452288049,
+          "n": 8194,
+          "profitable": false,
+          "roi": -0.05869267756895291,
+          "roi_ci_90": [
+            -0.08831097535631603,
+            -0.029006991939691515
+          ],
+          "significant": true
+        },
+        "Greece": {
+          "average_odds": 5.687228003784296,
+          "calibration_gap": -0.0040190076472262914,
+          "hit_rate": 0.27909176915799433,
+          "market_probability": 0.2831107768052206,
+          "n": 3171,
+          "profitable": false,
+          "roi": -0.12892456638284455,
+          "roi_ci_90": [
+            -0.17886489601337027,
+            -0.07809339967090777
+          ],
+          "significant": true
+        },
+        "Italy": {
+          "average_odds": 4.411845485455233,
+          "calibration_gap": -0.005242560723688228,
+          "hit_rate": 0.2841896486588591,
+          "market_probability": 0.2894322093825473,
+          "n": 10588,
+          "profitable": false,
+          "roi": -0.08841042689837553,
+          "roi_ci_90": [
+            -0.11539264372154645,
+            -0.059233398753103725
+          ],
+          "significant": true
+        },
+        "Netherlands": {
+          "average_odds": 5.247776677395394,
+          "calibration_gap": -0.006658483584503716,
+          "hit_rate": 0.3075018568952711,
+          "market_probability": 0.3141603404797748,
+          "n": 4039,
+          "profitable": false,
+          "roi": -0.11224545679623671,
+          "roi_ci_90": [
+            -0.15611729695062934,
+            -0.06656290026192244
+          ],
+          "significant": true
+        },
+        "Portugal": {
+          "average_odds": 5.378920881321983,
+          "calibration_gap": -0.0004463754755821281,
+          "hit_rate": 0.313970956434652,
+          "market_probability": 0.31441733191023413,
+          "n": 3994,
+          "profitable": false,
+          "roi": -0.10304682023034553,
+          "roi_ci_90": [
+            -0.1472804159310235,
+            -0.055892002536096844
+          ],
+          "significant": true
+        },
+        "Scotland": {
+          "average_odds": 4.201310772163966,
+          "calibration_gap": 0.0048020337127747115,
+          "hit_rate": 0.3315061963775024,
+          "market_probability": 0.3267041626647277,
+          "n": 8392,
+          "profitable": false,
+          "roi": -0.04391313155386083,
+          "roi_ci_90": [
+            -0.06888024814532881,
+            -0.019242962552654657
+          ],
+          "significant": true
+        },
+        "Spain": {
+          "average_odds": 4.6709523809523805,
+          "calibration_gap": -0.009910588776489926,
+          "hit_rate": 0.2664188351920694,
+          "market_probability": 0.2763294239685593,
+          "n": 11298,
+          "profitable": false,
+          "roi": -0.08818029739776953,
+          "roi_ci_90": [
+            -0.11304421438852992,
+            -0.06189353381080044
+          ],
+          "significant": true
+        },
+        "Turkey": {
+          "average_odds": 4.182581084146065,
+          "calibration_gap": -0.011146078851899388,
+          "hit_rate": 0.28850079383080063,
+          "market_probability": 0.2996468726827,
+          "n": 4409,
+          "profitable": false,
+          "roi": -0.1192760263098208,
+          "roi_ci_90": [
+            -0.15459221853633115,
+            -0.082692219511642
+          ],
+          "significant": true
+        }
+      },
+      "countries_examined": 11,
+      "leg": 2,
+      "profitable_countries": []
+    },
+    "over_under_25_leg0": {
+      "available": true,
+      "confirmed_in_majority": false,
+      "countries": {
+        "Belgium": {
+          "average_odds": 1.7419304812834224,
+          "calibration_gap": -0.008065728066009248,
+          "hit_rate": 0.5529411764705883,
+          "market_probability": 0.5610069045365975,
+          "n": 1870,
+          "profitable": false,
+          "roi": -0.06193978609625667,
+          "roi_ci_90": [
+            -0.0933839558400064,
+            -0.030492953709066888
+          ],
+          "significant": true
+        },
+        "England": {
+          "average_odds": 1.994360014985015,
+          "calibration_gap": -0.0004461356907221048,
+          "hit_rate": 0.49344405594405594,
+          "market_probability": 0.49389019163477804,
+          "n": 16016,
+          "profitable": false,
+          "roi": -0.04740673076923078,
+          "roi_ci_90": [
+            -0.062487772719506625,
+            -0.032187515774949674
+          ],
+          "significant": true
+        },
+        "France": {
+          "average_odds": 2.119141944317663,
+          "calibration_gap": 0.008597389418827261,
+          "hit_rate": 0.48083067092651754,
+          "market_probability": 0.4722332815076903,
+          "n": 4382,
+          "profitable": false,
+          "roi": -0.027225878594249214,
+          "roi_ci_90": [
+            -0.05496789579619654,
+            0.00047257144280361195
+          ],
+          "significant": false
+        },
+        "Germany": {
+          "average_odds": 1.7094818652849741,
+          "calibration_gap": 0.020394917099916476,
+          "hit_rate": 0.5963730569948187,
+          "market_probability": 0.5759781398949022,
+          "n": 3860,
+          "profitable": false,
+          "roi": -0.006970673575129536,
+          "roi_ci_90": [
+            -0.03024301376187394,
+            0.015557347852103642
+          ],
+          "significant": false
+        },
+        "Greece": {
+          "average_odds": 2.1946370967741933,
+          "calibration_gap": 0.008344403324577698,
+          "hit_rate": 0.4583333333333333,
+          "market_probability": 0.4499889300087556,
+          "n": 1488,
+          "profitable": false,
+          "roi": -0.0373486559139785,
+          "roi_ci_90": [
+            -0.08892301597874427,
+            0.011763463785703693
+          ],
+          "significant": false
+        },
+        "Italy": {
+          "average_odds": 2.0604957653377403,
+          "calibration_gap": 0.0006197751942984553,
+          "hit_rate": 0.483784342078083,
+          "market_probability": 0.48316456688378456,
+          "n": 4841,
+          "profitable": false,
+          "roi": -0.038009667424085944,
+          "roi_ci_90": [
+            -0.06278121966426907,
+            -0.014070392652381965
+          ],
+          "significant": true
+        },
+        "Netherlands": {
+          "average_odds": 1.6684902682798526,
+          "calibration_gap": -0.004709765178941727,
+          "hit_rate": 0.5870594423987375,
+          "market_probability": 0.5917692075776793,
+          "n": 1901,
+          "profitable": false,
+          "roi": -0.05152109416096791,
+          "roi_ci_90": [
+            -0.08681798190699438,
+            -0.016846550449195606
+          ],
+          "significant": true
+        },
+        "Portugal": {
+          "average_odds": 2.0595271629778673,
+          "calibration_gap": -0.0005527411966989026,
+          "hit_rate": 0.48541247484909456,
+          "market_probability": 0.48596521604579346,
+          "n": 1988,
+          "profitable": false,
+          "roi": -0.04691358148893361,
+          "roi_ci_90": [
+            -0.07331601770730804,
+            -0.020996078413658827
+          ],
+          "significant": true
+        },
+        "Scotland": {
+          "average_odds": 1.9211016187050363,
+          "calibration_gap": 0.005387393671051899,
+          "hit_rate": 0.5157374100719424,
+          "market_probability": 0.5103500164008905,
+          "n": 4448,
+          "profitable": false,
+          "roi": -0.03949285071942447,
+          "roi_ci_90": [
+            -0.06468034747128684,
+            -0.013744647701660182
+          ],
+          "significant": true
+        },
+        "Spain": {
+          "average_odds": 2.3514703717335297,
+          "calibration_gap": -0.0011461882392973521,
+          "hit_rate": 0.4280456385719544,
+          "market_probability": 0.42919182681125173,
+          "n": 5434,
+          "profitable": false,
+          "roi": -0.04719988958410012,
+          "roi_ci_90": [
+            -0.06816204401727512,
+            -0.025268324879104184
+          ],
+          "significant": true
+        },
+        "Turkey": {
+          "average_odds": 1.8287824175824174,
+          "calibration_gap": -0.0054808589864764334,
+          "hit_rate": 0.5336263736263737,
+          "market_probability": 0.5391072326128501,
+          "n": 2275,
+          "profitable": false,
+          "roi": -0.056109010989010985,
+          "roi_ci_90": [
+            -0.08942702920846199,
+            -0.02174891774723574
+          ],
+          "significant": true
+        }
+      },
+      "countries_examined": 11,
+      "leg": 0,
+      "profitable_countries": []
+    },
+    "over_under_25_leg1": {
+      "available": true,
+      "confirmed_in_majority": false,
+      "countries": {
+        "Belgium": {
+          "average_odds": 2.2457112299465236,
+          "calibration_gap": 0.008065728066009303,
+          "hit_rate": 0.4470588235294118,
+          "market_probability": 0.4389930954634025,
+          "n": 1870,
+          "profitable": false,
+          "roi": -0.034269625668449204,
+          "roi_ci_90": [
+            -0.0746941029109957,
+            0.006266203231903691
+          ],
+          "significant": false
+        },
+        "England": {
+          "average_odds": 1.9509134615384613,
+          "calibration_gap": 0.0004461356907220493,
+          "hit_rate": 0.5065559440559441,
+          "market_probability": 0.506109808365222,
+          "n": 16016,
+          "profitable": false,
+          "roi": -0.045035926573426574,
+          "roi_ci_90": [
+            -0.05944859802010517,
+            -0.0305621455528312
+          ],
+          "significant": true
+        },
+        "France": {
+          "average_odds": 1.8979917845732541,
+          "calibration_gap": -0.008597389418827261,
+          "hit_rate": 0.5191693290734825,
+          "market_probability": 0.5277667184923097,
+          "n": 4382,
+          "profitable": false,
+          "roi": -0.06165814696485624,
+          "roi_ci_90": [
+            -0.08504563899868393,
+            -0.03877562363592696
+          ],
+          "significant": true
+        },
+        "Germany": {
+          "average_odds": 2.363715025906736,
+          "calibration_gap": -0.020394917099916532,
+          "hit_rate": 0.40362694300518137,
+          "market_probability": 0.4240218601050979,
+          "n": 3860,
+          "profitable": false,
+          "roi": -0.09584948186528498,
+          "roi_ci_90": [
+            -0.1260609606353322,
+            -0.06571472776399051
+          ],
+          "significant": true
+        },
+        "Greece": {
+          "average_odds": 1.78747311827957,
+          "calibration_gap": -0.008344403324577643,
+          "hit_rate": 0.5416666666666666,
+          "market_probability": 0.5500110699912443,
+          "n": 1488,
+          "profitable": false,
+          "roi": -0.06860551075268818,
+          "roi_ci_90": [
+            -0.10855232389479712,
+            -0.027235495904488365
+          ],
+          "significant": true
+        },
+        "Italy": {
+          "average_odds": 1.9302747366246642,
+          "calibration_gap": -0.0006197751942984553,
+          "hit_rate": 0.5162156579219169,
+          "market_probability": 0.5168354331162154,
+          "n": 4841,
+          "profitable": false,
+          "roi": -0.039689072505680656,
+          "roi_ci_90": [
+            -0.0620446321605182,
+            -0.016201454363937197
+          ],
+          "significant": true
+        },
+        "Netherlands": {
+          "average_odds": 2.507511835875855,
+          "calibration_gap": 0.004709765178941727,
+          "hit_rate": 0.41294055760126247,
+          "market_probability": 0.40823079242232074,
+          "n": 1901,
+          "profitable": false,
+          "roi": -0.04120820620725934,
+          "roi_ci_90": [
+            -0.09081139682539682,
+            0.010743330712517242
+          ],
+          "significant": false
+        },
+        "Portugal": {
+          "average_odds": 1.9558702213279677,
+          "calibration_gap": 0.0005527411966989026,
+          "hit_rate": 0.5145875251509054,
+          "market_probability": 0.5140347839542065,
+          "n": 1988,
+          "profitable": false,
+          "roi": -0.04595543259557344,
+          "roi_ci_90": [
+            -0.07391160018955927,
+            -0.017234734104262378
+          ],
+          "significant": true
+        },
+        "Scotland": {
+          "average_odds": 2.0108610611510795,
+          "calibration_gap": -0.005387393671051954,
+          "hit_rate": 0.48426258992805754,
+          "market_probability": 0.4896499835991095,
+          "n": 4448,
+          "profitable": false,
+          "roi": -0.059865557553956845,
+          "roi_ci_90": [
+            -0.0874752731131059,
+            -0.03377106015826426
+          ],
+          "significant": true
+        },
+        "Spain": {
+          "average_odds": 1.753375046006625,
+          "calibration_gap": 0.0011461882392973521,
+          "hit_rate": 0.5719543614280457,
+          "market_probability": 0.5708081731887483,
+          "n": 5434,
+          "profitable": false,
+          "roi": -0.03885001840264999,
+          "roi_ci_90": [
+            -0.05730220522087043,
+            -0.021042504991803674
+          ],
+          "significant": true
+        },
+        "Turkey": {
+          "average_odds": 2.165740659340659,
+          "calibration_gap": 0.005480858986476378,
+          "hit_rate": 0.4663736263736264,
+          "market_probability": 0.46089276738715,
+          "n": 2275,
+          "profitable": false,
+          "roi": -0.04244175824175825,
+          "roi_ci_90": [
+            -0.08018715311116956,
+            -0.006130164404223237
+          ],
+          "significant": true
+        }
+      },
+      "countries_examined": 11,
+      "leg": 1,
+      "profitable_countries": []
+    }
+  },
+  "divisions": {
+    "rang_1": {
+      "average_odds": 1.198684586108468,
+      "calibration_gap": 0.02860162803353694,
+      "hit_rate": 0.8399143672692674,
+      "market_probability": 0.8113127392357304,
+      "n": 4204,
+      "overround": 1.0259912103298767,
+      "profitable": false,
+      "roi": 0.0010339200761179648,
+      "roi_ci_90": [
+        -0.010691721839827577,
+        0.012547986167493592
+      ],
+      "significant": false,
+      "top_band": "0.75-1.00"
+    },
+    "rang_2": {
+      "average_odds": 1.4940675174969125,
+      "calibration_gap": 0.010255434769119609,
+      "hit_rate": 0.6611774392754219,
+      "market_probability": 0.6509220045063023,
+      "n": 2429,
+      "overround": 1.028193385626567,
+      "profitable": false,
+      "roi": -0.022587978592013166,
+      "roi_ci_90": [
+        -0.04531310948727316,
+        2.4931908548706584e-05
+      ],
+      "significant": false,
+      "top_band": "0.60-0.75"
+    },
+    "rang_3": {
+      "average_odds": 1.4896162280701755,
+      "calibration_gap": 0.017838246194106344,
+      "hit_rate": 0.6666666666666666,
+      "market_probability": 0.6488284204725603,
+      "n": 912,
+      "overround": 1.0327004765187013,
+      "profitable": false,
+      "roi": -0.0158111842105263,
+      "roi_ci_90": [
+        -0.053155362480200925,
+        0.021357506475393504
+      ],
+      "significant": false,
+      "top_band": "0.60-0.75"
+    },
+    "rang_4": {
+      "average_odds": 1.48994708994709,
+      "calibration_gap": 0.04180121974310569,
+      "hit_rate": 0.689594356261023,
+      "market_probability": 0.6477931365179173,
+      "n": 567,
+      "overround": 1.0326241233727247,
+      "profitable": false,
+      "roi": 0.018352380952380964,
+      "roi_ci_90": [
+        -0.02661056846879828,
+        0.06501354892205634
+      ],
+      "significant": false,
+      "top_band": "0.60-0.75"
+    },
+    "rang_5": {
+      "average_odds": 1.4768969298245616,
+      "calibration_gap": 0.01742077980921697,
+      "hit_rate": 0.6710526315789473,
+      "market_probability": 0.6536318517697304,
+      "n": 912,
+      "overround": 1.0340353720157545,
+      "profitable": false,
+      "roi": -0.01901162280701753,
+      "roi_ci_90": [
+        -0.05477972814992142,
+        0.01779292144067921
+      ],
+      "significant": false,
+      "top_band": "0.60-0.75"
+    }
+  },
+  "timing_1x2": {
+    "available": true,
+    "close_log_loss": 1.0008947239980728,
+    "close_overround": 1.0276380214800576,
+    "closing_beats_opening_by": 0.003101912411755947,
+    "legs": {
+      "leg_0": {
+        "at_close": {
+          "average_odds": 2.686696757901435,
+          "calibration_gap": 0.000950963369691693,
+          "hit_rate": 0.4355308551146814,
+          "market_probability": 0.43457989174498973,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.04440631518248611,
+          "roi_ci_90": [
+            -0.05113387035350167,
+            -0.037714362275923126
+          ],
+          "significant": true
+        },
+        "at_open": {
+          "average_odds": 2.651022548542,
+          "calibration_gap": 0.0006636322958463725,
+          "hit_rate": 0.4355308551146814,
+          "market_probability": 0.43486722281883505,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.04731993060457533,
+          "roi_ci_90": [
+            -0.054013596636134906,
+            -0.040356321902422346
+          ],
+          "significant": true
+        },
+        "open_minus_close_roi": -0.002913615422089219
+      },
+      "leg_1": {
+        "at_close": {
+          "average_odds": 3.8608514361273776,
+          "calibration_gap": 0.00017116636569353139,
+          "hit_rate": 0.26412017935436405,
+          "market_probability": 0.2639490129886705,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.0483542308342364,
+          "roi_ci_90": [
+            -0.05589617101037369,
+            -0.0409065399149945
+          ],
+          "significant": true
+        },
+        "at_open": {
+          "average_odds": 3.8386845689629467,
+          "calibration_gap": 0.0007990668095969045,
+          "hit_rate": 0.26412017935436405,
+          "market_probability": 0.26332111254476714,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.04939733752224531,
+          "roi_ci_90": [
+            -0.05695032011453517,
+            -0.041898537614466394
+          ],
+          "significant": true
+        },
+        "open_minus_close_roi": -0.0010431066880089088
+      },
+      "leg_2": {
+        "at_close": {
+          "average_odds": 4.29353926607876,
+          "calibration_gap": -0.001122129735385169,
+          "hit_rate": 0.3003489655309545,
+          "market_probability": 0.3014710952663397,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.06388013879084935,
+          "roi_ci_90": [
+            -0.07274106446793045,
+            -0.055421442730876826
+          ],
+          "significant": true
+        },
+        "at_open": {
+          "average_odds": 4.2158842349104715,
+          "calibration_gap": -0.001462699105443277,
+          "hit_rate": 0.3003489655309545,
+          "market_probability": 0.3018116646363978,
+          "n": 100583,
+          "profitable": false,
+          "roi": -0.06661712953481205,
+          "roi_ci_90": [
+            -0.07561691455267172,
+            -0.05807208561540247
+          ],
+          "significant": true
+        },
+        "open_minus_close_roi": -0.0027369907439627056
+      }
+    },
+    "matches": 100583,
+    "mean_absolute_drift": 0.018180653104404677,
+    "open_log_loss": 1.0039966364098287,
+    "open_overround": 1.0301082967179953
+  },
+  "timing_asian_handicap": {
+    "available": false
+  },
+  "timing_over_under_25": {
+    "available": true,
+    "close_log_loss": 0.6746016854808983,
+    "close_overround": 1.034655686647135,
+    "closing_beats_opening_by": 0.0023623545438304916,
+    "legs": {
+      "leg_0": {
+        "at_close": {
+          "average_odds": 2.001524651605823,
+          "calibration_gap": 0.0022910190278404574,
+          "hit_rate": 0.5007972169879693,
+          "market_probability": 0.49850619796012885,
+          "n": 48293,
+          "profitable": false,
+          "roi": -0.041253428033048274,
+          "roi_ci_90": [
+            -0.050368294583606414,
+            -0.03203703698697243
+          ],
+          "significant": true
+        },
+        "at_open": {
+          "average_odds": 1.9767044913341478,
+          "calibration_gap": 0.0006162061338949032,
+          "hit_rate": 0.5007972169879693,
+          "market_probability": 0.5001810108540744,
+          "n": 48293,
+          "profitable": false,
+          "roi": -0.04816556022611973,
+          "roi_ci_90": [
+            -0.05819988311818209,
+            -0.037945892143708936
+          ],
+          "significant": true
+        },
+        "open_minus_close_roi": -0.006912132193071456
+      },
+      "leg_1": {
+        "at_close": {
+          "average_odds": 1.9986360342078564,
+          "calibration_gap": -0.002291019027840402,
+          "hit_rate": 0.49920278301203075,
+          "market_probability": 0.5014938020398712,
+          "n": 48293,
+          "profitable": false,
+          "roi": -0.0510489926076243,
+          "roi_ci_90": [
+            -0.060157961457969714,
+            -0.04196922417455621
+          ],
+          "significant": true
+        },
+        "at_open": {
+          "average_odds": 1.9860923943428654,
+          "calibration_gap": -0.0006162061338947922,
+          "hit_rate": 0.49920278301203075,
+          "market_probability": 0.49981898914592554,
+          "n": 48293,
+          "profitable": false,
+          "roi": -0.05117663429482534,
+          "roi_ci_90": [
+            -0.061203848421499125,
+            -0.04118794213709868
+          ],
+          "significant": true
+        },
+        "open_minus_close_roi": -0.00012764168720104385
+      }
+    },
+    "matches": 48293,
+    "mean_absolute_drift": 0.021683248312781053,
+    "open_log_loss": 0.6769640400247288,
+    "open_overround": 1.0376653862569356
+  }
+}

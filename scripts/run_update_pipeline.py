@@ -5,22 +5,26 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import app
+from src.data.tennis_pipeline import recalculate_elo_artifacts, run_data_update
 
 
 def main() -> int:
-    print("[update] Fetching new matches...")
-    df_new = app.fetch_new_matches(progress_callback=lambda msg: print(f"[update] {msg}"))
-
-    if df_new.empty:
-        print("[update] No new matches found. Nothing to update.")
-        return 0
-
-    print(f"[update] New matches: {len(df_new)}")
-    app.update_main_csv(df_new)
+    print("[update] Downloading, enriching, and validating ATP snapshots...")
+    report = run_data_update(PROJECT_ROOT)
+    changes = report["publication_changes"]
+    print(
+        "[update] Data published: "
+        f"rows={changes['current_rows']}, "
+        f"added={changes['rows_added']}, "
+        f"removed_or_revised={changes['rows_removed']}, "
+        f"odds_coverage={report['legacy_odds_dataset']['odds']['coverage']:.2%}"
+    )
 
     print("[update] Recalculating Elo files...")
-    result = app.recalculate_all_elo(progress_callback=lambda msg: print(f"[elo] {msg}"))
+    result = recalculate_elo_artifacts(
+        PROJECT_ROOT,
+        progress_callback=lambda msg: print(f"[elo] {msg}"),
+    )
 
     print(
         "[update] Done: "

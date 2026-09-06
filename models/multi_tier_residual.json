@@ -1,0 +1,33 @@
+{
+  "arms": {
+    "base": {
+      "gain_vs_market": 0.0008297445686491489,
+      "log_loss": 0.5686442546114476,
+      "market_log_loss": 0.5694739991800968,
+      "n": 44670
+    },
+    "rich": {
+      "gain_vs_market": 0.0008050069534251136,
+      "log_loss": 0.5686689922266717,
+      "market_log_loss": 0.5694739991800968,
+      "n": 44670
+    }
+  },
+  "enrichment_gain": -2.473761522403528e-05,
+  "first_test_year": 2005,
+  "market_log_loss": 0.5689315968216546,
+  "priced_completed_matches": 52399,
+  "thin_record_subgroup": {
+    "base": {
+      "gain_vs_market": 0.0020135997125483307,
+      "log_loss": 0.5422451673342457
+    },
+    "enrichment_gain": -0.0007199689977195334,
+    "market_log_loss": 0.544258767046794,
+    "n": 7669,
+    "rich": {
+      "gain_vs_market": 0.0012936307148287973,
+      "log_loss": 0.5429651363319652
+    }
+  }
+}

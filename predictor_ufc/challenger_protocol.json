@@ -1,0 +1,85 @@
+{
+  "protocol_version": "2.0.0",
+  "frozen_before_challenger_returns": true,
+  "created_for_research_date": "2026-09-02",
+  "disclosure": "La phase 1 a deja expose les resultats agreges 2022-2024; cette fenetre est une confirmation interne, pas un holdout pristine.",
+  "model_selection": ["2015-01-01", "2018-12-31"],
+  "rule_selection": ["2019-01-01", "2021-12-31"],
+  "internal_confirmation": ["2022-01-01", "2024-12-31"],
+  "pristine_economic_holdout": ["2025-09-13", "2026-08-29"],
+  "candidate_selection_metric": "lowest_walk_forward_log_loss",
+  "threshold_selection_metric": "highest_event_cluster_bootstrap_95pct_lower_bound",
+  "candidates": {
+    "structural_logit": {
+      "family": "logistic",
+      "feature_set": "structural",
+      "C": 0.05
+    },
+    "elastic_net_interactions": {
+      "family": "elastic_net",
+      "feature_set": "engineered",
+      "C": 0.05,
+      "l1_ratio": 0.2
+    },
+    "hist_gradient_boosting": {
+      "family": "hist_gbm",
+      "feature_set": "engineered",
+      "learning_rate": 0.03,
+      "max_iter": 180,
+      "max_leaf_nodes": 8,
+      "min_samples_leaf": 80,
+      "l2_regularization": 5.0
+    },
+    "xgboost_shallow": {
+      "family": "xgboost",
+      "feature_set": "engineered",
+      "n_estimators": 180,
+      "max_depth": 2,
+      "learning_rate": 0.03,
+      "min_child_weight": 30,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "reg_alpha": 1.0,
+      "reg_lambda": 10.0
+    },
+    "small_mlp": {
+      "family": "mlp",
+      "feature_set": "engineered",
+      "hidden_layer_sizes": [24, 12],
+      "alpha": 0.05,
+      "learning_rate_init": 0.001,
+      "early_stopping": true,
+      "max_iter": 500
+    }
+  },
+  "nonlinear_calibration": {
+    "method": "sigmoid_on_last_complete_training_year",
+    "base_model_excludes_calibration_year": true
+  },
+  "bet_rule": {
+    "edge_threshold_candidates": [0.03, 0.05, 0.08],
+    "minimum_decimal_odds": 1.25,
+    "maximum_decimal_odds": 4.0,
+    "minimum_selection_bets": 100,
+    "one_side_maximum_per_fight": true
+  },
+  "staking": {
+    "method": "one_tenth_kelly",
+    "kelly_divisor": 10.0,
+    "maximum_fraction_per_bet": 0.0025,
+    "maximum_event_exposure": 0.02,
+    "minimum_stake": 0.0,
+    "simultaneous_event_settlement": true
+  },
+  "confirmation_gate": {
+    "model_log_loss_must_beat_market": true,
+    "minimum_bets": 100,
+    "positive_roi": true,
+    "positive_years_minimum": 2,
+    "years_total": 3,
+    "maximum_drawdown": 0.15,
+    "cluster_bootstrap_confidence": 0.975,
+    "roi_lower_bound_must_exceed": 0.0,
+    "bootstrap_samples": 10000
+  }
+}

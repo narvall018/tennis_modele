@@ -1,0 +1,41 @@
+{
+  "best_gain_vs_market": -0.0007990389733452119,
+  "candidates": {
+    "hist_gradient_boosting": {
+      "gain_vs_market": -0.024874530234890946,
+      "log_loss": 1.0223946174159952,
+      "market_log_loss": 0.9975200871811043,
+      "n": 30118
+    },
+    "hist_gradient_boosting+marché": {
+      "gain_vs_market": -0.00899454206887218,
+      "log_loss": 1.0065146292499765,
+      "market_log_loss": 0.9975200871811043,
+      "n": 30118
+    },
+    "logistic": {
+      "gain_vs_market": -0.018216883152726515,
+      "log_loss": 1.0157369703338308,
+      "market_log_loss": 0.9975200871811043,
+      "n": 30118
+    },
+    "logistic+marché": {
+      "gain_vs_market": -0.0007990389733452119,
+      "log_loss": 0.9983191261544495,
+      "market_log_loss": 0.9975200871811043,
+      "n": 30118
+    }
+  },
+  "decision": "Arrêt. Les descripteurs n'ajoutent rien au prix; les saisons de réglage, validation et holdout restent fermées et réutilisables.",
+  "development_matches": 37552,
+  "development_seasons": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019
+  ],
+  "gate_passed": false,
+  "market_log_loss": 0.9975200871811043,
+  "minimum_gain_to_continue": 0.001
+}

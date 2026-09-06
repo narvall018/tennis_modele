@@ -1,0 +1,203 @@
+{
+  "as_of_date": "2026-09-06",
+  "date_max": "2026-09-03",
+  "date_min": "2000-07-28",
+  "duplicate_match_ids": 0,
+  "generated_at": "2026-09-06T20:13:13.662372+00:00",
+  "leagues": 22,
+  "markets": {
+    "1x2": {
+      "bet365_close": {
+        "complete_rows": 53921,
+        "coverage": 0.2816335697646481,
+        "implied_arbitrage_rate": 5.5636950353294636e-05,
+        "overround_median": 1.0616926932716406
+      },
+      "bet365_open": {
+        "complete_rows": 177135,
+        "coverage": 0.925189858872442,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.065490851513019
+      },
+      "betfair_exchange_close": {
+        "complete_rows": 15537,
+        "coverage": 0.08115095739013256,
+        "implied_arbitrage_rate": 0.0007079873849520499,
+        "overround_median": 1.0076256209732408
+      },
+      "betfair_exchange_open": {
+        "complete_rows": 15400,
+        "coverage": 0.08043539575259326,
+        "implied_arbitrage_rate": 0.00012987012987012987,
+        "overround_median": 1.0204323250722327
+      },
+      "market_average_close": {
+        "complete_rows": 53952,
+        "coverage": 0.28179548517168257,
+        "implied_arbitrage_rate": 0.00025948991696322655,
+        "overround_median": 1.0636273316261562
+      },
+      "market_average_open": {
+        "complete_rows": 53924,
+        "coverage": 0.2816492389975869,
+        "implied_arbitrage_rate": 1.8544618351754322e-05,
+        "overround_median": 1.0650874934335026
+      },
+      "market_maximum_close": {
+        "complete_rows": 53951,
+        "coverage": 0.2817902620940363,
+        "implied_arbitrage_rate": 0.3219402791421846,
+        "overround_median": 1.0076866077744162
+      },
+      "market_maximum_open": {
+        "complete_rows": 53924,
+        "coverage": 0.2816492389975869,
+        "implied_arbitrage_rate": 0.12092945627178993,
+        "overround_median": 1.0151194144838214
+      },
+      "pinnacle_close": {
+        "complete_rows": 101469,
+        "coverage": 0.5299804656896029,
+        "implied_arbitrage_rate": 9.855226719490681e-06,
+        "overround_median": 1.027652674653576
+      },
+      "pinnacle_open": {
+        "complete_rows": 101874,
+        "coverage": 0.5320958121363433,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.0301514463706518
+      }
+    },
+    "asian_handicap": {
+      "bet365_close": {
+        "complete_rows": 53885,
+        "coverage": 0.2814455389693823,
+        "implied_arbitrage_rate": 0.0004268349262317899,
+        "overround_median": 1.039136302294197
+      },
+      "bet365_open": {
+        "complete_rows": 59241,
+        "coverage": 0.3094203428428167,
+        "implied_arbitrage_rate": 3.376040242399689e-05,
+        "overround_median": 1.039136302294197
+      },
+      "betfair_exchange_close": {
+        "complete_rows": 15492,
+        "coverage": 0.0809159188960503,
+        "implied_arbitrage_rate": 0.0021301316808675446,
+        "overround_median": 1.0072775805192515
+      },
+      "betfair_exchange_open": {
+        "complete_rows": 12882,
+        "coverage": 0.06728368623927963,
+        "implied_arbitrage_rate": 7.76276975624903e-05,
+        "overround_median": 1.0161710468625076
+      },
+      "market_average_close": {
+        "complete_rows": 53950,
+        "coverage": 0.28178503901639,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.046448087431694
+      },
+      "market_average_open": {
+        "complete_rows": 53921,
+        "coverage": 0.2816335697646481,
+        "implied_arbitrage_rate": 0.0023738432150739045,
+        "overround_median": 1.0488552963084674
+      },
+      "pinnacle_close": {
+        "complete_rows": 48592,
+        "coverage": 0.2537997889876631,
+        "implied_arbitrage_rate": 0.00018521567336187027,
+        "overround_median": 1.026315789473684
+      },
+      "pinnacle_open": {
+        "complete_rows": 48404,
+        "coverage": 0.2528178503901639,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.029087472435157
+      }
+    },
+    "over_under_25": {
+      "bet365_close": {
+        "complete_rows": 53917,
+        "coverage": 0.28161267745406304,
+        "implied_arbitrage_rate": 0.00018547025984383403,
+        "overround_median": 1.0578747628083491
+      },
+      "bet365_open": {
+        "complete_rows": 57942,
+        "coverage": 0.302635564980309,
+        "implied_arbitrage_rate": 0.00020710365537951746,
+        "overround_median": 1.0578747628083491
+      },
+      "betfair_exchange_close": {
+        "complete_rows": 15522,
+        "coverage": 0.08107261122543848,
+        "implied_arbitrage_rate": 0.001030795000644247,
+        "overround_median": 1.0083307934572794
+      },
+      "betfair_exchange_open": {
+        "complete_rows": 14907,
+        "coverage": 0.07786041847298102,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.0310374149659864
+      },
+      "market_average_close": {
+        "complete_rows": 53951,
+        "coverage": 0.2817902620940363,
+        "implied_arbitrage_rate": 0.00020388871383292246,
+        "overround_median": 1.0598642483587404
+      },
+      "market_average_open": {
+        "complete_rows": 53923,
+        "coverage": 0.28164401591994065,
+        "implied_arbitrage_rate": 1.85449622610018e-05,
+        "overround_median": 1.060985797827903
+      },
+      "pinnacle_close": {
+        "complete_rows": 48507,
+        "coverage": 0.25335582738772994,
+        "implied_arbitrage_rate": 6.184674376894056e-05,
+        "overround_median": 1.034655686647135
+      },
+      "pinnacle_open": {
+        "complete_rows": 48309,
+        "coverage": 0.25232165801376805,
+        "implied_arbitrage_rate": 0.0,
+        "overround_median": 1.0376653862569356
+      }
+    }
+  },
+  "matches": 191458,
+  "matches_by_league": {
+    "B1": 6906,
+    "D1": 7837,
+    "D2": 7494,
+    "E0": 9810,
+    "E1": 14208,
+    "E2": 13822,
+    "E3": 13879,
+    "EC": 11294,
+    "F1": 9082,
+    "F2": 9019,
+    "G1": 5172,
+    "I1": 9412,
+    "I2": 10321,
+    "N1": 7627,
+    "P1": 7205,
+    "SC0": 5633,
+    "SC1": 4495,
+    "SC2": 4492,
+    "SC3": 4406,
+    "SP1": 9799,
+    "SP2": 11454,
+    "T1": 8091
+  },
+  "matches_with_pinnacle_open_and_close": 100584,
+  "result_distribution": {
+    "A": 0.28901377847883086,
+    "D": 0.2655830521576534,
+    "H": 0.44540316936351576
+  }
+}

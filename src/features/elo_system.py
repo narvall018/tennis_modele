@@ -301,9 +301,19 @@ class TennisEloEngine:
         Pour chaque match, les ratings PRÉ-MATCH sont stockés dans l'historique
         (garantit l'absence de data leakage).
         """
+        # ``fit`` suit la convention sklearn : chaque appel repart d'un état
+        # vierge. Cela évite de compter l'historique plusieurs fois lors d'une
+        # mise à jour ou d'un fold walk-forward.
+        self._players = {}
+        self._history = []
+
         df = df.copy()
         df["Date"] = pd.to_datetime(df["Date"])
-        df = df.sort_values("Date").reset_index(drop=True)
+        df["_round_order"] = df.get("Round", pd.Series(index=df.index, dtype=object)).map(
+            ROUND_MAP
+        ).fillna(3)
+        sort_cols = [column for column in ["Date", "Tournament", "_round_order", "Player_1"] if column in df]
+        df = df.sort_values(sort_cols, kind="mergesort").drop(columns="_round_order").reset_index(drop=True)
 
         n = len(df)
         self._history = []
@@ -319,6 +329,7 @@ class TennisEloEngine:
             surface = str(row.get("Surface", "Hard")).strip()
             series = str(row.get("Series", "ATP250")).strip()
             round_name = str(row.get("Round", "1st Round")).strip()
+            status = str(row.get("Status", "completed") or "completed").strip().lower()
 
             # Identifier gagnant / perdant
             if winner_raw == p1 or winner_raw == "1":
@@ -329,9 +340,12 @@ class TennisEloEngine:
             winner = self._get_or_create(winner_name)
             loser = self._get_or_create(loser_name)
 
-            # Apply temporal decay avant la mise à jour
-            self._apply_decay(winner, match_date)
-            self._apply_decay(loser, match_date)
+            # Le decay est une mutation d'état : ne l'appliquer que lorsqu'un
+            # match effectivement joué sera ensuite enregistré. Sinon plusieurs
+            # walkovers le même jour feraient décroître le rating plusieurs fois.
+            if status == "completed":
+                self._apply_decay(winner, match_date)
+                self._apply_decay(loser, match_date)
 
             # Stocker les features PRÉ-MATCH (avant update)
             surf = surface if surface in SURFACES else "Hard"
@@ -344,6 +358,17 @@ class TennisEloEngine:
                 "Surface": surface,
                 "Series": series,
                 "Round": round_name,
+                "Status": status,
+                "Tournament": str(row.get("Tournament", "")),
+                "Court": str(row.get("Court", "")),
+                "Best_of": row.get("Best_of", row.get("Best of", 3)),
+                "Rank_1": row.get("Rank_1", np.nan),
+                "Rank_2": row.get("Rank_2", np.nan),
+                "Pts_1": row.get("Pts_1", np.nan),
+                "Pts_2": row.get("Pts_2", np.nan),
+                "odds_p1": row.get("odds_p1", row.get("Odd_1", np.nan)),
+                "odds_p2": row.get("odds_p2", row.get("Odd_2", np.nan)),
+                "source_row_id": row.get("source_row_id", row.get("_source_row_id", i)),
                 # Elo pré-match
                 "elo_p1": (winner.global_elo if winner_name == p1 else loser.global_elo),
                 "elo_p2": (loser.global_elo if winner_name == p1 else winner.global_elo),
@@ -369,8 +394,10 @@ class TennisEloEngine:
             }
             self._history.append(record)
 
-            # Mettre à jour les ratings
-            self._update_pair(winner, loser, surface, series, round_name, match_date)
+            # Conserver les lignes nécessaires au règlement des paris, sans
+            # transformer un abandon ou walkover en signal de performance.
+            if status == "completed":
+                self._update_pair(winner, loser, surface, series, round_name, match_date)
 
         return self
 

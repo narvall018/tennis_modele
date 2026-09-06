@@ -1,0 +1,80 @@
+{
+  "data_sha256": "fc5e5009e9abf620d8f44e7fa30ff44629df2e4b5d09dcc2d3e1a8abb03ac02c",
+  "fold_rule": "train through Y-2, calibrate on Y-1, test on Y",
+  "frozen_at_utc": "2026-09-06T12:25:01.231431+00:00",
+  "holdout_opened": true,
+  "holdout_opened_at_utc": "2026-09-06T12:29:02.569492+00:00",
+  "holdout_opens": "exactly once, after model, blend, rule, gate and staking are frozen",
+  "notes": {
+    "data_source": "data/wta_tennis.csv, built from the official Tennis-Data WTA workbooks",
+    "decision_rule": "Le passage de la gate finale n'autorise qu'un suivi papier prospectif. Aucun argent réel n'est engagé sur la seule foi de ce backtest.",
+    "known_inapplicable_features": "best_of_5 et l'expérience en Grand Chelem à 5 sets sont constants sur le circuit WTA; les variables correspondantes restent dans la matrice et reçoivent un poids nul.",
+    "primary_price": "Tennis-Data WTA market average pre-match decimal odds",
+    "prior_exposure": "Seul un contrôle d'intégrité agrégé a été lu avant le gel: AUC et log-loss du marché dévigé sur l'ensemble de la table, plus l'overround médian et le taux de victoire de Player_1. Aucune performance par année, par segment ou par stratégie.",
+    "rating_warm_up_years": "2007-2010, used only to build ratings and training folds",
+    "study_label": "WTA",
+    "study_label_long": "WTA main tour match winner",
+    "why_this_tour": "Aucune recherche de ce dépôt n'a jamais lu une ligne WTA. Le holdout 2023-2026 est donc une vraie preuve hors échantillon, utilisable une seule fois."
+  },
+  "protocol_sha256": "2ceeff7a30a31a86de684904da36c7a4d80e7ca26185d1ba46c86d064db3a35c",
+  "study": "wta_nested_strategy",
+  "superseded": [
+    {
+      "amended_at_utc": "2026-09-06T12:25:01.231419+00:00",
+      "previous_protocol_sha256": "ca3ead30cb301535713744b63216b98fc0ec2aeb31d9d684a5d829bbe836923e",
+      "previous_windows": {
+        "development": [
+          2011,
+          2012,
+          2013,
+          2014,
+          2015
+        ],
+        "holdout": [
+          2023,
+          2024,
+          2025,
+          2026
+        ],
+        "minimum_tuning_bets": 120,
+        "tuning": [
+          2016,
+          2017,
+          2018,
+          2019
+        ],
+        "validation": [
+          2020,
+          2021,
+          2022
+        ]
+      },
+      "reason": "Le garde-fou du moteur exige 10 000 lignes d'entraînement par fold; les folds 2011 (6 966) et 2012 (9 335) sont refuses. Developpement decale a 2013, premiere annee admissible. Decision fondee uniquement sur des tailles d'echantillon, avant tout calcul de rendement WTA."
+    }
+  ],
+  "windows": {
+    "development": [
+      2013,
+      2014,
+      2015,
+      2016
+    ],
+    "holdout": [
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "minimum_tuning_bets": 120,
+    "tuning": [
+      2017,
+      2018,
+      2019
+    ],
+    "validation": [
+      2020,
+      2021,
+      2022
+    ]
+  }
+}

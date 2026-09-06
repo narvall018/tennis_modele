@@ -1,0 +1,136 @@
+{
+  "column_groups": {
+    "identifiers": [
+      "match_id",
+      "tourney_id",
+      "match_num",
+      "player_1_id",
+      "player_2_id"
+    ],
+    "outcome": [
+      "winner_id",
+      "winner_name",
+      "loser_id",
+      "loser_name",
+      "player_1_won",
+      "score",
+      "match_status"
+    ],
+    "post_match": [
+      "postmatch_player_1_ace",
+      "postmatch_player_2_ace",
+      "postmatch_player_1_df",
+      "postmatch_player_2_df",
+      "postmatch_player_1_svpt",
+      "postmatch_player_2_svpt",
+      "postmatch_player_1_1stIn",
+      "postmatch_player_2_1stIn",
+      "postmatch_player_1_1stWon",
+      "postmatch_player_2_1stWon",
+      "postmatch_player_1_2ndWon",
+      "postmatch_player_2_2ndWon",
+      "postmatch_player_1_SvGms",
+      "postmatch_player_2_SvGms",
+      "postmatch_player_1_bpSaved",
+      "postmatch_player_2_bpSaved",
+      "postmatch_player_1_bpFaced",
+      "postmatch_player_2_bpFaced",
+      "minutes"
+    ],
+    "pre_match": [
+      "match_date",
+      "surface",
+      "draw_size",
+      "tourney_level",
+      "indoor",
+      "best_of",
+      "round",
+      "player_1_hand",
+      "player_1_ht",
+      "player_1_ioc",
+      "player_1_age",
+      "player_1_rank",
+      "player_1_rank_points",
+      "player_2_hand",
+      "player_2_ht",
+      "player_2_ioc",
+      "player_2_age",
+      "player_2_rank",
+      "player_2_rank_points",
+      "player_1_odds",
+      "player_2_odds",
+      "market_overround"
+    ]
+  },
+  "generated_at": "2026-09-06T12:12:30.266651+00:00",
+  "sources": {
+    "match_stats": {
+      "name": "TennisMyLife match database",
+      "updated_at": "2026-09-06T05:40:02.686Z",
+      "url": "https://stats.tennismylife.org/api/data-files"
+    },
+    "odds": {
+      "name": "Tennis-Data official ATP workbooks",
+      "updated_at": "2026-09-06T12:05:57.479790+00:00",
+      "url": "http://www.tennis-data.co.uk/alldata.php"
+    },
+    "ranking_file": "atp_rankings_2026-08-31.csv",
+    "ranking_updated_at": "2026-08-31T20:02:54.259Z",
+    "ranking_url": "https://stats.tennismylife.org/data/atp_rankings_2026-08-31.csv",
+    "season_files": [
+      "2000.csv",
+      "2001.csv",
+      "2002.csv",
+      "2003.csv",
+      "2004.csv",
+      "2005.csv",
+      "2006.csv",
+      "2007.csv",
+      "2008.csv",
+      "2009.csv",
+      "2010.csv",
+      "2011.csv",
+      "2012.csv",
+      "2013.csv",
+      "2014.csv",
+      "2015.csv",
+      "2016.csv",
+      "2017.csv",
+      "2018.csv",
+      "2019.csv",
+      "2020.csv",
+      "2021.csv",
+      "2022.csv",
+      "2023.csv",
+      "2024.csv",
+      "2025.csv",
+      "2026.csv",
+      "ongoing_tourneys.csv"
+    ]
+  },
+  "tables": {
+    "data/atp_tennis.csv": {
+      "feature_time": "pre_match plus outcome and post-event settlement status",
+      "odds_semantics": "Odd_1/Odd_2 are a same-source market-average pair where available; named bookmaker, maximum, and exchange prices are retained separately",
+      "role": "legacy-compatible ATP match and pre-match odds table",
+      "rows": 71369
+    },
+    "data/processed/atp_matches_enriched.csv.gz": {
+      "leakage_warning": "columns prefixed postmatch_ and outcome columns are unavailable before a match",
+      "role": "deduplicated rich matches joined to odds with confidence",
+      "rows": 79705
+    },
+    "data/processed/atp_players_current.csv": {
+      "role": "latest player profile and current ranking snapshot",
+      "rows": 2786
+    },
+    "data/raw/tennis_data/atp_odds_2000_current.csv.gz": {
+      "role": "unaltered concatenation of official yearly Tennis-Data workbooks",
+      "rows": 71369
+    },
+    "data/raw/tennis_mylife/atp_matches_2000_current.csv.gz": {
+      "role": "unaltered downloaded match-stat rows with source metadata",
+      "rows": 80198
+    }
+  }
+}

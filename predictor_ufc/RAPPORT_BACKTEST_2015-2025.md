@@ -1,5 +1,11 @@
 # 📊 RAPPORT BACKTEST UFC PREDICTOR 2015-2025
 
+> **OBSOLÈTE — NE PAS UTILISER POUR MISER.** Ce rapport optimisait et évaluait les
+> stratégies sur les mêmes données, autorisait jusqu'à 36 % de bankroll par pari,
+> et ne disposait pas de provenance/timestamp vérifiable pour les anciennes cotes.
+> Ses ROI de 946 % à 9 413 % ne constituent pas une validation. Le remplacement
+> rigoureux est `RAPPORT_RIGOUREUX_2026.md`; son verdict est **NO BET**.
+
 ## 📅 Période Analysée
 **Du 3 janvier 2015 au 6 septembre 2025** (10 ans et 8 mois)
 

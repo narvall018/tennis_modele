@@ -1,0 +1,46 @@
+{
+  "extra_matches_known_per_player": {
+    "mean": 112.21244520752852,
+    "median": 85.0,
+    "share_of_matches_with_new_information": 0.8985575109584943
+  },
+  "groups": {
+    "all_main_tour": {
+      "auc_gain": 0.013375531083197112,
+      "baseline": {
+        "auc": 0.7212981648100714,
+        "log_loss": 0.6161427741090457,
+        "n": 76881
+      },
+      "enriched": {
+        "auc": 0.7346736958932685,
+        "log_loss": 0.6114548350167855,
+        "n": 76881
+      },
+      "log_loss_gain": 0.004687939092260174
+    },
+    "thin_main_tour_record": {
+      "auc_gain": 0.04978965858360396,
+      "baseline": {
+        "auc": 0.6867467627587256,
+        "log_loss": 0.6366287352016209,
+        "n": 19456
+      },
+      "enriched": {
+        "auc": 0.7365364213423296,
+        "log_loss": 0.6143330905277059,
+        "n": 19456
+      },
+      "log_loss_gain": 0.022295644673914983
+    }
+  },
+  "matches_in_rating_pass": {
+    "baseline": 79705,
+    "enriched": 230817
+  },
+  "thin_record_threshold": 20,
+  "tier_weights": {
+    "Challenger": 0.7,
+    "Qualifying": 0.6
+  }
+}

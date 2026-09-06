@@ -1,0 +1,268 @@
+{
+  "protocol": {
+    "protocol_version": "1.0.0",
+    "frozen_before_return_analysis": true,
+    "orientation": "deterministic_sha256_parity_swap",
+    "model_selection": [
+      "2015-01-01",
+      "2018-12-31"
+    ],
+    "strategy_selection": [
+      "2019-01-01",
+      "2021-12-31"
+    ],
+    "validation": [
+      "2022-01-01",
+      "2024-12-31"
+    ],
+    "final_holdout": [
+      "2025-09-13",
+      "2026-08-29"
+    ],
+    "legacy_odds_use": "research_and_validation_only_unverified_snapshot",
+    "holdout_quote": {
+      "bookmaker_priority": [
+        "Pinnacle",
+        "BetOnline.ag"
+      ],
+      "cutoff_hours_before_event_date": 24,
+      "maximum_quote_age_days": 14,
+      "no_line_shopping": true
+    },
+    "model_candidates": {
+      "market_recal_c0.1": {
+        "features": "market",
+        "C": 0.1
+      },
+      "market_recal_c1": {
+        "features": "market",
+        "C": 1.0
+      },
+      "market_recal_c10": {
+        "features": "market",
+        "C": 10.0
+      },
+      "market_plus_c0.01": {
+        "features": "market_plus_stats",
+        "C": 0.01
+      },
+      "market_plus_c0.1": {
+        "features": "market_plus_stats",
+        "C": 0.1
+      },
+      "market_plus_c1": {
+        "features": "market_plus_stats",
+        "C": 1.0
+      }
+    },
+    "bet_rule": {
+      "edge_threshold_candidates": [
+        0.02,
+        0.03,
+        0.05,
+        0.08,
+        0.1
+      ],
+      "minimum_decimal_odds": 1.25,
+      "maximum_decimal_odds": 5.0,
+      "minimum_selection_bets": 80,
+      "one_side_maximum_per_fight": true
+    },
+    "staking": {
+      "method": "one_eighth_kelly",
+      "maximum_fraction_per_bet": 0.005,
+      "maximum_event_exposure": 0.03,
+      "minimum_stake": 0.0,
+      "simultaneous_event_settlement": true
+    },
+    "validation_gate": {
+      "minimum_bets": 80,
+      "positive_roi": true,
+      "maximum_drawdown": 0.2,
+      "cluster_bootstrap_confidence": 0.95,
+      "roi_lower_bound_must_exceed": 0.0,
+      "bootstrap_samples": 5000
+    }
+  },
+  "model_selection": {
+    "market_recal_c0.1": {
+      "n": 1765,
+      "log_loss": 0.6172916493791639,
+      "brier": 0.2149540863820642,
+      "auc": 0.7132301169214955,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    },
+    "market_recal_c1": {
+      "n": 1765,
+      "log_loss": 0.6173735159695405,
+      "brier": 0.21502293380851623,
+      "auc": 0.7131767955801105,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    },
+    "market_recal_c10": {
+      "n": 1765,
+      "log_loss": 0.617385316892075,
+      "brier": 0.2150308012525745,
+      "auc": 0.7131266863677246,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    },
+    "market_plus_c0.01": {
+      "n": 1765,
+      "log_loss": 0.6156816764064287,
+      "brier": 0.21382515333245397,
+      "auc": 0.718974688423487,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    },
+    "market_plus_c0.1": {
+      "n": 1765,
+      "log_loss": 0.6161421191715282,
+      "brier": 0.21401226457799025,
+      "auc": 0.7182102017217011,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    },
+    "market_plus_c1": {
+      "n": 1765,
+      "log_loss": 0.6169258399662094,
+      "brier": 0.2141195997088963,
+      "auc": 0.7183489656944624,
+      "market_log_loss": 0.6169284651737198,
+      "market_brier": 0.2147068251245173
+    }
+  },
+  "selected_model": "market_plus_c0.01",
+  "strategy_selection": {
+    "0.02": {
+      "bets": 686,
+      "events": 126,
+      "wins": 340,
+      "win_rate": 0.4956268221574344,
+      "average_odds": 2.2896879480938637,
+      "average_edge": 0.1013050217362528,
+      "profit_units": 13.685593593035092,
+      "roi": 0.019949844887806257,
+      "roi_bootstrap_95": {
+        "low": -0.06978183187133542,
+        "median": 0.018278215183320283,
+        "high": 0.11094480676792161
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1103.4582742539626,
+      "return": 0.1034582742539627,
+      "max_drawdown": 0.128678792447302,
+      "total_staked": 3223.224810531417
+    },
+    "0.03": {
+      "bets": 616,
+      "events": 126,
+      "wins": 301,
+      "win_rate": 0.48863636363636365,
+      "average_odds": 2.33744144672591,
+      "average_edge": 0.11008343912615477,
+      "profit_units": 17.606674390728045,
+      "roi": 0.028582263621311763,
+      "roi_bootstrap_95": {
+        "low": -0.07129548820096654,
+        "median": 0.026674034812479014,
+        "high": 0.12985352894181929
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1115.272008304286,
+      "return": 0.11527200830428597,
+      "max_drawdown": 0.1272470036735247,
+      "total_staked": 3022.908600100168
+    },
+    "0.05": {
+      "bets": 476,
+      "events": 125,
+      "wins": 234,
+      "win_rate": 0.49159663865546216,
+      "average_odds": 2.383819288620197,
+      "average_edge": 0.1307692126289079,
+      "profit_units": 26.580855123036915,
+      "roi": 0.05584213261142209,
+      "roi_bootstrap_95": {
+        "low": -0.057306155243881315,
+        "median": 0.054486807105688546,
+        "high": 0.17265441381288135
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1149.8147856105643,
+      "return": 0.14981478561056427,
+      "max_drawdown": 0.1049381945866388,
+      "total_staked": 2588.6356213664044
+    },
+    "0.08": {
+      "bets": 327,
+      "events": 119,
+      "wins": 155,
+      "win_rate": 0.4740061162079511,
+      "average_odds": 2.4581540253089864,
+      "average_edge": 0.16160645384210837,
+      "profit_units": 20.645281744419204,
+      "roi": 0.063135418178652,
+      "roi_bootstrap_95": {
+        "low": -0.07804918286788705,
+        "median": 0.06296847870218082,
+        "high": 0.20455445794261432
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1102.2790863896516,
+      "return": 0.10227908638965166,
+      "max_drawdown": 0.09855302055639593,
+      "total_staked": 1760.1983722562388
+    },
+    "0.1": {
+      "bets": 246,
+      "events": 112,
+      "wins": 114,
+      "win_rate": 0.4634146341463415,
+      "average_odds": 2.510462932434943,
+      "average_edge": 0.18556531081212493,
+      "profit_units": 18.873167368578613,
+      "roi": 0.07672019255519762,
+      "roi_bootstrap_95": {
+        "low": -0.07740228579962176,
+        "median": 0.07659264800577448,
+        "high": 0.2327945677603243
+      },
+      "initial_bankroll": 1000.0,
+      "final_bankroll": 1089.4628305008941,
+      "return": 0.08946283050089421,
+      "max_drawdown": 0.06615050413794601,
+      "total_staked": 1299.6207224039726
+    }
+  },
+  "selected_threshold": 0.05,
+  "validation": {
+    "bets": 380,
+    "events": 117,
+    "wins": 180,
+    "win_rate": 0.47368421052631576,
+    "average_odds": 2.449224423869098,
+    "average_edge": 0.13719304099804341,
+    "profit_units": 2.9780865045460185,
+    "roi": 0.007837069748805311,
+    "roi_bootstrap_95": {
+      "low": -0.11302483761568968,
+      "median": 0.007562773405418659,
+      "high": 0.140513732447651
+    },
+    "initial_bankroll": 1000.0,
+    "final_bankroll": 1048.819503919987,
+    "return": 0.04881950391998702,
+    "max_drawdown": 0.08402233513082963,
+    "total_staked": 1892.696315982731
+  },
+  "validation_gate_checks": {
+    "minimum_bets": true,
+    "positive_roi": true,
+    "maximum_drawdown": true,
+    "positive_95pct_cluster_bootstrap_lower_bound": false
+  },
+  "approved_for_holdout": false
+}

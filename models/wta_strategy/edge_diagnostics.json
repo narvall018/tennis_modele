@@ -1,0 +1,1574 @@
+{
+  "break_even_reference": {
+    "average": {
+      "approximate_log_loss_gain_required": 0.0016526804064129867,
+      "median_overround": 1.0574764256847777
+    },
+    "bet365": {
+      "approximate_log_loss_gain_required": 0.0014236722793518272,
+      "median_overround": 1.0533478497550355
+    },
+    "maximum": {
+      "approximate_log_loss_gain_required": 7.438381224425181e-05,
+      "median_overround": 1.0121968822170901
+    },
+    "pinnacle": {
+      "approximate_log_loss_gain_required": 0.00041768271559194936,
+      "median_overround": 1.028900676788001
+    }
+  },
+  "model_weight": 0.7000000000000001,
+  "odds_haircut": 0.02,
+  "periods": {
+    "development": {
+      "rows": 9923,
+      "sources": {
+        "average": {
+          "all_odds": {
+            "average_odds": 2.053374858437146,
+            "bet_rate": 0.09235435623888714,
+            "blend_gain_vs_this_source": 0.0012529649248783636,
+            "blend_log_loss": 0.580378826323968,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 167,
+                "profit_units": 0.5806000000000013,
+                "roi": 0.0034766467065868345
+              },
+              "1.5-2": {
+                "n_bets": 344,
+                "profit_units": -14.6028,
+                "roi": -0.04245
+              },
+              "2-3": {
+                "n_bets": 292,
+                "profit_units": 17.616,
+                "roi": 0.06032876712328767
+              },
+              "3-6": {
+                "n_bets": 75,
+                "profit_units": 3.644,
+                "roi": 0.04858666666666667
+              },
+              "6-inf": {
+                "n_bets": 5,
+                "profit_units": 6.829399999999999,
+                "roi": 1.3658799999999998
+              }
+            },
+            "market_log_loss": 0.5816317912488463,
+            "matches_priced": 9561,
+            "max_odds": null,
+            "mean_claimed_edge": 0.014507092084158634,
+            "median_overround": 1.0607340655214492,
+            "n_bets": 883,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": 14.0672,
+            "roi": 0.01593114382785957
+          },
+          "odds_below_6": {
+            "average_odds": 2.0275398633257407,
+            "bet_rate": 0.09183139838928982,
+            "blend_gain_vs_this_source": 0.0012529649248783636,
+            "blend_log_loss": 0.580378826323968,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 167,
+                "profit_units": 0.5806000000000013,
+                "roi": 0.0034766467065868345
+              },
+              "1.5-2": {
+                "n_bets": 344,
+                "profit_units": -14.6028,
+                "roi": -0.04245
+              },
+              "2-3": {
+                "n_bets": 292,
+                "profit_units": 17.616,
+                "roi": 0.06032876712328767
+              },
+              "3-6": {
+                "n_bets": 75,
+                "profit_units": 3.644,
+                "roi": 0.04858666666666667
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5816317912488463,
+            "matches_priced": 9561,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.014462497993943205,
+            "median_overround": 1.0607340655214492,
+            "n_bets": 878,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": 7.237799999999997,
+            "roi": 0.008243507972665145
+          }
+        },
+        "bet365": {
+          "all_odds": {
+            "average_odds": 4.00513249651325,
+            "bet_rate": 0.15021998742928974,
+            "blend_gain_vs_this_source": 0.001257424986085831,
+            "blend_log_loss": 0.5806114230834446,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 111,
+                "profit_units": 1.9104000000000037,
+                "roi": 0.017210810810810842
+              },
+              "1.5-2": {
+                "n_bets": 173,
+                "profit_units": -12.878599999999999,
+                "roi": -0.07444277456647398
+              },
+              "2-3": {
+                "n_bets": 566,
+                "profit_units": 59.27980000000001,
+                "roi": 0.10473462897526503
+              },
+              "3-6": {
+                "n_bets": 386,
+                "profit_units": -12.048800000000005,
+                "roi": -0.031214507772020738
+              },
+              "6-inf": {
+                "n_bets": 198,
+                "profit_units": -80.08000000000001,
+                "roi": -0.4044444444444445
+              }
+            },
+            "market_log_loss": 0.5818688480695304,
+            "matches_priced": 9546,
+            "max_odds": null,
+            "mean_claimed_edge": 0.033745272213410546,
+            "median_overround": 1.0686274509803921,
+            "n_bets": 1434,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": -43.817199999999985,
+            "roi": -0.03055592747559274
+          },
+          "odds_below_6": {
+            "average_odds": 2.585647249190939,
+            "bet_rate": 0.12947831552482716,
+            "blend_gain_vs_this_source": 0.001257424986085831,
+            "blend_log_loss": 0.5806114230834446,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 111,
+                "profit_units": 1.9104000000000037,
+                "roi": 0.017210810810810842
+              },
+              "1.5-2": {
+                "n_bets": 173,
+                "profit_units": -12.878599999999999,
+                "roi": -0.07444277456647398
+              },
+              "2-3": {
+                "n_bets": 566,
+                "profit_units": 59.27980000000001,
+                "roi": 0.10473462897526503
+              },
+              "3-6": {
+                "n_bets": 386,
+                "profit_units": -12.048800000000005,
+                "roi": -0.031214507772020738
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5818688480695304,
+            "matches_priced": 9546,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.026583939893253593,
+            "median_overround": 1.0686274509803921,
+            "n_bets": 1236,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": 36.26280000000002,
+            "roi": 0.029338834951456328
+          }
+        },
+        "maximum": {
+          "all_odds": {
+            "average_odds": 3.285733574442435,
+            "bet_rate": 0.8678593848085373,
+            "blend_gain_vs_this_source": 0.00031460228981472493,
+            "blend_log_loss": 0.5802751936761609,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1629,
+                "profit_units": 58.30619999999999,
+                "roi": 0.03579263351749539
+              },
+              "1.5-2": {
+                "n_bets": 1925,
+                "profit_units": -39.406799999999976,
+                "roi": -0.020471064935064922
+              },
+              "2-3": {
+                "n_bets": 2190,
+                "profit_units": 170.26659999999998,
+                "roi": 0.07774730593607306
+              },
+              "3-6": {
+                "n_bets": 1812,
+                "profit_units": -30.357800000000026,
+                "roi": -0.016753752759381912
+              },
+              "6-inf": {
+                "n_bets": 739,
+                "profit_units": -92.74,
+                "roi": -0.12549391069012178
+              }
+            },
+            "market_log_loss": 0.5805897959659756,
+            "matches_priced": 9558,
+            "max_odds": null,
+            "mean_claimed_edge": 0.053741777632545916,
+            "median_overround": 1.0018993352326686,
+            "n_bets": 8295,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": 66.0682,
+            "roi": 0.007964822182037373
+          },
+          "odds_below_6": {
+            "average_odds": 2.373226574907358,
+            "bet_rate": 0.7905419543837623,
+            "blend_gain_vs_this_source": 0.00031460228981472493,
+            "blend_log_loss": 0.5802751936761609,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1629,
+                "profit_units": 58.30619999999999,
+                "roi": 0.03579263351749539
+              },
+              "1.5-2": {
+                "n_bets": 1925,
+                "profit_units": -39.406799999999976,
+                "roi": -0.020471064935064922
+              },
+              "2-3": {
+                "n_bets": 2190,
+                "profit_units": 170.26659999999998,
+                "roi": 0.07774730593607306
+              },
+              "3-6": {
+                "n_bets": 1812,
+                "profit_units": -30.357800000000026,
+                "roi": -0.016753752759381912
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5805897959659756,
+            "matches_priced": 9558,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.045070692079768625,
+            "median_overround": 1.0018993352326686,
+            "n_bets": 7556,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": 158.8082,
+            "roi": 0.021017496029645314
+          }
+        },
+        "pinnacle": {
+          "all_odds": {
+            "average_odds": 3.1846572580645165,
+            "bet_rate": 0.5723877465379773,
+            "blend_gain_vs_this_source": 0.0007807201272767017,
+            "blend_log_loss": 0.5804778679298417,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1008,
+                "profit_units": 39.2422,
+                "roi": 0.03893075396825397
+              },
+              "1.5-2": {
+                "n_bets": 1421,
+                "profit_units": -17.828999999999997,
+                "roi": -0.012546798029556648
+              },
+              "2-3": {
+                "n_bets": 1443,
+                "profit_units": 78.0392,
+                "roi": 0.05408121968121968
+              },
+              "3-6": {
+                "n_bets": 1078,
+                "profit_units": 23.2546,
+                "roi": 0.021571985157699442
+              },
+              "6-inf": {
+                "n_bets": 506,
+                "profit_units": -120.01800000000001,
+                "roi": -0.23718972332015814
+              }
+            },
+            "market_log_loss": 0.5812585880571184,
+            "matches_priced": 9532,
+            "max_odds": null,
+            "mean_claimed_edge": 0.04156808445355133,
+            "median_overround": 1.0251898133502055,
+            "n_bets": 5456,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": 2.688999999999993,
+            "roi": 0.0004928519061583565
+          },
+          "odds_below_6": {
+            "average_odds": 2.33189696969697,
+            "bet_rate": 0.5193033990767939,
+            "blend_gain_vs_this_source": 0.0007807201272767017,
+            "blend_log_loss": 0.5804778679298417,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1008,
+                "profit_units": 39.2422,
+                "roi": 0.03893075396825397
+              },
+              "1.5-2": {
+                "n_bets": 1421,
+                "profit_units": -17.828999999999997,
+                "roi": -0.012546798029556648
+              },
+              "2-3": {
+                "n_bets": 1443,
+                "profit_units": 78.0392,
+                "roi": 0.05408121968121968
+              },
+              "3-6": {
+                "n_bets": 1078,
+                "profit_units": 23.2546,
+                "roi": 0.021571985157699442
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5812585880571184,
+            "matches_priced": 9532,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.03540024467908005,
+            "median_overround": 1.0251898133502055,
+            "n_bets": 4950,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": 122.70699999999997,
+            "roi": 0.02478929292929292
+          }
+        }
+      },
+      "years": [
+        2013,
+        2014,
+        2015,
+        2016
+      ]
+    },
+    "holdout": {
+      "rows": 9434,
+      "sources": {
+        "average": {
+          "all_odds": {
+            "average_odds": 1.8592601431980906,
+            "bet_rate": 0.04628300011046062,
+            "blend_gain_vs_this_source": 0.0016794847861973938,
+            "blend_log_loss": 0.5826640775877686,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 82,
+                "profit_units": -7.272599999999999,
+                "roi": -0.08869024390243901
+              },
+              "1.5-2": {
+                "n_bets": 216,
+                "profit_units": 12.462600000000002,
+                "roi": 0.05769722222222223
+              },
+              "2-3": {
+                "n_bets": 107,
+                "profit_units": -4.768000000000001,
+                "roi": -0.044560747663551406
+              },
+              "3-6": {
+                "n_bets": 14,
+                "profit_units": -10.9322,
+                "roi": -0.7808714285714285
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.584343562373966,
+            "matches_priced": 9053,
+            "max_odds": null,
+            "mean_claimed_edge": 0.00967577692798324,
+            "median_overround": 1.0574764256847777,
+            "n_bets": 419,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": -10.510200000000003,
+            "roi": -0.025084009546539388
+          },
+          "odds_below_6": {
+            "average_odds": 1.8592601431980906,
+            "bet_rate": 0.04628300011046062,
+            "blend_gain_vs_this_source": 0.0016794847861973938,
+            "blend_log_loss": 0.5826640775877686,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 82,
+                "profit_units": -7.272599999999999,
+                "roi": -0.08869024390243901
+              },
+              "1.5-2": {
+                "n_bets": 216,
+                "profit_units": 12.462600000000002,
+                "roi": 0.05769722222222223
+              },
+              "2-3": {
+                "n_bets": 107,
+                "profit_units": -4.768000000000001,
+                "roi": -0.044560747663551406
+              },
+              "3-6": {
+                "n_bets": 14,
+                "profit_units": -10.9322,
+                "roi": -0.7808714285714285
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.584343562373966,
+            "matches_priced": 9053,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.00967577692798324,
+            "median_overround": 1.0574764256847777,
+            "n_bets": 419,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": -10.510200000000003,
+            "roi": -0.025084009546539388
+          }
+        },
+        "bet365": {
+          "all_odds": {
+            "average_odds": 2.9707227241139678,
+            "bet_rate": 0.1594106569181345,
+            "blend_gain_vs_this_source": 0.0013910592293110424,
+            "blend_log_loss": 0.5829118065587,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 195,
+                "profit_units": 4.656600000000003,
+                "roi": 0.023880000000000012
+              },
+              "1.5-2": {
+                "n_bets": 429,
+                "profit_units": 51.971000000000004,
+                "roi": 0.12114452214452215
+              },
+              "2-3": {
+                "n_bets": 438,
+                "profit_units": 37.167199999999994,
+                "roi": 0.0848566210045662
+              },
+              "3-6": {
+                "n_bets": 287,
+                "profit_units": -47.00920000000001,
+                "roi": -0.16379512195121954
+              },
+              "6-inf": {
+                "n_bets": 90,
+                "profit_units": 0.8300000000000018,
+                "roi": 0.009222222222222243
+              }
+            },
+            "market_log_loss": 0.584302865788011,
+            "matches_priced": 9027,
+            "max_odds": null,
+            "mean_claimed_edge": 0.03743433375025586,
+            "median_overround": 1.0533478497550355,
+            "n_bets": 1439,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": 47.61559999999999,
+            "roi": 0.03308936761640027
+          },
+          "odds_below_6": {
+            "average_odds": 2.2663973313565604,
+            "bet_rate": 0.1494405671873269,
+            "blend_gain_vs_this_source": 0.0013910592293110424,
+            "blend_log_loss": 0.5829118065587,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 195,
+                "profit_units": 4.656600000000003,
+                "roi": 0.023880000000000012
+              },
+              "1.5-2": {
+                "n_bets": 429,
+                "profit_units": 51.971000000000004,
+                "roi": 0.12114452214452215
+              },
+              "2-3": {
+                "n_bets": 438,
+                "profit_units": 37.167199999999994,
+                "roi": 0.0848566210045662
+              },
+              "3-6": {
+                "n_bets": 287,
+                "profit_units": -47.00920000000001,
+                "roi": -0.16379512195121954
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.584302865788011,
+            "matches_priced": 9027,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.023670078902391263,
+            "median_overround": 1.0533478497550355,
+            "n_bets": 1349,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": 46.785599999999995,
+            "roi": 0.034681690140845066
+          }
+        },
+        "maximum": {
+          "all_odds": {
+            "average_odds": 3.155424403183024,
+            "bet_rate": 0.6669615214506855,
+            "blend_gain_vs_this_source": 0.0004027247063168593,
+            "blend_log_loss": 0.5824308395638728,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1233,
+                "profit_units": -26.269600000000008,
+                "roi": -0.021305433901054344
+              },
+              "1.5-2": {
+                "n_bets": 1685,
+                "profit_units": 60.166800000000016,
+                "roi": 0.035707299703264105
+              },
+              "2-3": {
+                "n_bets": 1631,
+                "profit_units": 90.84939999999999,
+                "roi": 0.05570165542611894
+              },
+              "3-6": {
+                "n_bets": 982,
+                "profit_units": -17.506200000000007,
+                "roi": -0.017827087576374752
+              },
+              "6-inf": {
+                "n_bets": 501,
+                "profit_units": -198.10720000000003,
+                "roi": -0.39542355289421166
+              }
+            },
+            "market_log_loss": 0.5828335642701896,
+            "matches_priced": 9044,
+            "max_odds": null,
+            "mean_claimed_edge": 0.04186316221698147,
+            "median_overround": 1.0121968822170901,
+            "n_bets": 6032,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": -90.86680000000007,
+            "roi": -0.015064124668435024
+          },
+          "odds_below_6": {
+            "average_odds": 2.210499005604773,
+            "bet_rate": 0.6115656789031402,
+            "blend_gain_vs_this_source": 0.0004027247063168593,
+            "blend_log_loss": 0.5824308395638728,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1233,
+                "profit_units": -26.269600000000008,
+                "roi": -0.021305433901054344
+              },
+              "1.5-2": {
+                "n_bets": 1685,
+                "profit_units": 60.166800000000016,
+                "roi": 0.035707299703264105
+              },
+              "2-3": {
+                "n_bets": 1631,
+                "profit_units": 90.84939999999999,
+                "roi": 0.05570165542611894
+              },
+              "3-6": {
+                "n_bets": 982,
+                "profit_units": -17.506200000000007,
+                "roi": -0.017827087576374752
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5828335642701896,
+            "matches_priced": 9044,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.030462756181926506,
+            "median_overround": 1.0121968822170901,
+            "n_bets": 5531,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": 107.24039999999998,
+            "roi": 0.01938897125293798
+          }
+        },
+        "pinnacle": {
+          "all_odds": {
+            "average_odds": 3.1425453226976066,
+            "bet_rate": 0.3852493364995111,
+            "blend_gain_vs_this_source": 0.0009065058609539767,
+            "blend_log_loss": 0.5868466562863947,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 546,
+                "profit_units": -6.465199999999999,
+                "roi": -0.01184102564102564
+              },
+              "1.5-2": {
+                "n_bets": 875,
+                "profit_units": 33.83200000000001,
+                "roi": 0.03866514285714286
+              },
+              "2-3": {
+                "n_bets": 747,
+                "profit_units": 66.3228,
+                "roi": 0.0887855421686747
+              },
+              "3-6": {
+                "n_bets": 378,
+                "profit_units": 11.494399999999994,
+                "roi": 0.030408465608465593
+              },
+              "6-inf": {
+                "n_bets": 212,
+                "profit_units": -137.4776,
+                "roi": -0.6484792452830188
+              }
+            },
+            "market_log_loss": 0.5877531621473486,
+            "matches_priced": 7159,
+            "max_odds": null,
+            "mean_claimed_edge": 0.033524867664142484,
+            "median_overround": 1.028900676788001,
+            "n_bets": 2758,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": -32.29360000000002,
+            "roi": -0.0117090645395214
+          },
+          "odds_below_6": {
+            "average_odds": 2.163688138256088,
+            "bet_rate": 0.35563626204777204,
+            "blend_gain_vs_this_source": 0.0009065058609539767,
+            "blend_log_loss": 0.5868466562863947,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 546,
+                "profit_units": -6.465199999999999,
+                "roi": -0.01184102564102564
+              },
+              "1.5-2": {
+                "n_bets": 875,
+                "profit_units": 33.83200000000001,
+                "roi": 0.03866514285714286
+              },
+              "2-3": {
+                "n_bets": 747,
+                "profit_units": 66.3228,
+                "roi": 0.0887855421686747
+              },
+              "3-6": {
+                "n_bets": 378,
+                "profit_units": 11.494399999999994,
+                "roi": 0.030408465608465593
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5877531621473486,
+            "matches_priced": 7159,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.023242758951725857,
+            "median_overround": 1.028900676788001,
+            "n_bets": 2546,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": 105.18399999999998,
+            "roi": 0.04131343283582089
+          }
+        }
+      },
+      "years": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    "tuning": {
+      "rows": 7441,
+      "sources": {
+        "average": {
+          "all_odds": {
+            "average_odds": 2.0159010152284265,
+            "bet_rate": 0.11017897091722595,
+            "blend_gain_vs_this_source": 0.000541704312897795,
+            "blend_log_loss": 0.5979648154592626,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 130,
+                "profit_units": -12.708599999999999,
+                "roi": -0.09775846153846153
+              },
+              "1.5-2": {
+                "n_bets": 336,
+                "profit_units": 4.6496,
+                "roi": 0.01383809523809524
+              },
+              "2-3": {
+                "n_bets": 258,
+                "profit_units": -42.93200000000001,
+                "roi": -0.16640310077519382
+              },
+              "3-6": {
+                "n_bets": 63,
+                "profit_units": -20.208000000000006,
+                "roi": -0.32076190476190486
+              },
+              "6-inf": {
+                "n_bets": 1,
+                "profit_units": -1.0,
+                "roi": -1.0
+              }
+            },
+            "market_log_loss": 0.5985065197721604,
+            "matches_priced": 7152,
+            "max_odds": null,
+            "mean_claimed_edge": 0.015342410002882901,
+            "median_overround": 1.0540220060996819,
+            "n_bets": 788,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": -72.19900000000001,
+            "roi": -0.09162309644670052
+          },
+          "odds_below_6": {
+            "average_odds": 2.0106607369758573,
+            "bet_rate": 0.11003914988814317,
+            "blend_gain_vs_this_source": 0.000541704312897795,
+            "blend_log_loss": 0.5979648154592626,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 130,
+                "profit_units": -12.708599999999999,
+                "roi": -0.09775846153846153
+              },
+              "1.5-2": {
+                "n_bets": 336,
+                "profit_units": 4.6496,
+                "roi": 0.01383809523809524
+              },
+              "2-3": {
+                "n_bets": 258,
+                "profit_units": -42.93200000000001,
+                "roi": -0.16640310077519382
+              },
+              "3-6": {
+                "n_bets": 63,
+                "profit_units": -20.208000000000006,
+                "roi": -0.32076190476190486
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5985065197721604,
+            "matches_priced": 7152,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.01535005711406923,
+            "median_overround": 1.0540220060996819,
+            "n_bets": 787,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": -71.19900000000001,
+            "roi": -0.09046886912325287
+          }
+        },
+        "bet365": {
+          "all_odds": {
+            "average_odds": 2.536738636363636,
+            "bet_rate": 0.12342215988779803,
+            "blend_gain_vs_this_source": 0.0009117300080586643,
+            "blend_log_loss": 0.5983073212590477,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 109,
+                "profit_units": 1.2930000000000044,
+                "roi": 0.011862385321100958
+              },
+              "1.5-2": {
+                "n_bets": 184,
+                "profit_units": -14.654399999999997,
+                "roi": -0.07964347826086955
+              },
+              "2-3": {
+                "n_bets": 391,
+                "profit_units": -26.043599999999994,
+                "roi": -0.06660767263427109
+              },
+              "3-6": {
+                "n_bets": 178,
+                "profit_units": -37.7162,
+                "roi": -0.21188876404494383
+              },
+              "6-inf": {
+                "n_bets": 18,
+                "profit_units": -5.24,
+                "roi": -0.2911111111111111
+              }
+            },
+            "market_log_loss": 0.5992190512671064,
+            "matches_priced": 7130,
+            "max_odds": null,
+            "mean_claimed_edge": 0.025577453609060653,
+            "median_overround": 1.0666666666666667,
+            "n_bets": 880,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": -82.36119999999998,
+            "roi": -0.0935922727272727
+          },
+          "odds_below_6": {
+            "average_odds": 2.3472505800464036,
+            "bet_rate": 0.1208976157082749,
+            "blend_gain_vs_this_source": 0.0009117300080586643,
+            "blend_log_loss": 0.5983073212590477,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 109,
+                "profit_units": 1.2930000000000044,
+                "roi": 0.011862385321100958
+              },
+              "1.5-2": {
+                "n_bets": 184,
+                "profit_units": -14.654399999999997,
+                "roi": -0.07964347826086955
+              },
+              "2-3": {
+                "n_bets": 391,
+                "profit_units": -26.043599999999994,
+                "roi": -0.06660767263427109
+              },
+              "3-6": {
+                "n_bets": 178,
+                "profit_units": -37.7162,
+                "roi": -0.21188876404494383
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5992190512671064,
+            "matches_priced": 7130,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.02492079976847764,
+            "median_overround": 1.0666666666666667,
+            "n_bets": 862,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": -77.12119999999999,
+            "roi": -0.08946774941995358
+          }
+        },
+        "maximum": {
+          "all_odds": {
+            "average_odds": 2.5874767270945616,
+            "bet_rate": 0.856962911126662,
+            "blend_gain_vs_this_source": -0.000655539922929882,
+            "blend_log_loss": 0.5981554566595432,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1229,
+                "profit_units": 13.206999999999987,
+                "roi": 0.01074613506916191
+              },
+              "1.5-2": {
+                "n_bets": 1688,
+                "profit_units": -27.76979999999999,
+                "roi": -0.01645130331753554
+              },
+              "2-3": {
+                "n_bets": 1834,
+                "profit_units": -36.31600000000003,
+                "roi": -0.01980152671755727
+              },
+              "3-6": {
+                "n_bets": 1095,
+                "profit_units": -22.546400000000016,
+                "roi": -0.02059031963470321
+              },
+              "6-inf": {
+                "n_bets": 277,
+                "profit_units": -96.01340000000002,
+                "roi": -0.34661877256317697
+              }
+            },
+            "market_log_loss": 0.5974999167366133,
+            "matches_priced": 7145,
+            "max_odds": null,
+            "mean_claimed_edge": 0.04070370286514184,
+            "median_overround": 1.0028756290438532,
+            "n_bets": 6123,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": -169.4386,
+            "roi": -0.027672480810060428
+          },
+          "odds_below_6": {
+            "average_odds": 2.2569791310297638,
+            "bet_rate": 0.8181945416375087,
+            "blend_gain_vs_this_source": -0.000655539922929882,
+            "blend_log_loss": 0.5981554566595432,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1229,
+                "profit_units": 13.206999999999987,
+                "roi": 0.01074613506916191
+              },
+              "1.5-2": {
+                "n_bets": 1688,
+                "profit_units": -27.76979999999999,
+                "roi": -0.01645130331753554
+              },
+              "2-3": {
+                "n_bets": 1834,
+                "profit_units": -36.31600000000003,
+                "roi": -0.01980152671755727
+              },
+              "3-6": {
+                "n_bets": 1095,
+                "profit_units": -22.546400000000016,
+                "roi": -0.02059031963470321
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5974999167366133,
+            "matches_priced": 7145,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.03834722486590945,
+            "median_overround": 1.0028756290438532,
+            "n_bets": 5846,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": -73.42520000000002,
+            "roi": -0.012559904208005478
+          }
+        },
+        "pinnacle": {
+          "all_odds": {
+            "average_odds": 2.5538891951488423,
+            "bet_rate": 0.5091929824561403,
+            "blend_gain_vs_this_source": -0.00033570794700144013,
+            "blend_log_loss": 0.5981211790815408,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 583,
+                "profit_units": -9.017200000000006,
+                "roi": -0.015466895368782171
+              },
+              "1.5-2": {
+                "n_bets": 1075,
+                "profit_units": -28.906999999999996,
+                "roi": -0.02689023255813953
+              },
+              "2-3": {
+                "n_bets": 1178,
+                "profit_units": -22.74700000000002,
+                "roi": -0.019309847198641785
+              },
+              "3-6": {
+                "n_bets": 653,
+                "profit_units": -27.525400000000012,
+                "roi": -0.042152220520673835
+              },
+              "6-inf": {
+                "n_bets": 139,
+                "profit_units": -38.9172,
+                "roi": -0.2799798561151079
+              }
+            },
+            "market_log_loss": 0.5977854711345394,
+            "matches_priced": 7125,
+            "max_odds": null,
+            "mean_claimed_edge": 0.031105789710251307,
+            "median_overround": 1.026378896882494,
+            "n_bets": 3628,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": -127.11380000000005,
+            "roi": -0.03503687982359428
+          },
+          "odds_below_6": {
+            "average_odds": 2.3034135855546003,
+            "bet_rate": 0.4896842105263158,
+            "blend_gain_vs_this_source": -0.00033570794700144013,
+            "blend_log_loss": 0.5981211790815408,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 583,
+                "profit_units": -9.017200000000006,
+                "roi": -0.015466895368782171
+              },
+              "1.5-2": {
+                "n_bets": 1075,
+                "profit_units": -28.906999999999996,
+                "roi": -0.02689023255813953
+              },
+              "2-3": {
+                "n_bets": 1178,
+                "profit_units": -22.74700000000002,
+                "roi": -0.019309847198641785
+              },
+              "3-6": {
+                "n_bets": 653,
+                "profit_units": -27.525400000000012,
+                "roi": -0.042152220520673835
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5977854711345394,
+            "matches_priced": 7125,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.029701238339616257,
+            "median_overround": 1.026378896882494,
+            "n_bets": 3489,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": -88.19660000000002,
+            "roi": -0.025278475207795935
+          }
+        }
+      },
+      "years": [
+        2017,
+        2018,
+        2019
+      ]
+    },
+    "validation": {
+      "rows": 5871,
+      "sources": {
+        "average": {
+          "all_odds": {
+            "average_odds": 1.5998484848484849,
+            "bet_rate": 0.10575040056969913,
+            "blend_gain_vs_this_source": 0.0018357667430668467,
+            "blend_log_loss": 0.5800059473010812,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 275,
+                "profit_units": -1.603800000000005,
+                "roi": -0.005832000000000019
+              },
+              "1.5-2": {
+                "n_bets": 249,
+                "profit_units": 3.1559999999999997,
+                "roi": 0.012674698795180721
+              },
+              "2-3": {
+                "n_bets": 61,
+                "profit_units": 2.2310000000000016,
+                "roi": 0.036573770491803305
+              },
+              "3-6": {
+                "n_bets": 9,
+                "profit_units": 1.7224,
+                "roi": 0.19137777777777776
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5818417140441481,
+            "matches_priced": 5617,
+            "max_odds": null,
+            "mean_claimed_edge": 0.011116811794490925,
+            "median_overround": 1.0552530496813135,
+            "n_bets": 594,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": 5.505599999999998,
+            "roi": 0.009268686868686865
+          },
+          "odds_below_6": {
+            "average_odds": 1.5998484848484849,
+            "bet_rate": 0.10575040056969913,
+            "blend_gain_vs_this_source": 0.0018357667430668467,
+            "blend_log_loss": 0.5800059473010812,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 275,
+                "profit_units": -1.603800000000005,
+                "roi": -0.005832000000000019
+              },
+              "1.5-2": {
+                "n_bets": 249,
+                "profit_units": 3.1559999999999997,
+                "roi": 0.012674698795180721
+              },
+              "2-3": {
+                "n_bets": 61,
+                "profit_units": 2.2310000000000016,
+                "roi": 0.036573770491803305
+              },
+              "3-6": {
+                "n_bets": 9,
+                "profit_units": 1.7224,
+                "roi": 0.19137777777777776
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5818417140441481,
+            "matches_priced": 5617,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.011116811794490925,
+            "median_overround": 1.0552530496813135,
+            "n_bets": 594,
+            "odds_haircut": 0.02,
+            "price_source": "average",
+            "profit_units": 5.505599999999998,
+            "roi": 0.009268686868686865
+          }
+        },
+        "bet365": {
+          "all_odds": {
+            "average_odds": 1.9073238095238096,
+            "bet_rate": 0.1879026485325698,
+            "blend_gain_vs_this_source": 0.0027213591085608613,
+            "blend_log_loss": 0.5808008358449596,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 386,
+                "profit_units": 8.063200000000009,
+                "roi": 0.020889119170984478
+              },
+              "1.5-2": {
+                "n_bets": 379,
+                "profit_units": 12.448,
+                "roi": 0.032844327176781006
+              },
+              "2-3": {
+                "n_bets": 195,
+                "profit_units": -7.953799999999994,
+                "roi": -0.04078871794871792
+              },
+              "3-6": {
+                "n_bets": 82,
+                "profit_units": 9.738800000000001,
+                "roi": 0.1187658536585366
+              },
+              "6-inf": {
+                "n_bets": 8,
+                "profit_units": -8.0,
+                "roi": -1.0
+              }
+            },
+            "market_log_loss": 0.5835221949535204,
+            "matches_priced": 5588,
+            "max_odds": null,
+            "mean_claimed_edge": 0.02297468275990139,
+            "median_overround": 1.0555555555555556,
+            "n_bets": 1050,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": 14.29620000000001,
+            "roi": 0.01361542857142858
+          },
+          "odds_below_6": {
+            "average_odds": 1.8068042226487524,
+            "bet_rate": 0.18647100930565497,
+            "blend_gain_vs_this_source": 0.0027213591085608613,
+            "blend_log_loss": 0.5808008358449596,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 386,
+                "profit_units": 8.063200000000009,
+                "roi": 0.020889119170984478
+              },
+              "1.5-2": {
+                "n_bets": 379,
+                "profit_units": 12.448,
+                "roi": 0.032844327176781006
+              },
+              "2-3": {
+                "n_bets": 195,
+                "profit_units": -7.953799999999994,
+                "roi": -0.04078871794871792
+              },
+              "3-6": {
+                "n_bets": 82,
+                "profit_units": 9.738800000000001,
+                "roi": 0.1187658536585366
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5835221949535204,
+            "matches_priced": 5588,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.022343718063527734,
+            "median_overround": 1.0555555555555556,
+            "n_bets": 1042,
+            "odds_haircut": 0.02,
+            "price_source": "bet365",
+            "profit_units": 22.296200000000006,
+            "roi": 0.021397504798464497
+          }
+        },
+        "maximum": {
+          "all_odds": {
+            "average_odds": 2.3098729227761488,
+            "bet_rate": 0.9125780553077609,
+            "blend_gain_vs_this_source": 2.1196718886118404e-05,
+            "blend_log_loss": 0.57981025313471,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1682,
+                "profit_units": 22.350999999999996,
+                "roi": 0.013288347205707488
+              },
+              "1.5-2": {
+                "n_bets": 1551,
+                "profit_units": -9.65999999999999,
+                "roi": -0.0062282398452611154
+              },
+              "2-3": {
+                "n_bets": 1133,
+                "profit_units": 31.25299999999999,
+                "roi": 0.027584289496910847
+              },
+              "3-6": {
+                "n_bets": 565,
+                "profit_units": -49.2488,
+                "roi": -0.08716601769911506
+              },
+              "6-inf": {
+                "n_bets": 184,
+                "profit_units": -95.168,
+                "roi": -0.5172173913043479
+              }
+            },
+            "market_log_loss": 0.5798314498535961,
+            "matches_priced": 5605,
+            "max_odds": null,
+            "mean_claimed_edge": 0.04277785773491902,
+            "median_overround": 0.9980237154150198,
+            "n_bets": 5115,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": -100.47280000000002,
+            "roi": -0.019642776148582605
+          },
+          "odds_below_6": {
+            "average_odds": 1.9765564794159403,
+            "bet_rate": 0.879750223015165,
+            "blend_gain_vs_this_source": 2.1196718886118404e-05,
+            "blend_log_loss": 0.57981025313471,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1682,
+                "profit_units": 22.350999999999996,
+                "roi": 0.013288347205707488
+              },
+              "1.5-2": {
+                "n_bets": 1551,
+                "profit_units": -9.65999999999999,
+                "roi": -0.0062282398452611154
+              },
+              "2-3": {
+                "n_bets": 1133,
+                "profit_units": 31.25299999999999,
+                "roi": 0.027584289496910847
+              },
+              "3-6": {
+                "n_bets": 565,
+                "profit_units": -49.2488,
+                "roi": -0.08716601769911506
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5798314498535961,
+            "matches_priced": 5605,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.040089244111922995,
+            "median_overround": 0.9980237154150198,
+            "n_bets": 4931,
+            "odds_haircut": 0.02,
+            "price_source": "maximum",
+            "profit_units": -5.304800000000014,
+            "roi": -0.0010758061245183562
+          }
+        },
+        "pinnacle": {
+          "all_odds": {
+            "average_odds": 1.986981343283582,
+            "bet_rate": 0.48201438848920863,
+            "blend_gain_vs_this_source": 0.0004175004442403818,
+            "blend_log_loss": 0.5808351492091203,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1032,
+                "profit_units": 0.651999999999985,
+                "roi": 0.0006317829457364196
+              },
+              "1.5-2": {
+                "n_bets": 874,
+                "profit_units": -50.40679999999999,
+                "roi": -0.05767368421052631
+              },
+              "2-3": {
+                "n_bets": 526,
+                "profit_units": 3.4071999999999902,
+                "roi": 0.006477566539923936
+              },
+              "3-6": {
+                "n_bets": 205,
+                "profit_units": 7.819999999999998,
+                "roi": 0.03814634146341462
+              },
+              "6-inf": {
+                "n_bets": 43,
+                "profit_units": -26.3294,
+                "roi": -0.6123116279069767
+              }
+            },
+            "market_log_loss": 0.5812526496533607,
+            "matches_priced": 5560,
+            "max_odds": null,
+            "mean_claimed_edge": 0.023276217285219995,
+            "median_overround": 1.027941553447834,
+            "n_bets": 2680,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": -64.85700000000003,
+            "roi": -0.02420037313432837
+          },
+          "odds_below_6": {
+            "average_odds": 1.8556124383769435,
+            "bet_rate": 0.47428057553956837,
+            "blend_gain_vs_this_source": 0.0004175004442403818,
+            "blend_log_loss": 0.5808351492091203,
+            "by_odds_band": {
+              "1-1.5": {
+                "n_bets": 1032,
+                "profit_units": 0.651999999999985,
+                "roi": 0.0006317829457364196
+              },
+              "1.5-2": {
+                "n_bets": 874,
+                "profit_units": -50.40679999999999,
+                "roi": -0.05767368421052631
+              },
+              "2-3": {
+                "n_bets": 526,
+                "profit_units": 3.4071999999999902,
+                "roi": 0.006477566539923936
+              },
+              "3-6": {
+                "n_bets": 205,
+                "profit_units": 7.819999999999998,
+                "roi": 0.03814634146341462
+              },
+              "6-inf": {
+                "n_bets": 0,
+                "profit_units": null,
+                "roi": null
+              }
+            },
+            "market_log_loss": 0.5812526496533607,
+            "matches_priced": 5560,
+            "max_odds": 6.0,
+            "mean_claimed_edge": 0.022881406214051204,
+            "median_overround": 1.027941553447834,
+            "n_bets": 2637,
+            "odds_haircut": 0.02,
+            "price_source": "pinnacle",
+            "profit_units": -38.52760000000003,
+            "roi": -0.014610390595373541
+          }
+        }
+      },
+      "years": [
+        2020,
+        2021,
+        2022
+      ]
+    }
+  },
+  "pooled_across_all_periods": {
+    "average": {
+      "all_odds": {
+        "interval_excludes_zero": false,
+        "n_bets": 2684,
+        "positive_periods_out_of_4": 2,
+        "profit_units": -63.13640000000002,
+        "roi": -0.023523248882265285,
+        "roi_ci_90": [
+          -0.05708919607469939,
+          0.010301570611564758
+        ]
+      },
+      "odds_below_6": {
+        "interval_excludes_zero": false,
+        "n_bets": 2678,
+        "positive_periods_out_of_4": 2,
+        "profit_units": -68.96580000000002,
+        "roi": -0.025752725914861843,
+        "roi_ci_90": [
+          -0.057177028157435,
+          0.006059525232738605
+        ]
+      }
+    },
+    "bet365": {
+      "all_odds": {
+        "interval_excludes_zero": false,
+        "n_bets": 4803,
+        "positive_periods_out_of_4": 2,
+        "profit_units": -64.26659999999995,
+        "roi": -0.01338051217988756,
+        "roi_ci_90": [
+          -0.04278793823171928,
+          0.015261162754390992
+        ]
+      },
+      "odds_below_6": {
+        "interval_excludes_zero": false,
+        "n_bets": 4489,
+        "positive_periods_out_of_4": 3,
+        "profit_units": 28.223400000000055,
+        "roi": 0.006287235464468714,
+        "roi_ci_90": [
+          -0.01920218205599644,
+          0.03105960574839777
+        ]
+      }
+    },
+    "maximum": {
+      "all_odds": {
+        "interval_excludes_zero": false,
+        "n_bets": 25565,
+        "positive_periods_out_of_4": 1,
+        "profit_units": -294.71000000000004,
+        "roi": -0.011527870134950128,
+        "roi_ci_90": [
+          -0.023827585089583745,
+          0.000578972310194519
+        ]
+      },
+      "odds_below_6": {
+        "interval_excludes_zero": false,
+        "n_bets": 23864,
+        "positive_periods_out_of_4": 2,
+        "profit_units": 187.31859999999992,
+        "roi": 0.00784942172309755,
+        "roi_ci_90": [
+          -0.003250915925314242,
+          0.019173394458752376
+        ]
+      }
+    },
+    "pinnacle": {
+      "all_odds": {
+        "interval_excludes_zero": false,
+        "n_bets": 14522,
+        "positive_periods_out_of_4": 1,
+        "profit_units": -221.57540000000014,
+        "roi": -0.01525791213331498,
+        "roi_ci_90": [
+          -0.031042335163492217,
+          0.0002780159049556006
+        ]
+      },
+      "odds_below_6": {
+        "interval_excludes_zero": false,
+        "n_bets": 13622,
+        "positive_periods_out_of_4": 2,
+        "profit_units": 101.16679999999991,
+        "roi": 0.007426721479958883,
+        "roi_ci_90": [
+          -0.007104895627908079,
+          0.021387862645430383
+        ]
+      }
+    }
+  },
+  "rule": "back every side whose blended expected value is positive; no threshold, no tuning",
+  "what_this_is": "Diagnostic sur données déjà dépensées. Aucun chiffre ici n'est une preuve de rentabilité et aucune règle ne peut être sélectionnée à partir de ces cellules."
+}

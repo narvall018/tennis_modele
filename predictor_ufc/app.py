@@ -83,7 +83,20 @@ def is_logged_in():
 def can_access_betting():
     """Vérifie si l'utilisateur peut accéder aux fonctions de paris"""
     user = get_current_user()
-    return user is not None and user.get("can_bet", False)
+    return user is not None and user.get("can_bet", False) and rigorous_betting_is_approved()
+
+
+def get_rigorous_strategy_lock():
+    """Lit le verdict du protocole rigoureux; l'absence de preuve bloque les mises."""
+    path = Path(__file__).resolve().parent / "data" / "rigorous" / "reports" / "locked_strategy.json"
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return {"approved_for_holdout": False, "status": "NO_VALIDATION_ARTIFACT"}
+
+
+def rigorous_betting_is_approved():
+    return bool(get_rigorous_strategy_lock().get("approved_for_holdout", False))
 
 def can_view_bankroll():
     """Vérifie si l'utilisateur peut voir la bankroll"""
@@ -448,67 +461,21 @@ K_FACTOR = 24
 BASE_ELO = 1500.0
 
 # ============================================================================
-# ✅ STRATÉGIES DE PARIS OPTIMISÉES - Grid Search + AG Multi-Îles Parallélisé
-# Backtest 2014-2025 sur 5,099 combats UFC | Bankroll initiale: 1000€
-# Optimisation: Kelly fraction, Edge threshold, plage de cotes, max stake
-# Grid Search: 20,790 combinaisons | AG: 6 îles × 500 individus × 300 générations
-# Validation Out-of-Sample 2023-2025: Toutes stratégies ✅ cohérentes
+# MODE RECHERCHE. Le protocole rigoureux 2026 n'a pas franchi son intervalle
+# de confiance de validation. Les anciens presets optimises sur le meme
+# echantillon ont donc ete retires de l'interface de mise.
 # ============================================================================
 BETTING_STRATEGIES = {
-    "🛡️ SAFE (RECOMMANDÉE)": {
-        "kelly_fraction": 2.75,
+    "⛔ AUCUNE MISE — validation échouée": {
+        "kelly_fraction": 8.0,
         "min_confidence": 0.0,
-        "min_edge": 0.035,  # Edge minimum 3.5%
-        "max_value": 1.0,
-        "min_odds": 1.0,
+        "min_edge": 1.0,
+        "max_value": 0.0,
+        "min_odds": 1.25,
         "max_odds": 5.0,
-        "max_bet_fraction": 0.25,
-        "min_bet_pct": 0.01,
-        "description": "🛡️ SAFE - Profit 119k€ | ROI 17% | DD 34% | 11/12 ans | ~140 paris/an | Pour débutants"
-    },
-    "🟢 ÉQUILIBRÉE (DD<35%)": {
-        "kelly_fraction": 2.5,
-        "min_confidence": 0.0,
-        "min_edge": 0.042,  # Edge minimum 4.2%
-        "max_value": 1.0,
-        "min_odds": 1.0,
-        "max_odds": 5.0,
-        "max_bet_fraction": 0.30,
-        "min_bet_pct": 0.01,
-        "description": "🟢 ÉQUILIBRÉE - Profit 202k€ | ROI 19% | DD 35% | 11/12 ans | ~122 paris/an | Recommandée"
-    },
-    "🔥 AGRESSIVE (DD<40%)": {
-        "kelly_fraction": 2.0,
-        "min_confidence": 0.0,
-        "min_edge": 0.042,  # Edge minimum 4.2%
-        "max_value": 1.0,
-        "min_odds": 1.0,
-        "max_odds": 5.0,
-        "max_bet_fraction": 0.36,
-        "min_bet_pct": 0.01,
-        "description": "🔥 AGRESSIVE - Profit 418k€ | ROI 20% | DD 40% | 11/12 ans | ~122 paris/an | Traders expérimentés"
-    },
-    "📈 VOLUME+ (Plus de paris)": {
-        "kelly_fraction": 3.0,
-        "min_confidence": 0.0,
-        "min_edge": 0.03,  # Edge minimum 3%
-        "max_value": 1.0,
-        "min_odds": 1.0,
-        "max_odds": 5.0,
-        "max_bet_fraction": 0.20,
-        "min_bet_pct": 0.01,
-        "description": "📈 VOLUME+ - Profit 82k€ | ROI 15% | DD 34% | 10/12 ans | ~157 paris/an | Plus d'opportunités"
-    },
-    "💎 SÉLECTIF (Meilleur Sharpe)": {
-        "kelly_fraction": 2.2,
-        "min_confidence": 0.0,
-        "min_edge": 0.063,  # Edge minimum 6.3%
-        "max_value": 1.0,
-        "min_odds": 1.0,
-        "max_odds": 5.0,
-        "max_bet_fraction": 0.37,
-        "min_bet_pct": 0.01,
-        "description": "💎 SÉLECTIF - Profit 367k€ | ROI 32% | DD 40% | Sharpe 1.44 | 12/12 ans | ~77 paris/an | Meilleur ratio"
+        "max_bet_fraction": 0.0,
+        "min_bet_pct": 0.0,
+        "description": "Mode recherche: phase 2 −0,60%; ajout des classements phase 3 −0,51%, IC99% [-7,79%; +6,65%]. Aucun edge démontré."
     },
 }
 
@@ -2954,37 +2921,37 @@ def show_home_page(model_data=None):
     
     st.markdown("""
     <div class="section-fade-in" style="text-align: center; padding: 50px 0;">
-        <h1>🥊 Application de Paris Sportifs 🥊</h1>
+        <h1>🥊 Laboratoire prédictif UFC 🥊</h1>
         <p style="font-size: 1.3rem; color: #888;">
-            Modèle ML sans data leakage - Stratégie réaliste validée
+            Recherche chronologique — aucune stratégie de mise validée à ce jour
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 📊 Performance du Modèle (Market + Reach + Age)")
+    st.markdown("### 📊 Dernière confirmation chronologique (2022–2024)")
     
     cols = st.columns(4)
     with cols[0]:
         st.markdown("""
         <div class="metric-box">
-            <div class="metric-value">17-20%</div>
-            <div class="metric-label">ROI Backtest</div>
+            <div class="metric-value">−0,60%</div>
+            <div class="metric-label">ROI observé</div>
         </div>
         """, unsafe_allow_html=True)
     
     with cols[1]:
         st.markdown("""
         <div class="metric-box">
-            <div class="metric-value">11-12/12</div>
-            <div class="metric-label">Années profit</div>
+            <div class="metric-value">313</div>
+            <div class="metric-label">Paris simulés</div>
         </div>
         """, unsafe_allow_html=True)
     
     with cols[2]:
         st.markdown("""
         <div class="metric-box">
-            <div class="metric-value">34-40%</div>
-            <div class="metric-label">Max Drawdown</div>
+            <div class="metric-value">−12,84% à +11,90%</div>
+            <div class="metric-label">IC bootstrap 97,5%</div>
         </div>
         """, unsafe_allow_html=True)
     
@@ -3004,15 +2971,15 @@ def show_home_page(model_data=None):
         st.markdown("""
         <div class="card">
             <h3 style="color: var(--primary-blue);">📅 Événements à venir</h3>
-            <p>Consultez les prochains combats UFC avec recommandations de paris automatiques</p>
+            <p>Consultez les prochains combats et les probabilités à titre expérimental</p>
         </div>
         """, unsafe_allow_html=True)
     
     with cols[1]:
         st.markdown("""
         <div class="card">
-            <h3 style="color: var(--success-color);">💰 Gestion de Bankroll</h3>
-            <p>Suivez vos paris et gérez votre bankroll avec la stratégie Kelly optimisée</p>
+            <h3 style="color: var(--success-color);">🧪 Validation</h3>
+            <p>Le placement de mises reste bloqué tant que le protocole statistique n'est pas franchi</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -3029,11 +2996,10 @@ def show_home_page(model_data=None):
     st.markdown("""
     <div class="card">
         <ol style="line-height: 2;">
-            <li><b>Événements à venir</b> : Récupérez les prochains combats et obtenez des recommandations de paris</li>
+            <li><b>Événements à venir</b> : consultez les prochains combats et les probabilités expérimentales</li>
             <li><b>Saisissez les cotes</b> : Entrez les cotes proposées par votre bookmaker</li>
-            <li><b>Suivez les recommandations</b> : L'application calcule automatiquement les mises optimales selon Kelly</li>
-            <li><b>Enregistrez vos paris</b> : Ajoutez les paris à votre historique pour suivre vos performances</li>
-            <li><b>Mettez à jour les résultats</b> : Après les combats, enregistrez les résultats pour suivre votre ROI</li>
+            <li><b>Ne misez pas</b> : la validation actuelle ne démontre pas un avantage rentable</li>
+            <li><b>Paper trading</b> : utilisez les signaux uniquement pour une validation prospective</li>
         </ol>
     </div>
     """, unsafe_allow_html=True)
@@ -3055,6 +3021,12 @@ def show_events_page(model_data, fighters_data, current_bankroll):
     """Affiche la page des événements à venir"""
 
     st.title("📅 Événements UFC à venir")
+
+    if not rigorous_betting_is_approved():
+        st.warning(
+            "⛔ Mode recherche / NO BET : la phase 2 perd −0,60%; l'ajout des classements "
+            "en phase 3 perd −0,51%, IC99% [-7,79%; +6,65%]. Les mises et recommandations réelles sont bloquées."
+        )
 
     # Boutons principaux
     btn_cols = st.columns([2, 2, 1])
@@ -3489,6 +3461,9 @@ def show_events_page(model_data, fighters_data, current_bankroll):
                                         'proba': prediction['proba_b'],
                                         'color': '🔵'
                                     }
+
+                            if not rigorous_betting_is_approved():
+                                best_bet = None
                             
                             if best_bet:
                                 st.markdown(f"""

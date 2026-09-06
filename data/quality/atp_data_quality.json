@@ -1,0 +1,390 @@
+{
+  "as_of_date": "2026-09-06",
+  "enrichment": {
+    "median_date_delta_days": 2.0,
+    "median_match_confidence": 0.9,
+    "rich_rows_with_matched_odds": 61935,
+    "rich_rows_with_valid_odds": 54393
+  },
+  "generated_at": "2026-09-06T12:12:30.266651+00:00",
+  "legacy_odds_dataset": {
+    "bookmaker_odds": {
+      "bet365": {
+        "coverage": 0.8761366980061371,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 1,
+        "overround_median": 1.0666666666666667,
+        "rows": 71369,
+        "valid_pairs": 62529
+      },
+      "betfair_exchange": {
+        "coverage": 0.03601003236699407,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.006451612903226,
+        "rows": 71369,
+        "valid_pairs": 2570
+      },
+      "market_average": {
+        "coverage": 0.5856744524933795,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 4,
+        "overround_below_0_95": 11,
+        "overround_median": 1.057690096801637,
+        "rows": 71369,
+        "valid_pairs": 41799
+      },
+      "market_maximum": {
+        "coverage": 0.5856884641791253,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 3,
+        "overround_below_0_95": 789,
+        "overround_median": 1.0021367521367521,
+        "rows": 71369,
+        "valid_pairs": 41800
+      },
+      "pinnacle": {
+        "coverage": 0.760442208802141,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 5,
+        "overround_below_0_95": 5,
+        "overround_median": 1.0241077314248046,
+        "rows": 71369,
+        "valid_pairs": 54272
+      }
+    },
+    "duplicate_match_keys": 0,
+    "max_date": "2026-08-29",
+    "min_date": "2000-01-03",
+    "odds": {
+      "coverage": 0.884599756196668,
+      "one_sided_pairs": 0,
+      "overround_above_1_25": 5,
+      "overround_below_0_95": 11,
+      "overround_median": 1.0608732830955052,
+      "rows": 71369,
+      "valid_pairs": 63133
+    },
+    "odds_by_year": {
+      "2000": {
+        "coverage": 0.0,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": null,
+        "rows": 2963,
+        "valid_pairs": 0
+      },
+      "2001": {
+        "coverage": 0.0,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": null,
+        "rows": 3056,
+        "valid_pairs": 0
+      },
+      "2002": {
+        "coverage": 0.4280114041339986,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0748906386701662,
+        "rows": 2806,
+        "valid_pairs": 1201
+      },
+      "2003": {
+        "coverage": 0.9211647727272727,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0737405009850831,
+        "rows": 2816,
+        "valid_pairs": 2594
+      },
+      "2004": {
+        "coverage": 0.9555092109836636,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0737405009850831,
+        "rows": 2877,
+        "valid_pairs": 2749
+      },
+      "2005": {
+        "coverage": 0.979381443298969,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0756634669678147,
+        "rows": 2910,
+        "valid_pairs": 2850
+      },
+      "2006": {
+        "coverage": 0.9821182943603851,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0756634669678147,
+        "rows": 2908,
+        "valid_pairs": 2856
+      },
+      "2007": {
+        "coverage": 0.9851274787535411,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0755356995118723,
+        "rows": 2824,
+        "valid_pairs": 2782
+      },
+      "2008": {
+        "coverage": 0.9899590925994793,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0730697369085493,
+        "rows": 2689,
+        "valid_pairs": 2662
+      },
+      "2009": {
+        "coverage": 0.9871841816184548,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0730697369085493,
+        "rows": 2731,
+        "valid_pairs": 2696
+      },
+      "2010": {
+        "coverage": 0.996267263904442,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 4,
+        "overround_median": 1.0663006756756757,
+        "rows": 2679,
+        "valid_pairs": 2669
+      },
+      "2011": {
+        "coverage": 0.9970093457943925,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 2,
+        "overround_median": 1.0642520466385514,
+        "rows": 2675,
+        "valid_pairs": 2667
+      },
+      "2012": {
+        "coverage": 0.9992369324685234,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0620656244759545,
+        "rows": 2621,
+        "valid_pairs": 2619
+      },
+      "2013": {
+        "coverage": 0.9992472713586752,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 1,
+        "overround_median": 1.0606792209882505,
+        "rows": 2657,
+        "valid_pairs": 2655
+      },
+      "2014": {
+        "coverage": 0.999609375,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0602459979630743,
+        "rows": 2560,
+        "valid_pairs": 2559
+      },
+      "2015": {
+        "coverage": 0.9992395437262357,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0608747028352004,
+        "rows": 2630,
+        "valid_pairs": 2628
+      },
+      "2016": {
+        "coverage": 0.9992383853769993,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0589421783953386,
+        "rows": 2626,
+        "valid_pairs": 2624
+      },
+      "2017": {
+        "coverage": 0.9988614800759014,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0560675883256527,
+        "rows": 2635,
+        "valid_pairs": 2632
+      },
+      "2018": {
+        "coverage": 0.9996229260935143,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0512318731496813,
+        "rows": 2652,
+        "valid_pairs": 2651
+      },
+      "2019": {
+        "coverage": 0.9996143463170073,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0526535641930699,
+        "rows": 2593,
+        "valid_pairs": 2592
+      },
+      "2020": {
+        "coverage": 1.0,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 1,
+        "overround_median": 1.0542751340297352,
+        "rows": 1267,
+        "valid_pairs": 1267
+      },
+      "2021": {
+        "coverage": 0.9995982322217758,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 1,
+        "overround_below_0_95": 0,
+        "overround_median": 1.054225158271401,
+        "rows": 2489,
+        "valid_pairs": 2488
+      },
+      "2022": {
+        "coverage": 0.9984802431610942,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 1,
+        "overround_median": 1.055423399775791,
+        "rows": 2632,
+        "valid_pairs": 2628
+      },
+      "2023": {
+        "coverage": 0.9985212569316081,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0552406194017032,
+        "rows": 2705,
+        "valid_pairs": 2701
+      },
+      "2024": {
+        "coverage": 0.9981678270428729,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 1,
+        "overround_median": 1.0569769551805481,
+        "rows": 2729,
+        "valid_pairs": 2724
+      },
+      "2025": {
+        "coverage": 1.0,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 1,
+        "overround_median": 1.0565171602405643,
+        "rows": 2616,
+        "valid_pairs": 2616
+      },
+      "2026": {
+        "coverage": 1.0,
+        "one_sided_pairs": 0,
+        "overround_above_1_25": 0,
+        "overround_below_0_95": 0,
+        "overround_median": 1.0618662413125213,
+        "rows": 2023,
+        "valid_pairs": 2023
+      }
+    },
+    "rows": 71369,
+    "score_rows_checked": 68774,
+    "score_winner_mismatches": 13,
+    "status_counts": {
+      "awarded": 5,
+      "completed": 68779,
+      "defaulted": 2,
+      "retired": 2194,
+      "sched": 1,
+      "walkover": 388
+    },
+    "winner_not_in_players": 0
+  },
+  "publication_changes": {
+    "current_rows": 71369,
+    "previous_rows": 71369,
+    "rows_added": 0,
+    "rows_removed": 0
+  },
+  "rich_match_dataset": {
+    "completed": 76881,
+    "duplicate_match_ids": 0,
+    "max_date": "2026-09-05",
+    "min_date": "2000-01-03",
+    "players": 2786,
+    "retired": 2385,
+    "rows": 79705,
+    "serve_stats_coverage": 0.9161031302929553,
+    "walkovers": 423
+  },
+  "sources": {
+    "match_stats": {
+      "name": "TennisMyLife match database",
+      "updated_at": "2026-09-06T05:40:02.686Z",
+      "url": "https://stats.tennismylife.org/api/data-files"
+    },
+    "odds": {
+      "name": "Tennis-Data official ATP workbooks",
+      "updated_at": "2026-09-06T12:05:57.479790+00:00",
+      "url": "http://www.tennis-data.co.uk/alldata.php"
+    },
+    "ranking_file": "atp_rankings_2026-08-31.csv",
+    "ranking_updated_at": "2026-08-31T20:02:54.259Z",
+    "ranking_url": "https://stats.tennismylife.org/data/atp_rankings_2026-08-31.csv",
+    "season_files": [
+      "2000.csv",
+      "2001.csv",
+      "2002.csv",
+      "2003.csv",
+      "2004.csv",
+      "2005.csv",
+      "2006.csv",
+      "2007.csv",
+      "2008.csv",
+      "2009.csv",
+      "2010.csv",
+      "2011.csv",
+      "2012.csv",
+      "2013.csv",
+      "2014.csv",
+      "2015.csv",
+      "2016.csv",
+      "2017.csv",
+      "2018.csv",
+      "2019.csv",
+      "2020.csv",
+      "2021.csv",
+      "2022.csv",
+      "2023.csv",
+      "2024.csv",
+      "2025.csv",
+      "2026.csv",
+      "ongoing_tourneys.csv"
+    ]
+  }
+}

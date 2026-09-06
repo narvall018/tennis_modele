@@ -1,0 +1,72 @@
+{
+  "generated_at_utc": "2026-09-06T12:07:38.778060+00:00",
+  "sources": {
+    "ufcstats": "http://ufcstats.com",
+    "historical_extract_repository": "https://github.com/DanMcInerney/mma-ai",
+    "historical_extract_commit": "13a1af267f70f98e922686ce6e73e7ea73e2e3c9",
+    "historical_competitions_url": "https://raw.githubusercontent.com/DanMcInerney/mma-ai/main/data/raw/ufcstats/competitions.csv",
+    "historical_competitions_download_sha256": "22543d9b6863221073f32e900138e7c6f4f10716fe8bb86f4fd026af5040b1e0",
+    "historical_fighters_url": "https://raw.githubusercontent.com/DanMcInerney/mma-ai/main/data/raw/ufcstats/individuals.csv",
+    "historical_fighters_download_sha256": "59f7e8901776d9534f488307e14c01c02733244e439e1234282685bda66970cb",
+    "rankings_repository": "https://github.com/martj42/ufc_rankings_history",
+    "rankings_repository_commit": "01b6e8aa45ae48ae91da2d73b46793a9da14e1eb",
+    "rankings_url": "https://raw.githubusercontent.com/martj42/ufc_rankings_history/master/rankings_history.csv",
+    "rankings_download_sha256": "830bac4f4d110a1dbc5162fc324865010faccab973d9d4c8acac14be1b23cc0c",
+    "rankings_date_min": "2013-02-04",
+    "rankings_date_max": "2026-06-16",
+    "odds_dataset": "https://www.kaggle.com/datasets/jerzyszocik/ufc-betting-odds-daily-dataset",
+    "odds_dataset_version": 239,
+    "odds_dataset_last_updated": "2026-09-05T15:38:38.967Z",
+    "odds_dataset_license": "CC0: Public Domain",
+    "odds_csv_download_sha256": "aff33ccb0932381ccc7fd658b4258700894e638802ce1cac6d7835c9f9d9e6c6"
+  },
+  "artifacts": {
+    "data/rigorous/raw/ufcstats_competitions.parquet": {
+      "bytes": 1357118,
+      "sha256": "e047e2386da7939aab01a373b964efa8eba1d6a40c1caaf0f905e4823f0e3b92"
+    },
+    "data/rigorous/raw/ufcstats_fighters.parquet": {
+      "bytes": 218241,
+      "sha256": "252b2875ed8d3f5b74917389617c88db90a7c5644250761ffb803d3878780ca0"
+    },
+    "data/rigorous/raw/ufc_rankings_history.parquet": {
+      "bytes": 158930,
+      "sha256": "5f888fc67e6cab1339120d4eccc5a791a99760ad5931c045b62136cd580daa79"
+    },
+    "data/rigorous/raw/ufc_odds_snapshots_matched.parquet": {
+      "bytes": 924115,
+      "sha256": "941bf4853f3e1569e0297dbbe9ab0006bff860b30f68e3ebd91a14635948c24a"
+    },
+    "data/rigorous/processed/fights.parquet": {
+      "bytes": 999876,
+      "sha256": "41aaf3e52c59dfbb0fe76cff322aeb92f76fa4aefc836ec3d7556c790a70a2ab"
+    },
+    "data/rigorous/processed/fighters.parquet": {
+      "bytes": 306540,
+      "sha256": "3cb34668d29fd7449b0d5d03946457907aacc3a22f5b061f646b65ae83cd6974"
+    },
+    "data/rigorous/processed/moneyline_quotes.parquet": {
+      "bytes": 434005,
+      "sha256": "2e73a051340b6f7ea4f348da36953d067fc053089deb370b617bc9e57848d08d"
+    },
+    "data/rigorous/processed/method_props_quotes.parquet": {
+      "bytes": 347293,
+      "sha256": "3c87057a4446523f6753ac6c5614f7791656fcf2db1bbd49a97dac72b6946f07"
+    },
+    "data/rigorous/processed/moneyline_trajectories.parquet": {
+      "bytes": 50014,
+      "sha256": "044c7bdf4b6ad36aa477688a5600fdf3d3decee2b228fc7073ccf90063b89f7c"
+    },
+    "data/rigorous/processed/prefight_rankings.parquet": {
+      "bytes": 326913,
+      "sha256": "2bfb5a20fecd6ec6b4852a06a52a344f3b6b7da22830db36974f751d07858fcc"
+    }
+  },
+  "limitations": [
+    "Les cotes legacy 2010-2024 n'ont ni bookmaker ni timestamp pre-combat verifiables.",
+    "Les cotes horodatees sont des snapshots gratuits, pas une garantie d'execution.",
+    "Les profils UFCStats actuels peuvent differer de la valeur affichee historiquement.",
+    "Les classements historiques proviennent d'une archive tierce du classement UFC publie.",
+    "Les props legacy n'ont pas d'horodatage verifiable et sont exclus des preuves economiques."
+  ]
+}

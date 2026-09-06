@@ -1,0 +1,3682 @@
+{
+  "ATP_Bet365": {
+    "bettable_book": "B365",
+    "by_probability_decile": {
+      "0.5-0.6": {
+        "favourite": {
+          "calibration_gap": -0.0015983760014885995,
+          "market_probability": 0.5535283954405333,
+          "n": 14404,
+          "profitable": false,
+          "realised_rate": 0.5519300194390447,
+          "roi": -0.07734858094973616,
+          "roi_ci_90": [
+            -0.08684990677061798,
+            -0.0676532683070806
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": 0.0015983760014885995,
+          "market_probability": 0.4464716045594667,
+          "n": 14404,
+          "profitable": false,
+          "realised_rate": 0.4480699805609553,
+          "roi": -0.06684934184948621,
+          "roi_ci_90": [
+            -0.07889098225114667,
+            -0.05530593621189549
+          ],
+          "significant": true
+        }
+      },
+      "0.6-0.7": {
+        "favourite": {
+          "calibration_gap": 0.00473786856740499,
+          "market_probability": 0.6484955592711261,
+          "n": 14814,
+          "profitable": false,
+          "realised_rate": 0.6532334278385311,
+          "roi": -0.0574653327933036,
+          "roi_ci_90": [
+            -0.06720101713062848,
+            -0.04787896888780529
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.004737868567405101,
+          "market_probability": 0.351504440728874,
+          "n": 14814,
+          "profitable": false,
+          "realised_rate": 0.3467665721614689,
+          "roi": -0.09344372080464428,
+          "roi_ci_90": [
+            -0.11110281104860927,
+            -0.07572822153721676
+          ],
+          "significant": true
+        }
+      },
+      "0.7-0.8": {
+        "favourite": {
+          "calibration_gap": 0.014531629992505568,
+          "market_probability": 0.7468622417781579,
+          "n": 11651,
+          "profitable": false,
+          "realised_rate": 0.7613938717706634,
+          "roi": -0.036083252939661796,
+          "roi_ci_90": [
+            -0.04364745199274762,
+            -0.028484594747854548
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.01453162999250554,
+          "market_probability": 0.2531377582218421,
+          "n": 11651,
+          "profitable": false,
+          "realised_rate": 0.23860612822933655,
+          "roi": -0.1439346562526822,
+          "roi_ci_90": [
+            -0.16586469372657933,
+            -0.12205556071543139
+          ],
+          "significant": true
+        }
+      },
+      "0.8-0.9": {
+        "favourite": {
+          "calibration_gap": 0.01313775210122703,
+          "market_probability": 0.8457643833632037,
+          "n": 7633,
+          "profitable": false,
+          "realised_rate": 0.8589021354644307,
+          "roi": -0.031718412157736145,
+          "roi_ci_90": [
+            -0.03855821662862175,
+            -0.024546575549430405
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.01313775210122703,
+          "market_probability": 0.15423561663679627,
+          "n": 7633,
+          "profitable": false,
+          "realised_rate": 0.14109786453556925,
+          "roi": -0.2259105960958994,
+          "roi_ci_90": [
+            -0.25986935870749767,
+            -0.19137808438784934
+          ],
+          "significant": true
+        }
+      },
+      "0.9-1.0": {
+        "favourite": {
+          "calibration_gap": 0.016538198588124664,
+          "market_probability": 0.9345919174778496,
+          "n": 3274,
+          "profitable": false,
+          "realised_rate": 0.9511301160659743,
+          "roi": -0.012372217470983481,
+          "roi_ci_90": [
+            -0.019008422214625526,
+            -0.006083629234869784
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.016538198588124685,
+          "market_probability": 0.06540808252215034,
+          "n": 3274,
+          "profitable": false,
+          "realised_rate": 0.04886988393402566,
+          "roi": -0.4443617593158216,
+          "roi_ci_90": [
+            -0.5186686901544175,
+            -0.3644116001533749
+          ],
+          "significant": true
+        }
+      }
+    },
+    "calibration_is_self_referential": false,
+    "matches_usable": 51776,
+    "multiplicity": {
+      "cells_examined": 62,
+      "cells_profitable": 0,
+      "cells_with_interval_excluding_zero": 61,
+      "expected_by_chance_at_90pct": 6.2
+    },
+    "odds_haircut": 0.02,
+    "reference_book": "Pinnacle (devigged)",
+    "segments": {
+      "best_of": {
+        "Bo3": {
+          "favourite": {
+            "calibration_gap": 0.0037770295997280323,
+            "market_probability": 0.6786533017003556,
+            "n": 41805,
+            "profitable": false,
+            "realised_rate": 0.6824303313000837,
+            "roi": -0.05776933620380335,
+            "roi_ci_90": [
+              -0.06291489161302657,
+              -0.05245268216307179
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003777029599728088,
+            "market_probability": 0.32134669829964435,
+            "n": 41805,
+            "profitable": false,
+            "realised_rate": 0.31756966869991626,
+            "roi": -0.11577864848702309,
+            "roi_ci_90": [
+              -0.12786686047680826,
+              -0.10313758291792877
+            ],
+            "significant": true
+          }
+        },
+        "Bo5": {
+          "favourite": {
+            "calibration_gap": 0.02136190949998329,
+            "market_probability": 0.7447598435839602,
+            "n": 9971,
+            "profitable": false,
+            "realised_rate": 0.7661217530839435,
+            "roi": -0.02541295356533946,
+            "roi_ci_90": [
+              -0.033014871130513705,
+              -0.017814072768361562
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.021361909499983234,
+            "market_probability": 0.2552401564160398,
+            "n": 9971,
+            "profitable": false,
+            "realised_rate": 0.23387824691605658,
+            "roi": -0.23701188045331462,
+            "roi_ci_90": [
+              -0.26072396376561363,
+              -0.21332209736885002
+            ],
+            "significant": true
+          }
+        }
+      },
+      "era": {
+        "2000_2014": {
+          "favourite": {
+            "calibration_gap": 0.010286062715422317,
+            "market_probability": 0.698508828284696,
+            "n": 25367,
+            "profitable": false,
+            "realised_rate": 0.7087948910001183,
+            "roi": -0.05124256474947765,
+            "roi_ci_90": [
+              -0.05743509348357585,
+              -0.044876564223282234
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010286062715422373,
+            "market_probability": 0.3014911717153041,
+            "n": 25367,
+            "profitable": false,
+            "realised_rate": 0.2912051089998817,
+            "roi": -0.1593159955848149,
+            "roi_ci_90": [
+              -0.17664314701218736,
+              -0.14234768256596542
+            ],
+            "significant": true
+          }
+        },
+        "2015_2026": {
+          "favourite": {
+            "calibration_gap": 0.004164177709828132,
+            "market_probability": 0.684540430567653,
+            "n": 26409,
+            "profitable": false,
+            "realised_rate": 0.6887046082774811,
+            "roi": -0.05182208792457115,
+            "roi_ci_90": [
+              -0.058150318544114905,
+              -0.04583781539192842
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004164177709827965,
+            "market_probability": 0.3154595694323468,
+            "n": 26409,
+            "profitable": false,
+            "realised_rate": 0.31129539172251885,
+            "roi": -0.11973202317391798,
+            "roi_ci_90": [
+              -0.13421077173284737,
+              -0.10556081149815
+            ],
+            "significant": true
+          }
+        }
+      },
+      "hash_control": {
+        "hash_0": {
+          "favourite": {
+            "calibration_gap": 0.008140880807605999,
+            "market_probability": 0.6910997420350725,
+            "n": 13037,
+            "profitable": false,
+            "realised_rate": 0.6992406228426785,
+            "roi": -0.0515979289713891,
+            "roi_ci_90": [
+              -0.06253610796678603,
+              -0.04081374935942162
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008140880807605944,
+            "market_probability": 0.3089002579649274,
+            "n": 13037,
+            "profitable": false,
+            "realised_rate": 0.3007593771573215,
+            "roi": -0.14379215310270765,
+            "roi_ci_90": [
+              -0.1684875295603897,
+              -0.11875143648277778
+            ],
+            "significant": true
+          }
+        },
+        "hash_1": {
+          "favourite": {
+            "calibration_gap": 0.0027622484184779417,
+            "market_probability": 0.6912349377625444,
+            "n": 12794,
+            "profitable": false,
+            "realised_rate": 0.6939971861810224,
+            "roi": -0.05722199312177581,
+            "roi_ci_90": [
+              -0.067148317382418,
+              -0.04742308969953229
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0027622484184779417,
+            "market_probability": 0.3087650622374556,
+            "n": 12794,
+            "profitable": false,
+            "realised_rate": 0.30600281381897765,
+            "roi": -0.11963491949351258,
+            "roi_ci_90": [
+              -0.14391047991662134,
+              -0.09458701043621988
+            ],
+            "significant": true
+          }
+        },
+        "hash_2": {
+          "favourite": {
+            "calibration_gap": 0.00764250489939311,
+            "market_probability": 0.6927123786062387,
+            "n": 12962,
+            "profitable": false,
+            "realised_rate": 0.7003548835056318,
+            "roi": -0.05088970992130842,
+            "roi_ci_90": [
+              -0.05990188924920879,
+              -0.041585223013225744
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.007642504899393221,
+            "market_probability": 0.30728762139376137,
+            "n": 12962,
+            "profitable": false,
+            "realised_rate": 0.29964511649436815,
+            "roi": -0.14693719487733375,
+            "roi_ci_90": [
+              -0.16860623805353217,
+              -0.1257665481110328
+            ],
+            "significant": true
+          }
+        },
+        "hash_3": {
+          "favourite": {
+            "calibration_gap": 0.010041077114708807,
+            "market_probability": 0.6904903871077359,
+            "n": 12983,
+            "profitable": false,
+            "realised_rate": 0.7005314642224447,
+            "roi": -0.046524444273280424,
+            "roi_ci_90": [
+              -0.05554363029683201,
+              -0.03695323280093102
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010041077114708863,
+            "market_probability": 0.30950961289226414,
+            "n": 12983,
+            "profitable": false,
+            "realised_rate": 0.2994685357775553,
+            "roi": -0.14584799198952478,
+            "roi_ci_90": [
+              -0.1688887200644354,
+              -0.12398041877549133
+            ],
+            "significant": true
+          }
+        }
+      },
+      "rank_gap": {
+        "gap_0_10": {
+          "favourite": {
+            "calibration_gap": 0.0023520021377443356,
+            "market_probability": 0.6331793763948284,
+            "n": 7537,
+            "profitable": false,
+            "realised_rate": 0.6355313785325727,
+            "roi": -0.06321958604219183,
+            "roi_ci_90": [
+              -0.07639886069028033,
+              -0.049557939828214194
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0023520021377442246,
+            "market_probability": 0.3668206236051716,
+            "n": 7537,
+            "profitable": false,
+            "realised_rate": 0.36446862146742737,
+            "roi": -0.10561285922780946,
+            "roi_ci_90": [
+              -0.12996878932919162,
+              -0.08187358988996098
+            ],
+            "significant": true
+          }
+        },
+        "gap_10_30": {
+          "favourite": {
+            "calibration_gap": 0.004449029427723961,
+            "market_probability": 0.6571959526920356,
+            "n": 13143,
+            "profitable": false,
+            "realised_rate": 0.6616449821197595,
+            "roi": -0.05756499733698545,
+            "roi_ci_90": [
+              -0.06656975703711546,
+              -0.04860822378312946
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004449029427724016,
+            "market_probability": 0.34280404730796443,
+            "n": 13143,
+            "profitable": false,
+            "realised_rate": 0.3383550178802404,
+            "roi": -0.11602970250323366,
+            "roi_ci_90": [
+              -0.13377644403015285,
+              -0.0979978275943393
+            ],
+            "significant": true
+          }
+        },
+        "gap_30_80": {
+          "favourite": {
+            "calibration_gap": 0.008408830950668467,
+            "market_probability": 0.7020032584336089,
+            "n": 18661,
+            "profitable": false,
+            "realised_rate": 0.7104120893842774,
+            "roi": -0.04932148759444829,
+            "roi_ci_90": [
+              -0.05687170268127341,
+              -0.04222518267948184
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008408830950668467,
+            "market_probability": 0.2979967415663911,
+            "n": 18661,
+            "profitable": false,
+            "realised_rate": 0.28958791061572264,
+            "roi": -0.14041497454584428,
+            "roi_ci_90": [
+              -0.15910885848437975,
+              -0.12089061517937202
+            ],
+            "significant": true
+          }
+        },
+        "gap_80_plus": {
+          "favourite": {
+            "calibration_gap": 0.010722299955569947,
+            "market_probability": 0.7464576448764924,
+            "n": 12326,
+            "profitable": false,
+            "realised_rate": 0.7571799448320623,
+            "roi": -0.04183768619178969,
+            "roi_ci_90": [
+              -0.0504887746586953,
+              -0.033546906725196605
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010722299955570058,
+            "market_probability": 0.25354235512350776,
+            "n": 12326,
+            "profitable": false,
+            "realised_rate": 0.2428200551679377,
+            "roi": -0.17902240142787607,
+            "roi_ci_90": [
+              -0.20456426298830804,
+              -0.1525749675818732
+            ],
+            "significant": true
+          }
+        }
+      },
+      "round_stage": {
+        "early": {
+          "favourite": {
+            "calibration_gap": 0.008687128487392393,
+            "market_probability": 0.689777580970103,
+            "n": 37843,
+            "profitable": false,
+            "realised_rate": 0.6984647094574954,
+            "roi": -0.050460367835530984,
+            "roi_ci_90": [
+              -0.055906996217554336,
+              -0.045093397122312785
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008687128487392448,
+            "market_probability": 0.310222419029897,
+            "n": 37843,
+            "profitable": false,
+            "realised_rate": 0.30153529054250455,
+            "roi": -0.1461049552096821,
+            "roi_ci_90": [
+              -0.15924077376617066,
+              -0.13199069687935172
+            ],
+            "significant": true
+          }
+        },
+        "late": {
+          "favourite": {
+            "calibration_gap": 0.0030252866355108265,
+            "market_probability": 0.6957474112759224,
+            "n": 13933,
+            "profitable": false,
+            "realised_rate": 0.6987726979114333,
+            "roi": -0.054465510658149696,
+            "roi_ci_90": [
+              -0.06292657097229452,
+              -0.0455482966572219
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003025286635510993,
+            "market_probability": 0.30425258872407773,
+            "n": 13933,
+            "profitable": false,
+            "realised_rate": 0.30122730208856674,
+            "roi": -0.12016952845761861,
+            "roi_ci_90": [
+              -0.1411272185623409,
+              -0.09961822624031808
+            ],
+            "significant": true
+          }
+        }
+      },
+      "surface": {
+        "Carpet": {
+          "favourite": {
+            "calibration_gap": 0.004942427773845459,
+            "market_probability": 0.6834944030612723,
+            "n": 934,
+            "profitable": false,
+            "realised_rate": 0.6884368308351178,
+            "roi": -0.05215171306209849,
+            "roi_ci_90": [
+              -0.09277232898663478,
+              -0.013763128219904332
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004942427773845459,
+            "market_probability": 0.3165055969387277,
+            "n": 934,
+            "profitable": false,
+            "realised_rate": 0.31156316916488225,
+            "roi": -0.12198004282655248,
+            "roi_ci_90": [
+              -0.18837445340182074,
+              -0.05188608974358974
+            ],
+            "significant": true
+          }
+        },
+        "Clay": {
+          "favourite": {
+            "calibration_gap": 0.008356125019656324,
+            "market_probability": 0.6875646137730781,
+            "n": 16351,
+            "profitable": false,
+            "realised_rate": 0.6959207387927344,
+            "roi": -0.049697249097914474,
+            "roi_ci_90": [
+              -0.05780994042021219,
+              -0.041738966210555666
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008356125019656269,
+            "market_probability": 0.31243538622692185,
+            "n": 16351,
+            "profitable": false,
+            "realised_rate": 0.3040792612072656,
+            "roi": -0.1391581713656657,
+            "roi_ci_90": [
+              -0.15862916857392453,
+              -0.1184900831738865
+            ],
+            "significant": true
+          }
+        },
+        "Grass": {
+          "favourite": {
+            "calibration_gap": 0.014941996199289043,
+            "market_probability": 0.7024898181324067,
+            "n": 5903,
+            "profitable": false,
+            "realised_rate": 0.7174318143316958,
+            "roi": -0.03717937320006774,
+            "roi_ci_90": [
+              -0.05105650672494792,
+              -0.02491439017685895
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.014941996199288987,
+            "market_probability": 0.29751018186759326,
+            "n": 5903,
+            "profitable": false,
+            "realised_rate": 0.2825681856683043,
+            "roi": -0.15666744706081653,
+            "roi_ci_90": [
+              -0.1926539778573567,
+              -0.11583226463025062
+            ],
+            "significant": true
+          }
+        },
+        "Hard": {
+          "favourite": {
+            "calibration_gap": 0.00494782743596589,
+            "market_probability": 0.6915332135602563,
+            "n": 28588,
+            "profitable": false,
+            "realised_rate": 0.6964810409962222,
+            "roi": -0.055535903176157815,
+            "roi_ci_90": [
+              -0.061604097834716064,
+              -0.04947002689691103
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004947827435965835,
+            "market_probability": 0.3084667864397436,
+            "n": 28588,
+            "profitable": false,
+            "realised_rate": 0.3035189590037778,
+            "roi": -0.13604516930180496,
+            "roi_ci_90": [
+              -0.1519924660583054,
+              -0.12036804608762076
+            ],
+            "significant": true
+          }
+        }
+      },
+      "tier": {
+        "ATP250": {
+          "favourite": {
+            "calibration_gap": 0.004430353347657179,
+            "market_probability": 0.6640399773916424,
+            "n": 16448,
+            "profitable": false,
+            "realised_rate": 0.6684703307392996,
+            "roi": -0.05858846789883266,
+            "roi_ci_90": [
+              -0.06676567207194171,
+              -0.05061658004884543
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004430353347657179,
+            "market_probability": 0.33596002260835756,
+            "n": 16448,
+            "profitable": false,
+            "realised_rate": 0.3315296692607004,
+            "roi": -0.1079243920233463,
+            "roi_ci_90": [
+              -0.12673403960149496,
+              -0.08918489128643077
+            ],
+            "significant": true
+          }
+        },
+        "ATP500": {
+          "favourite": {
+            "calibration_gap": 0.009296895071718714,
+            "market_probability": 0.6921538137973878,
+            "n": 6066,
+            "profitable": false,
+            "realised_rate": 0.7014507088691065,
+            "roi": -0.05011234421364984,
+            "roi_ci_90": [
+              -0.06423109703797501,
+              -0.03640433428340823
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.009296895071718658,
+            "market_probability": 0.30784618620261217,
+            "n": 6066,
+            "profitable": false,
+            "realised_rate": 0.2985492911308935,
+            "roi": -0.1378408506429278,
+            "roi_ci_90": [
+              -0.1675021553603589,
+              -0.1059028402125869
+            ],
+            "significant": true
+          }
+        },
+        "Grand Slam": {
+          "favourite": {
+            "calibration_gap": 0.021121454386892946,
+            "market_probability": 0.7448146003084619,
+            "n": 9946,
+            "profitable": false,
+            "realised_rate": 0.7659360546953549,
+            "roi": -0.02570063342047052,
+            "roi_ci_90": [
+              -0.0335490872357228,
+              -0.017693797984665506
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.021121454386892946,
+            "market_probability": 0.25518539969153803,
+            "n": 9946,
+            "profitable": false,
+            "realised_rate": 0.23406394530464508,
+            "roi": -0.23634310878745224,
+            "roi_ci_90": [
+              -0.2614465035011497,
+              -0.21202486631706813
+            ],
+            "significant": true
+          }
+        },
+        "International": {
+          "favourite": {
+            "calibration_gap": 0.012383020628164654,
+            "market_probability": 0.682402255445455,
+            "n": 5868,
+            "profitable": false,
+            "realised_rate": 0.6947852760736196,
+            "roi": -0.04479108043626447,
+            "roi_ci_90": [
+              -0.0594699809593979,
+              -0.030904561964530012
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.012383020628164598,
+            "market_probability": 0.317597744554545,
+            "n": 5868,
+            "profitable": false,
+            "realised_rate": 0.3052147239263804,
+            "roi": -0.16493478186775734,
+            "roi_ci_90": [
+              -0.1993482724271785,
+              -0.12871561183827368
+            ],
+            "significant": true
+          }
+        },
+        "International Gold": {
+          "favourite": {
+            "calibration_gap": -0.0034440784344498265,
+            "market_probability": 0.6832443004100325,
+            "n": 1802,
+            "profitable": false,
+            "realised_rate": 0.6798002219755827,
+            "roi": -0.07036340732519421,
+            "roi_ci_90": [
+              -0.09037622194948125,
+              -0.051639370848286646
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.0034440784344498265,
+            "market_probability": 0.31675569958996747,
+            "n": 1802,
+            "profitable": false,
+            "realised_rate": 0.3201997780244173,
+            "roi": -0.13094638179800222,
+            "roi_ci_90": [
+              -0.18130989779833653,
+              -0.08206407073375953
+            ],
+            "significant": true
+          }
+        },
+        "Masters": {
+          "favourite": {
+            "calibration_gap": 0.0007636037814644503,
+            "market_probability": 0.685325252737108,
+            "n": 2746,
+            "profitable": false,
+            "realised_rate": 0.6860888565185724,
+            "roi": -0.06120211944646757,
+            "roi_ci_90": [
+              -0.07806696728682168,
+              -0.04397025390632058
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0007636037814644503,
+            "market_probability": 0.31467474726289196,
+            "n": 2746,
+            "profitable": false,
+            "realised_rate": 0.3139111434814275,
+            "roi": -0.12147859431900947,
+            "roi_ci_90": [
+              -0.1615712363634553,
+              -0.08138632499374483
+            ],
+            "significant": true
+          }
+        },
+        "Masters 1000": {
+          "favourite": {
+            "calibration_gap": -0.0034782797900151374,
+            "market_probability": 0.6905491514297218,
+            "n": 8593,
+            "profitable": false,
+            "realised_rate": 0.6870708716397067,
+            "roi": -0.0646797207028977,
+            "roi_ci_90": [
+              -0.07616732512049434,
+              -0.05316369216123599
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.0034782797900150264,
+            "market_probability": 0.3094508485702782,
+            "n": 8593,
+            "profitable": false,
+            "realised_rate": 0.31292912836029324,
+            "roi": -0.07962027231467475,
+            "roi_ci_90": [
+              -0.10375787409590768,
+              -0.05424113133459751
+            ],
+            "significant": true
+          }
+        },
+        "Masters Cup": {
+          "favourite": {
+            "calibration_gap": -0.023147928709696064,
+            "market_probability": 0.7071870166575788,
+            "n": 307,
+            "profitable": false,
+            "realised_rate": 0.6840390879478827,
+            "roi": -0.10323706840390878,
+            "roi_ci_90": [
+              -0.1799752090910049,
+              -0.03265411306083856
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.02314792870969601,
+            "market_probability": 0.29281298334242123,
+            "n": 307,
+            "profitable": false,
+            "realised_rate": 0.31596091205211724,
+            "roi": -0.06469185667752443,
+            "roi_ci_90": [
+              -0.2440121802656547,
+              0.12254444836513957
+            ],
+            "significant": false
+          }
+        }
+      }
+    }
+  },
+  "ATP_Pinnacle": {
+    "bettable_book": "Pinnacle",
+    "by_probability_decile": {
+      "0.5-0.6": {
+        "favourite": {
+          "calibration_gap": -0.001605224913460268,
+          "market_probability": 0.5535501474607925,
+          "n": 14525,
+          "profitable": false,
+          "realised_rate": 0.5519449225473322,
+          "roi": -0.03586559311531843,
+          "roi_ci_90": [
+            -0.045628679772614276,
+            -0.025835453312714626
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": 0.001605224913460268,
+          "market_probability": 0.44644985253920755,
+          "n": 14525,
+          "profitable": false,
+          "realised_rate": 0.4480550774526678,
+          "roi": -0.03156762134251292,
+          "roi_ci_90": [
+            -0.04393580444817552,
+            -0.01973415302600723
+          ],
+          "significant": true
+        }
+      },
+      "0.6-0.7": {
+        "favourite": {
+          "calibration_gap": 0.005098353799462774,
+          "market_probability": 0.6485288147985679,
+          "n": 14929,
+          "profitable": false,
+          "realised_rate": 0.6536271685980307,
+          "roi": -0.02314094581016813,
+          "roi_ci_90": [
+            -0.0332418947302973,
+            -0.013078108334316451
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.005098353799462663,
+          "market_probability": 0.351471185201432,
+          "n": 14929,
+          "profitable": false,
+          "realised_rate": 0.34637283140196934,
+          "roi": -0.052724174425614584,
+          "roi_ci_90": [
+            -0.07095441270178877,
+            -0.03408875414657985
+          ],
+          "significant": true
+        }
+      },
+      "0.7-0.8": {
+        "favourite": {
+          "calibration_gap": 0.014521286132985312,
+          "market_probability": 0.7468365494974384,
+          "n": 11754,
+          "profitable": false,
+          "realised_rate": 0.7613578356304237,
+          "roi": -0.008958812319210464,
+          "roi_ci_90": [
+            -0.0167282300742618,
+            -0.0012372344490394222
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.014521286132985423,
+          "market_probability": 0.2531634505025617,
+          "n": 11754,
+          "profitable": false,
+          "realised_rate": 0.2386421643695763,
+          "roi": -0.09503954398502638,
+          "roi_ci_90": [
+            -0.1174100473035683,
+            -0.07222991789289437
+          ],
+          "significant": true
+        }
+      },
+      "0.8-0.9": {
+        "favourite": {
+          "calibration_gap": 0.012923581966794329,
+          "market_probability": 0.8458187692895525,
+          "n": 7681,
+          "profitable": false,
+          "realised_rate": 0.8587423512563468,
+          "roi": -0.009875258429891967,
+          "roi_ci_90": [
+            -0.016807613660405667,
+            -0.0027738973067272877
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.012923581966794356,
+          "market_probability": 0.15418123071044754,
+          "n": 7681,
+          "profitable": false,
+          "realised_rate": 0.14125764874365318,
+          "roi": -0.13187860955604738,
+          "roi_ci_90": [
+            -0.17065412763499235,
+            -0.09314109217374292
+          ],
+          "significant": true
+        }
+      },
+      "0.9-1.0": {
+        "favourite": {
+          "calibration_gap": 0.016626361995564554,
+          "market_probability": 0.9357827423496912,
+          "n": 3383,
+          "profitable": false,
+          "realised_rate": 0.9524091043452557,
+          "roi": -0.003337363287023336,
+          "roi_ci_90": [
+            -0.009891646683979315,
+            0.002914890113799173
+          ],
+          "significant": false
+        },
+        "underdog": {
+          "calibration_gap": -0.016626361995564484,
+          "market_probability": 0.06421725765030879,
+          "n": 3383,
+          "profitable": false,
+          "realised_rate": 0.04759089565474431,
+          "roi": -0.3122196866686373,
+          "roi_ci_90": [
+            -0.4054521957347932,
+            -0.21222957922385194
+          ],
+          "significant": true
+        }
+      }
+    },
+    "calibration_is_self_referential": true,
+    "matches_usable": 52272,
+    "multiplicity": {
+      "cells_examined": 62,
+      "cells_profitable": 0,
+      "cells_with_interval_excluding_zero": 52,
+      "expected_by_chance_at_90pct": 6.2
+    },
+    "odds_haircut": 0.02,
+    "reference_book": "Pinnacle (devigged)",
+    "segments": {
+      "best_of": {
+        "Bo3": {
+          "favourite": {
+            "calibration_gap": 0.003882166491280814,
+            "market_probability": 0.6788349647940985,
+            "n": 42221,
+            "profitable": false,
+            "realised_rate": 0.6827171312853794,
+            "roi": -0.02527473768977524,
+            "roi_ci_90": [
+              -0.030532876448281388,
+              -0.019982410082061856
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0038821664912807585,
+            "market_probability": 0.32116503520590145,
+            "n": 42221,
+            "profitable": false,
+            "realised_rate": 0.3172828687146207,
+            "roi": -0.06140952606522822,
+            "roi_ci_90": [
+              -0.07443053346667385,
+              -0.04788102216039716
+            ],
+            "significant": true
+          }
+        },
+        "Bo5": {
+          "favourite": {
+            "calibration_gap": 0.021399332753045397,
+            "market_probability": 0.7463849673165994,
+            "n": 10051,
+            "profitable": false,
+            "realised_rate": 0.7677843000696448,
+            "roi": 0.0008219818923490174,
+            "roi_ci_90": [
+              -0.007175790991941328,
+              0.00879153860383012
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.02139933275304534,
+            "market_probability": 0.2536150326834005,
+            "n": 10051,
+            "profitable": false,
+            "realised_rate": 0.23221569993035518,
+            "roi": -0.18298287732563925,
+            "roi_ci_90": [
+              -0.20933225197575916,
+              -0.15584614414564643
+            ],
+            "significant": true
+          }
+        }
+      },
+      "era": {
+        "2000_2014": {
+          "favourite": {
+            "calibration_gap": 0.01056742805931632,
+            "market_probability": 0.6991199872096925,
+            "n": 25817,
+            "profitable": false,
+            "realised_rate": 0.7096874152690088,
+            "roi": -0.014036323352829536,
+            "roi_ci_90": [
+              -0.020045534000562096,
+              -0.007773570489596042
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.01056742805931643,
+            "market_probability": 0.3008800127903076,
+            "n": 25817,
+            "profitable": false,
+            "realised_rate": 0.2903125847309912,
+            "roi": -0.09830684045396444,
+            "roi_ci_90": [
+              -0.11799755002394875,
+              -0.07932633493325064
+            ],
+            "significant": true
+          }
+        },
+        "2015_2026": {
+          "favourite": {
+            "calibration_gap": 0.0040133946218805505,
+            "market_probability": 0.6847032940948081,
+            "n": 26455,
+            "profitable": false,
+            "realised_rate": 0.6887166887166887,
+            "roi": -0.026327242487242487,
+            "roi_ci_90": [
+              -0.03278879757489071,
+              -0.01996102773035206
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0040133946218805505,
+            "market_probability": 0.3152967059051918,
+            "n": 26455,
+            "profitable": false,
+            "realised_rate": 0.31128331128331127,
+            "roi": -0.07159118503118504,
+            "roi_ci_90": [
+              -0.08701494951735628,
+              -0.05632771683651711
+            ],
+            "significant": true
+          }
+        }
+      },
+      "hash_control": {
+        "hash_0": {
+          "favourite": {
+            "calibration_gap": 0.008612644351780108,
+            "market_probability": 0.6914101502686895,
+            "n": 13161,
+            "profitable": false,
+            "realised_rate": 0.7000227946204696,
+            "roi": -0.019367783603069677,
+            "roi_ci_90": [
+              -0.030517884052832508,
+              -0.008367073743748735
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008612644351780274,
+            "market_probability": 0.3085898497313107,
+            "n": 13161,
+            "profitable": false,
+            "realised_rate": 0.29997720537953043,
+            "roi": -0.09495689993161616,
+            "roi_ci_90": [
+              -0.12145001649260397,
+              -0.06832250715140546
+            ],
+            "significant": true
+          }
+        },
+        "hash_1": {
+          "favourite": {
+            "calibration_gap": 0.002389815136197848,
+            "market_probability": 0.6915984092207901,
+            "n": 12908,
+            "profitable": false,
+            "realised_rate": 0.6939882243569879,
+            "roi": -0.026445593430430743,
+            "roi_ci_90": [
+              -0.036695671419069834,
+              -0.01625093331942145
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.002389815136197959,
+            "market_probability": 0.30840159077921003,
+            "n": 12908,
+            "profitable": false,
+            "realised_rate": 0.3060117756430121,
+            "roi": -0.061056348001239547,
+            "roi_ci_90": [
+              -0.0880628577945932,
+              -0.03341516405399838
+            ],
+            "significant": true
+          }
+        },
+        "hash_2": {
+          "favourite": {
+            "calibration_gap": 0.007758586368964759,
+            "market_probability": 0.6933188186894902,
+            "n": 13087,
+            "profitable": false,
+            "realised_rate": 0.701077405058455,
+            "roi": -0.019963614273706735,
+            "roi_ci_90": [
+              -0.029370983369188287,
+              -0.010273234088143875
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.007758586368964815,
+            "market_probability": 0.30668118131050986,
+            "n": 13087,
+            "profitable": false,
+            "realised_rate": 0.29892259494154505,
+            "roi": -0.09078137541071293,
+            "roi_ci_90": [
+              -0.11463402966455674,
+              -0.06752058698431482
+            ],
+            "significant": true
+          }
+        },
+        "hash_3": {
+          "favourite": {
+            "calibration_gap": 0.010159978577825468,
+            "market_probability": 0.6909684142248583,
+            "n": 13116,
+            "profitable": false,
+            "realised_rate": 0.7011283928026838,
+            "roi": -0.01535071820677036,
+            "roi_ci_90": [
+              -0.02495767995260687,
+              -0.005521067131085654
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010159978577825302,
+            "market_probability": 0.30903158577514156,
+            "n": 13116,
+            "profitable": false,
+            "realised_rate": 0.29887160719731626,
+            "roi": -0.09195132204940532,
+            "roi_ci_90": [
+              -0.11658901268503113,
+              -0.06825162675695942
+            ],
+            "significant": true
+          }
+        }
+      },
+      "rank_gap": {
+        "gap_0_10": {
+          "favourite": {
+            "calibration_gap": 0.0026862775018442475,
+            "market_probability": 0.633161034610162,
+            "n": 7571,
+            "profitable": false,
+            "realised_rate": 0.6358473121120063,
+            "roi": -0.029592001056663587,
+            "roi_ci_90": [
+              -0.04339718534632341,
+              -0.015568885080420116
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0026862775018442475,
+            "market_probability": 0.3668389653898379,
+            "n": 7571,
+            "profitable": false,
+            "realised_rate": 0.36415268788799365,
+            "roi": -0.06295945317659492,
+            "roi_ci_90": [
+              -0.08782087961712887,
+              -0.03794364437159299
+            ],
+            "significant": true
+          }
+        },
+        "gap_10_30": {
+          "favourite": {
+            "calibration_gap": 0.00445997550664301,
+            "market_probability": 0.657012147952015,
+            "n": 13219,
+            "profitable": false,
+            "realised_rate": 0.661472123458658,
+            "roi": -0.02494388985551101,
+            "roi_ci_90": [
+              -0.03412035533035818,
+              -0.015964909280438786
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004459975506643066,
+            "market_probability": 0.3429878520479851,
+            "n": 13219,
+            "profitable": false,
+            "realised_rate": 0.33852787654134203,
+            "roi": -0.06726733489673956,
+            "roi_ci_90": [
+              -0.08615849116085554,
+              -0.04742026886998142
+            ],
+            "significant": true
+          }
+        },
+        "gap_30_80": {
+          "favourite": {
+            "calibration_gap": 0.008093617745879245,
+            "market_probability": 0.7022225751637343,
+            "n": 18786,
+            "profitable": false,
+            "realised_rate": 0.7103161929096136,
+            "roi": -0.018134289364420315,
+            "roi_ci_90": [
+              -0.02597736119417841,
+              -0.01063070570873293
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008093617745879245,
+            "market_probability": 0.2977774248362657,
+            "n": 18786,
+            "profitable": false,
+            "realised_rate": 0.28968380709038644,
+            "roi": -0.08257564356435644,
+            "roi_ci_90": [
+              -0.10308167753286752,
+              -0.06102584598340417
+            ],
+            "significant": true
+          }
+        },
+        "gap_80_plus": {
+          "favourite": {
+            "calibration_gap": 0.011173871835205795,
+            "market_probability": 0.7472522012967497,
+            "n": 12580,
+            "profitable": false,
+            "realised_rate": 0.7584260731319555,
+            "roi": -0.013522941176470592,
+            "roi_ci_90": [
+              -0.022092967260793354,
+              -0.005246675447492263
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.01117387183520574,
+            "market_probability": 0.25274779870325026,
+            "n": 12580,
+            "profitable": false,
+            "realised_rate": 0.24157392686804452,
+            "roi": -0.11566627503974564,
+            "roi_ci_90": [
+              -0.14519955847376878,
+              -0.08538392412635097
+            ],
+            "significant": true
+          }
+        }
+      },
+      "round_stage": {
+        "early": {
+          "favourite": {
+            "calibration_gap": 0.008763436164838545,
+            "market_probability": 0.6903070113781141,
+            "n": 38298,
+            "profitable": false,
+            "realised_rate": 0.6990704475429527,
+            "roi": -0.018914350096610792,
+            "roi_ci_90": [
+              -0.0244934791320242,
+              -0.013440082314807826
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008763436164838545,
+            "market_probability": 0.30969298862188593,
+            "n": 38298,
+            "profitable": false,
+            "realised_rate": 0.3009295524570474,
+            "roi": -0.09170867930440234,
+            "roi_ci_90": [
+              -0.10628278785301204,
+              -0.0762369959701434
+            ],
+            "significant": true
+          }
+        },
+        "late": {
+          "favourite": {
+            "calibration_gap": 0.0031037331249631483,
+            "market_probability": 0.6959802800423476,
+            "n": 13974,
+            "profitable": false,
+            "realised_rate": 0.6990840131673107,
+            "roi": -0.023935965364247892,
+            "roi_ci_90": [
+              -0.03271283254254013,
+              -0.014778074012918372
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003103733124963093,
+            "market_probability": 0.30401971995765237,
+            "n": 13974,
+            "profitable": false,
+            "realised_rate": 0.3009159868326893,
+            "roi": -0.06581318877916131,
+            "roi_ci_90": [
+              -0.08870825045634138,
+              -0.04295631031310688
+            ],
+            "significant": true
+          }
+        }
+      },
+      "surface": {
+        "Carpet": {
+          "favourite": {
+            "calibration_gap": 0.005825071944040916,
+            "market_probability": 0.6840483457774781,
+            "n": 948,
+            "profitable": false,
+            "realised_rate": 0.689873417721519,
+            "roi": -0.016111075949367084,
+            "roi_ci_90": [
+              -0.05283769253772543,
+              0.016335747848610027
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.0058250719440407495,
+            "market_probability": 0.31595165422252175,
+            "n": 948,
+            "profitable": false,
+            "realised_rate": 0.310126582278481,
+            "roi": -0.060456012658227865,
+            "roi_ci_90": [
+              -0.12330117757118661,
+              0.011011590864890628
+            ],
+            "significant": false
+          }
+        },
+        "Clay": {
+          "favourite": {
+            "calibration_gap": 0.00868782083098707,
+            "market_probability": 0.6879691909961912,
+            "n": 16572,
+            "profitable": false,
+            "realised_rate": 0.6966570118271783,
+            "roi": -0.01740137702148202,
+            "roi_ci_90": [
+              -0.025703389353576675,
+              -0.009467532737074283
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008687820830987125,
+            "market_probability": 0.31203080900380875,
+            "n": 16572,
+            "profitable": false,
+            "realised_rate": 0.3033429881728216,
+            "roi": -0.0869413661597876,
+            "roi_ci_90": [
+              -0.1070378699359714,
+              -0.06510716232436219
+            ],
+            "significant": true
+          }
+        },
+        "Grass": {
+          "favourite": {
+            "calibration_gap": 0.015373288154990505,
+            "market_probability": 0.703002996163689,
+            "n": 5937,
+            "profitable": false,
+            "realised_rate": 0.7183762843186795,
+            "roi": -0.0071532322721913405,
+            "roi_ci_90": [
+              -0.021967051750663262,
+              0.005977022522026718
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.015373288154990505,
+            "market_probability": 0.29699700383631106,
+            "n": 5937,
+            "profitable": false,
+            "realised_rate": 0.28162371568132055,
+            "roi": -0.09767511874684184,
+            "roi_ci_90": [
+              -0.1392163272022976,
+              -0.05060810355438131
+            ],
+            "significant": true
+          }
+        },
+        "Hard": {
+          "favourite": {
+            "calibration_gap": 0.004797004967516005,
+            "market_probability": 0.6919928614215175,
+            "n": 28815,
+            "profitable": false,
+            "realised_rate": 0.6967898663890335,
+            "roi": -0.02473521776852334,
+            "roi_ci_90": [
+              -0.031039118002843143,
+              -0.018362288113158307
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.004797004967516061,
+            "market_probability": 0.30800713857848255,
+            "n": 28815,
+            "profitable": false,
+            "realised_rate": 0.3032101336109665,
+            "roi": -0.08169115738330732,
+            "roi_ci_90": [
+              -0.09874910130823485,
+              -0.06484959133995892
+            ],
+            "significant": true
+          }
+        }
+      },
+      "tier": {
+        "ATP250": {
+          "favourite": {
+            "calibration_gap": 0.004376992785241951,
+            "market_probability": 0.6641312945075757,
+            "n": 16471,
+            "profitable": false,
+            "realised_rate": 0.6685082872928176,
+            "roi": -0.02630325541861454,
+            "roi_ci_90": [
+              -0.0347566584615962,
+              -0.018233472234768552
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00437699278524184,
+            "market_probability": 0.33586870549242415,
+            "n": 16471,
+            "profitable": false,
+            "realised_rate": 0.3314917127071823,
+            "roi": -0.0649585295367616,
+            "roi_ci_90": [
+              -0.08468746980490546,
+              -0.045585600255047466
+            ],
+            "significant": true
+          }
+        },
+        "ATP500": {
+          "favourite": {
+            "calibration_gap": 0.009117015184093469,
+            "market_probability": 0.6922501401445179,
+            "n": 6071,
+            "profitable": false,
+            "realised_rate": 0.7013671553286114,
+            "roi": -0.020888641080546864,
+            "roi_ci_90": [
+              -0.0352544056942042,
+              -0.00682660450907559
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00911701518409358,
+            "market_probability": 0.30774985985548214,
+            "n": 6071,
+            "profitable": false,
+            "realised_rate": 0.29863284467138856,
+            "roi": -0.0901380398616373,
+            "roi_ci_90": [
+              -0.12236300604022271,
+              -0.05598118101251736
+            ],
+            "significant": true
+          }
+        },
+        "Grand Slam": {
+          "favourite": {
+            "calibration_gap": 0.021160889607875766,
+            "market_probability": 0.7464433393967123,
+            "n": 10026,
+            "profitable": false,
+            "realised_rate": 0.767604229004588,
+            "roi": 0.0005258707360861757,
+            "roi_ci_90": [
+              -0.0076607451557530026,
+              0.009013653260024764
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.02116088960787582,
+            "market_probability": 0.25355666060328774,
+            "n": 10026,
+            "profitable": false,
+            "realised_rate": 0.23239577099541192,
+            "roi": -0.18235235387991225,
+            "roi_ci_90": [
+              -0.20983783073040768,
+              -0.15439203988491276
+            ],
+            "significant": true
+          }
+        },
+        "International": {
+          "favourite": {
+            "calibration_gap": 0.013507643942672898,
+            "market_probability": 0.6831344526994237,
+            "n": 6105,
+            "profitable": false,
+            "realised_rate": 0.6966420966420966,
+            "roi": -0.00785186568386569,
+            "roi_ci_90": [
+              -0.02144873000503956,
+              0.005092282054651003
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.013507643942672898,
+            "market_probability": 0.31686554730057626,
+            "n": 6105,
+            "profitable": false,
+            "realised_rate": 0.30335790335790336,
+            "roi": -0.09151111875511878,
+            "roi_ci_90": [
+              -0.1287251556618405,
+              -0.051455954125900975
+            ],
+            "significant": true
+          }
+        },
+        "International Gold": {
+          "favourite": {
+            "calibration_gap": -0.00506006322112984,
+            "market_probability": 0.683214888247641,
+            "n": 1886,
+            "profitable": false,
+            "realised_rate": 0.6781548250265111,
+            "roi": -0.036982142099681876,
+            "roi_ci_90": [
+              -0.0567393529576884,
+              -0.01803450027334902
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.00506006322112984,
+            "market_probability": 0.316785111752359,
+            "n": 1886,
+            "profitable": false,
+            "realised_rate": 0.32184517497348886,
+            "roi": -0.058061643690349954,
+            "roi_ci_90": [
+              -0.11392063208657886,
+              -0.0030179969255436268
+            ],
+            "significant": true
+          }
+        },
+        "Masters": {
+          "favourite": {
+            "calibration_gap": 0.0020935382210917064,
+            "market_probability": 0.6848692124952407,
+            "n": 2792,
+            "profitable": false,
+            "realised_rate": 0.6869627507163324,
+            "roi": -0.024858631805157603,
+            "roi_ci_90": [
+              -0.0408372532729386,
+              -0.008660135363919077
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0020935382210917064,
+            "market_probability": 0.3151307875047593,
+            "n": 2792,
+            "profitable": false,
+            "realised_rate": 0.3130372492836676,
+            "roi": -0.03275413323782236,
+            "roi_ci_90": [
+              -0.0808505001667709,
+              0.01462344027814272
+            ],
+            "significant": false
+          }
+        },
+        "Masters 1000": {
+          "favourite": {
+            "calibration_gap": -0.003745984822622561,
+            "market_probability": 0.6906510231323509,
+            "n": 8614,
+            "profitable": false,
+            "realised_rate": 0.6869050383097284,
+            "roi": -0.03412102159275598,
+            "roi_ci_90": [
+              -0.04618056621336297,
+              -0.02219762867810132
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.00374598482262245,
+            "market_probability": 0.30934897686764923,
+            "n": 8614,
+            "profitable": false,
+            "realised_rate": 0.3130949616902717,
+            "roi": -0.02602598560482936,
+            "roi_ci_90": [
+              -0.05173012233757633,
+              0.0017619499305839628
+            ],
+            "significant": false
+          }
+        },
+        "Masters Cup": {
+          "favourite": {
+            "calibration_gap": -0.023147928709696064,
+            "market_probability": 0.7071870166575788,
+            "n": 307,
+            "profitable": false,
+            "realised_rate": 0.6840390879478827,
+            "roi": -0.07515224755700325,
+            "roi_ci_90": [
+              -0.15496322355521155,
+              -0.0010504310430669913
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.02314792870969601,
+            "market_probability": 0.29281298334242123,
+            "n": 307,
+            "profitable": false,
+            "realised_rate": 0.31596091205211724,
+            "roi": -0.008764820846905524,
+            "roi_ci_90": [
+              -0.20729550235602925,
+              0.19545558071407382
+            ],
+            "significant": false
+          }
+        }
+      }
+    }
+  },
+  "WTA_Bet365": {
+    "bettable_book": "B365",
+    "by_probability_decile": {
+      "0.5-0.6": {
+        "favourite": {
+          "calibration_gap": -0.004963649678778381,
+          "market_probability": 0.5524064491404204,
+          "n": 11888,
+          "profitable": false,
+          "realised_rate": 0.547442799461642,
+          "roi": -0.08357087819650066,
+          "roi_ci_90": [
+            -0.09632046464506097,
+            -0.07091099271756499
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": 0.004963649678778326,
+          "market_probability": 0.4475935508595797,
+          "n": 11888,
+          "profitable": false,
+          "realised_rate": 0.452557200538358,
+          "roi": -0.0594624831763122,
+          "roi_ci_90": [
+            -0.0746367538405741,
+            -0.043607571105280116
+          ],
+          "significant": true
+        }
+      },
+      "0.6-0.7": {
+        "favourite": {
+          "calibration_gap": 0.003332167588997126,
+          "market_probability": 0.6481382967238031,
+          "n": 11867,
+          "profitable": false,
+          "realised_rate": 0.6514704643128002,
+          "roi": -0.058052977163562794,
+          "roi_ci_90": [
+            -0.0672729440760143,
+            -0.048116733308844334
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.0033321675889970703,
+          "market_probability": 0.35186170327619687,
+          "n": 11867,
+          "profitable": false,
+          "realised_rate": 0.3485295356871998,
+          "roi": -0.08653973202999916,
+          "roi_ci_90": [
+            -0.104387795897702,
+            -0.06920756796479001
+          ],
+          "significant": true
+        }
+      },
+      "0.7-0.8": {
+        "favourite": {
+          "calibration_gap": 0.012204785298291831,
+          "market_probability": 0.7471881249118546,
+          "n": 9422,
+          "profitable": false,
+          "realised_rate": 0.7593929102101464,
+          "roi": -0.03907469751645082,
+          "roi_ci_90": [
+            -0.0480103676004624,
+            -0.0297970264242398
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.01220478529829197,
+          "market_probability": 0.2528118750881455,
+          "n": 9422,
+          "profitable": false,
+          "realised_rate": 0.24060708978985354,
+          "roi": -0.13141178093822967,
+          "roi_ci_90": [
+            -0.15824113257609243,
+            -0.10550560290465381
+          ],
+          "significant": true
+        }
+      },
+      "0.8-0.9": {
+        "favourite": {
+          "calibration_gap": 0.019125620011965494,
+          "market_probability": 0.8451513940823446,
+          "n": 5747,
+          "profitable": false,
+          "realised_rate": 0.8642770140943101,
+          "roi": -0.0257312441273708,
+          "roi_ci_90": [
+            -0.03439987211927939,
+            -0.016928600094591073
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.01912562001196541,
+          "market_probability": 0.15484860591765534,
+          "n": 5747,
+          "profitable": false,
+          "realised_rate": 0.13572298590568993,
+          "roi": -0.24570381068383504,
+          "roi_ci_90": [
+            -0.2900727335581579,
+            -0.20228949261542048
+          ],
+          "significant": true
+        }
+      },
+      "0.9-1.0": {
+        "favourite": {
+          "calibration_gap": 0.029490270620196934,
+          "market_probability": 0.9288864203267333,
+          "n": 1922,
+          "profitable": false,
+          "realised_rate": 0.9583766909469302,
+          "roi": -0.0006631841831425329,
+          "roi_ci_90": [
+            -0.00797101783893983,
+            0.00693571002597405
+          ],
+          "significant": false
+        },
+        "underdog": {
+          "calibration_gap": -0.02949027062019701,
+          "market_probability": 0.07111357967326673,
+          "n": 1922,
+          "profitable": false,
+          "realised_rate": 0.04162330905306972,
+          "roi": -0.5678043704474506,
+          "roi_ci_90": [
+            -0.6452648120273405,
+            -0.49137138547768094
+          ],
+          "significant": true
+        }
+      }
+    },
+    "calibration_is_self_referential": false,
+    "matches_usable": 40846,
+    "multiplicity": {
+      "cells_examined": 64,
+      "cells_profitable": 0,
+      "cells_with_interval_excluding_zero": 61,
+      "expected_by_chance_at_90pct": 6.4
+    },
+    "odds_haircut": 0.02,
+    "reference_book": "Pinnacle (devigged)",
+    "segments": {
+      "best_of": {
+        "Bo3": {
+          "favourite": {
+            "calibration_gap": 0.00643467000958331,
+            "market_probability": 0.6840537618670234,
+            "n": 40845,
+            "profitable": false,
+            "realised_rate": 0.6904884318766067,
+            "roi": -0.05383080377035131,
+            "roi_ci_90": [
+              -0.05864733952479414,
+              -0.04891468661205396
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00643467000958331,
+            "market_probability": 0.3159462381329766,
+            "n": 40845,
+            "profitable": false,
+            "realised_rate": 0.3095115681233933,
+            "roi": -0.13409508140531276,
+            "roi_ci_90": [
+              -0.14519511639190416,
+              -0.12307584388012717
+            ],
+            "significant": true
+          }
+        }
+      },
+      "era": {
+        "2000_2014": {
+          "favourite": {
+            "calibration_gap": 0.008080009071481209,
+            "market_probability": 0.7004949446607828,
+            "n": 16210,
+            "profitable": false,
+            "realised_rate": 0.708574953732264,
+            "roi": -0.055173888957433664,
+            "roi_ci_90": [
+              -0.06234825225203873,
+              -0.04793387275114909
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00808000907148132,
+            "market_probability": 0.2995050553392173,
+            "n": 16210,
+            "profitable": false,
+            "realised_rate": 0.29142504626773597,
+            "roi": -0.15067322640345468,
+            "roi_ci_90": [
+              -0.16906997912040972,
+              -0.13266240534944532
+            ],
+            "significant": true
+          }
+        },
+        "2015_2026": {
+          "favourite": {
+            "calibration_gap": 0.005323378136462553,
+            "market_probability": 0.6732364530049565,
+            "n": 24636,
+            "profitable": false,
+            "realised_rate": 0.678559831141419,
+            "roi": -0.05298548628024028,
+            "roi_ci_90": [
+              -0.05964037698789575,
+              -0.04606116236682173
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005323378136462498,
+            "market_probability": 0.32676354699504345,
+            "n": 24636,
+            "profitable": false,
+            "realised_rate": 0.32144016885858095,
+            "roi": -0.12311193375547977,
+            "roi_ci_90": [
+              -0.13695096476902696,
+              -0.10972992874749724
+            ],
+            "significant": true
+          }
+        }
+      },
+      "hash_control": {
+        "hash_0": {
+          "favourite": {
+            "calibration_gap": 0.005498964666005746,
+            "market_probability": 0.6834816703482477,
+            "n": 10173,
+            "profitable": false,
+            "realised_rate": 0.6889806350142534,
+            "roi": -0.05621753465054554,
+            "roi_ci_90": [
+              -0.06748770008453019,
+              -0.04524836353572391
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005498964666005635,
+            "market_probability": 0.3165183296517522,
+            "n": 10173,
+            "profitable": false,
+            "realised_rate": 0.31101936498574656,
+            "roi": -0.1334315147940627,
+            "roi_ci_90": [
+              -0.15814590497073744,
+              -0.10924349217647453
+            ],
+            "significant": true
+          }
+        },
+        "hash_1": {
+          "favourite": {
+            "calibration_gap": 0.003946356772257187,
+            "market_probability": 0.6844280274641961,
+            "n": 10150,
+            "profitable": false,
+            "realised_rate": 0.6883743842364533,
+            "roi": -0.05740772610837436,
+            "roi_ci_90": [
+              -0.06781115675084383,
+              -0.04644471042113755
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003946356772257131,
+            "market_probability": 0.31557197253580394,
+            "n": 10150,
+            "profitable": false,
+            "realised_rate": 0.3116256157635468,
+            "roi": -0.1304936945812808,
+            "roi_ci_90": [
+              -0.1544169586925982,
+              -0.10733033837141277
+            ],
+            "significant": true
+          }
+        },
+        "hash_2": {
+          "favourite": {
+            "calibration_gap": 0.009130885159589153,
+            "market_probability": 0.6847702613863209,
+            "n": 10379,
+            "profitable": false,
+            "realised_rate": 0.6939011465459101,
+            "roi": -0.04897193178533576,
+            "roi_ci_90": [
+              -0.060471067622865075,
+              -0.037312687188481665
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.009130885159589042,
+            "market_probability": 0.31522973861367903,
+            "n": 10379,
+            "profitable": false,
+            "realised_rate": 0.30609885345409,
+            "roi": -0.13714708546102708,
+            "roi_ci_90": [
+              -0.16209611294589457,
+              -0.11201542165188018
+            ],
+            "significant": true
+          }
+        },
+        "hash_3": {
+          "favourite": {
+            "calibration_gap": 0.007034478012770462,
+            "market_probability": 0.6835215156780813,
+            "n": 10144,
+            "profitable": false,
+            "realised_rate": 0.6905559936908517,
+            "roi": -0.05292291995268136,
+            "roi_ci_90": [
+              -0.06316836938421579,
+              -0.04243054968136333
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0070344780127704065,
+            "market_probability": 0.31647848432191866,
+            "n": 10144,
+            "profitable": false,
+            "realised_rate": 0.30944400630914826,
+            "roi": -0.13505906940063092,
+            "roi_ci_90": [
+              -0.1581753336809626,
+              -0.11239457992605442
+            ],
+            "significant": true
+          }
+        }
+      },
+      "rank_gap": {
+        "gap_0_10": {
+          "favourite": {
+            "calibration_gap": 0.006332620689247115,
+            "market_probability": 0.6170792038067718,
+            "n": 5903,
+            "profitable": false,
+            "realised_rate": 0.623411824496019,
+            "roi": -0.057941250211756716,
+            "roi_ci_90": [
+              -0.07291716845990368,
+              -0.042462867304217534
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00633262068924717,
+            "market_probability": 0.3829207961932282,
+            "n": 5903,
+            "profitable": false,
+            "realised_rate": 0.37658817550398105,
+            "roi": -0.10182205658139927,
+            "roi_ci_90": [
+              -0.12681116372596138,
+              -0.0773294156330453
+            ],
+            "significant": true
+          }
+        },
+        "gap_10_30": {
+          "favourite": {
+            "calibration_gap": 0.003047549138557204,
+            "market_probability": 0.6436722664411182,
+            "n": 10411,
+            "profitable": false,
+            "realised_rate": 0.6467198155796754,
+            "roi": -0.060756161751993054,
+            "roi_ci_90": [
+              -0.07101235892252608,
+              -0.05027022198298371
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003047549138557093,
+            "market_probability": 0.35632773355888175,
+            "n": 10411,
+            "profitable": false,
+            "realised_rate": 0.35328018442032466,
+            "roi": -0.09439930842378252,
+            "roi_ci_90": [
+              -0.11664505899263727,
+              -0.07318415371480728
+            ],
+            "significant": true
+          }
+        },
+        "gap_30_80": {
+          "favourite": {
+            "calibration_gap": 0.008408852201023165,
+            "market_probability": 0.6945200180918638,
+            "n": 14579,
+            "profitable": false,
+            "realised_rate": 0.702928870292887,
+            "roi": -0.05119316962754645,
+            "roi_ci_90": [
+              -0.059298399864006,
+              -0.04317809013247909
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00840885220102322,
+            "market_probability": 0.3054799819081362,
+            "n": 14579,
+            "profitable": false,
+            "realised_rate": 0.29707112970711297,
+            "roi": -0.1419600384114137,
+            "roi_ci_90": [
+              -0.16049364162325258,
+              -0.12270909923617758
+            ],
+            "significant": true
+          }
+        },
+        "gap_80_plus": {
+          "favourite": {
+            "calibration_gap": 0.006992740724827917,
+            "market_probability": 0.7499927783451292,
+            "n": 9806,
+            "profitable": false,
+            "realised_rate": 0.7569855190699571,
+            "roi": -0.04837984499286149,
+            "roi_ci_90": [
+              -0.05681461821052348,
+              -0.039665908046167084
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006992740724827778,
+            "market_probability": 0.2500072216548706,
+            "n": 9806,
+            "profitable": false,
+            "realised_rate": 0.24301448093004283,
+            "roi": -0.18276308382622883,
+            "roi_ci_90": [
+              -0.21097613937458004,
+              -0.15580124179381125
+            ],
+            "significant": true
+          }
+        }
+      },
+      "round_stage": {
+        "early": {
+          "favourite": {
+            "calibration_gap": 0.00852699042255578,
+            "market_probability": 0.6874582182409413,
+            "n": 30288,
+            "profitable": false,
+            "realised_rate": 0.6959852086634971,
+            "roi": -0.05193790874273638,
+            "roi_ci_90": [
+              -0.057559235487618335,
+              -0.046098371954715375
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008526990422555725,
+            "market_probability": 0.3125417817590586,
+            "n": 30288,
+            "profitable": false,
+            "realised_rate": 0.3040147913365029,
+            "roi": -0.14597088615953513,
+            "roi_ci_90": [
+              -0.15871210745219574,
+              -0.13239246424269002
+            ],
+            "significant": true
+          }
+        },
+        "late": {
+          "favourite": {
+            "calibration_gap": 0.00036542952265894435,
+            "market_probability": 0.6742888610626792,
+            "n": 10558,
+            "profitable": false,
+            "realised_rate": 0.6746542905853381,
+            "roi": -0.059350615646902805,
+            "roi_ci_90": [
+              -0.07007277383177568,
+              -0.048078488703640114
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00036542952265905537,
+            "market_probability": 0.3257111389373209,
+            "n": 10558,
+            "profitable": false,
+            "realised_rate": 0.32534570941466184,
+            "roi": -0.09985152491002082,
+            "roi_ci_90": [
+              -0.12226367320572008,
+              -0.07725246333224386
+            ],
+            "significant": true
+          }
+        }
+      },
+      "surface": {
+        "Clay": {
+          "favourite": {
+            "calibration_gap": 0.005387102713334313,
+            "market_probability": 0.6846120067354144,
+            "n": 11229,
+            "profitable": false,
+            "realised_rate": 0.6899991094487488,
+            "roi": -0.05664588654377057,
+            "roi_ci_90": [
+              -0.06513883715018234,
+              -0.04787396091518491
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005387102713334313,
+            "market_probability": 0.31538799326458555,
+            "n": 11229,
+            "profitable": false,
+            "realised_rate": 0.31000089055125124,
+            "roi": -0.13779454982634248,
+            "roi_ci_90": [
+              -0.15769888716323124,
+              -0.1188116548660618
+            ],
+            "significant": true
+          }
+        },
+        "Grass": {
+          "favourite": {
+            "calibration_gap": -0.0022405683407358268,
+            "market_probability": 0.6876834665072921,
+            "n": 4527,
+            "profitable": false,
+            "realised_rate": 0.6854428981665562,
+            "roi": -0.0619426728517782,
+            "roi_ci_90": [
+              -0.07865918084099263,
+              -0.04459420751636105
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.0022405683407358823,
+            "market_probability": 0.3123165334927079,
+            "n": 4527,
+            "profitable": false,
+            "realised_rate": 0.31455710183344376,
+            "roi": -0.0994150209851999,
+            "roi_ci_90": [
+              -0.13713658098068834,
+              -0.06400081803060087
+            ],
+            "significant": true
+          }
+        },
+        "Hard": {
+          "favourite": {
+            "calibration_gap": 0.008629258593266909,
+            "market_probability": 0.6829812643454563,
+            "n": 24936,
+            "profitable": false,
+            "realised_rate": 0.6916105229387232,
+            "roi": -0.05090673885145972,
+            "roi_ci_90": [
+              -0.05759529729694352,
+              -0.04458695111688209
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008629258593266964,
+            "market_probability": 0.31701873565454386,
+            "n": 24936,
+            "profitable": false,
+            "realised_rate": 0.3083894770612769,
+            "roi": -0.13889893326916908,
+            "roi_ci_90": [
+              -0.15183744289131865,
+              -0.12530135600444514
+            ],
+            "significant": true
+          }
+        }
+      },
+      "tier": {
+        "Grand Slam": {
+          "favourite": {
+            "calibration_gap": 0.006013451437238415,
+            "market_probability": 0.7219293927451158,
+            "n": 8818,
+            "profitable": false,
+            "realised_rate": 0.7279428441823542,
+            "roi": -0.05043156724880924,
+            "roi_ci_90": [
+              -0.05984652306342029,
+              -0.04078782173298656
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006013451437238582,
+            "market_probability": 0.2780706072548843,
+            "n": 8818,
+            "profitable": false,
+            "realised_rate": 0.2720571558176457,
+            "roi": -0.1582958947607167,
+            "roi_ci_90": [
+              -0.18305534771093554,
+              -0.13276926935732156
+            ],
+            "significant": true
+          }
+        },
+        "International": {
+          "favourite": {
+            "calibration_gap": 0.002778355642263808,
+            "market_probability": 0.6697696975859274,
+            "n": 10145,
+            "profitable": false,
+            "realised_rate": 0.6725480532281912,
+            "roi": -0.06588178413011332,
+            "roi_ci_90": [
+              -0.07535053567574386,
+              -0.056591150536803934
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0027783556422637523,
+            "market_probability": 0.33023030241407253,
+            "n": 10145,
+            "profitable": false,
+            "realised_rate": 0.3274519467718088,
+            "roi": -0.11661805815672746,
+            "roi_ci_90": [
+              -0.13654231091585517,
+              -0.09529186185801615
+            ],
+            "significant": true
+          }
+        },
+        "Premier": {
+          "favourite": {
+            "calibration_gap": 0.008693389015652642,
+            "market_probability": 0.6745640268270315,
+            "n": 9001,
+            "profitable": false,
+            "realised_rate": 0.6832574158426842,
+            "roi": -0.055917778024663904,
+            "roi_ci_90": [
+              -0.06805104088140607,
+              -0.04416362663662032
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008693389015652642,
+            "market_probability": 0.3254359731729685,
+            "n": 9001,
+            "profitable": false,
+            "realised_rate": 0.3167425841573159,
+            "roi": -0.12798469058993445,
+            "roi_ci_90": [
+              -0.15296571248723154,
+              -0.10216106893740072
+            ],
+            "significant": true
+          }
+        },
+        "Tier 1": {
+          "favourite": {
+            "calibration_gap": 0.017077768055503872,
+            "market_probability": 0.712046468197042,
+            "n": 982,
+            "profitable": false,
+            "realised_rate": 0.7291242362525459,
+            "roi": -0.036823421588594675,
+            "roi_ci_90": [
+              -0.06912623418667638,
+              -0.011131690755796418
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.01707776805550376,
+            "market_probability": 0.28795353180295796,
+            "n": 982,
+            "profitable": false,
+            "realised_rate": 0.2708757637474542,
+            "roi": -0.2076285132382892,
+            "roi_ci_90": [
+              -0.2618779940818278,
+              -0.14270260892526151
+            ],
+            "significant": true
+          }
+        },
+        "Tier 2": {
+          "favourite": {
+            "calibration_gap": 0.021534487019194137,
+            "market_probability": 0.7062832587841632,
+            "n": 834,
+            "profitable": false,
+            "realised_rate": 0.7278177458033573,
+            "roi": -0.035431175059952004,
+            "roi_ci_90": [
+              -0.07109202196382428,
+              -0.003175525106126091
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.021534487019194193,
+            "market_probability": 0.29371674121583685,
+            "n": 834,
+            "profitable": false,
+            "realised_rate": 0.27218225419664266,
+            "roi": -0.19713717026378896,
+            "roi_ci_90": [
+              -0.2802227617057563,
+              -0.10941975520975153
+            ],
+            "significant": true
+          }
+        },
+        "Tier 3": {
+          "favourite": {
+            "calibration_gap": -0.009258331803174591,
+            "market_probability": 0.6993573417041646,
+            "n": 1010,
+            "profitable": false,
+            "realised_rate": 0.69009900990099,
+            "roi": -0.07368217821782176,
+            "roi_ci_90": [
+              -0.09303451016272314,
+              -0.053239112166998365
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.009258331803174535,
+            "market_probability": 0.30064265829583536,
+            "n": 1010,
+            "profitable": false,
+            "realised_rate": 0.3099009900990099,
+            "roi": -0.12017564356435644,
+            "roi_ci_90": [
+              -0.17266399469836935,
+              -0.06394912819087274
+            ],
+            "significant": true
+          }
+        },
+        "Tier 4": {
+          "favourite": {
+            "calibration_gap": 0.019647747570364582,
+            "market_probability": 0.6784090536254501,
+            "n": 669,
+            "profitable": false,
+            "realised_rate": 0.6980568011958147,
+            "roi": -0.04150343796711509,
+            "roi_ci_90": [
+              -0.07734655335932168,
+              0.003100733222914388
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.01964774757036447,
+            "market_probability": 0.3215909463745498,
+            "n": 669,
+            "profitable": false,
+            "realised_rate": 0.30194319880418535,
+            "roi": -0.22872615844544092,
+            "roi_ci_90": [
+              -0.3227550906698077,
+              -0.1559709640369004
+            ],
+            "significant": true
+          }
+        },
+        "Tour Championships": {
+          "favourite": {
+            "calibration_gap": -0.03612209101075681,
+            "market_probability": 0.650579922336058,
+            "n": 332,
+            "profitable": false,
+            "realised_rate": 0.6144578313253012,
+            "roi": -0.11872831325301203,
+            "roi_ci_90": [
+              -0.18417595022684932,
+              -0.05988591869669577
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.03612209101075681,
+            "market_probability": 0.349420077663942,
+            "n": 332,
+            "profitable": false,
+            "realised_rate": 0.3855421686746988,
+            "roi": -0.033807831325301206,
+            "roi_ci_90": [
+              -0.1416422858141858,
+              0.07670964260772793
+            ],
+            "significant": false
+          }
+        },
+        "WTA1000": {
+          "favourite": {
+            "calibration_gap": -0.0007939982596104622,
+            "market_probability": 0.6735644289140696,
+            "n": 2949,
+            "profitable": false,
+            "realised_rate": 0.6727704306544592,
+            "roi": -0.05417212614445573,
+            "roi_ci_90": [
+              -0.07307535422429362,
+              -0.034532246525371874
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.0007939982596106288,
+            "market_probability": 0.32643557108593024,
+            "n": 2949,
+            "profitable": false,
+            "realised_rate": 0.32722956934554087,
+            "roi": -0.09318799593082402,
+            "roi_ci_90": [
+              -0.13107716347057355,
+              -0.058886792340545856
+            ],
+            "significant": true
+          }
+        },
+        "WTA250": {
+          "favourite": {
+            "calibration_gap": 0.010578820663577293,
+            "market_probability": 0.6636188686817373,
+            "n": 3895,
+            "profitable": false,
+            "realised_rate": 0.6741976893453145,
+            "roi": -0.038613247753530144,
+            "roi_ci_90": [
+              -0.05713362027137637,
+              -0.018971227713724385
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010578820663577182,
+            "market_probability": 0.3363811313182627,
+            "n": 3895,
+            "profitable": false,
+            "realised_rate": 0.3258023106546855,
+            "roi": -0.12636636713735558,
+            "roi_ci_90": [
+              -0.16174814716833583,
+              -0.09234051134368433
+            ],
+            "significant": true
+          }
+        },
+        "WTA500": {
+          "favourite": {
+            "calibration_gap": 0.01836337680238942,
+            "market_probability": 0.6663048154172903,
+            "n": 2185,
+            "profitable": false,
+            "realised_rate": 0.6846681922196797,
+            "roi": -0.02774105263157893,
+            "roi_ci_90": [
+              -0.05041505578880071,
+              -0.00539557052661077
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.01836337680238931,
+            "market_probability": 0.3336951845827097,
+            "n": 2185,
+            "profitable": false,
+            "realised_rate": 0.3153318077803204,
+            "roi": -0.15148988558352403,
+            "roi_ci_90": [
+              -0.1958325896878143,
+              -0.10691821772315972
+            ],
+            "significant": true
+          }
+        }
+      }
+    }
+  },
+  "WTA_Pinnacle": {
+    "bettable_book": "Pinnacle",
+    "by_probability_decile": {
+      "0.5-0.6": {
+        "favourite": {
+          "calibration_gap": -0.0052103900514145485,
+          "market_probability": 0.5523881137786644,
+          "n": 11923,
+          "profitable": false,
+          "realised_rate": 0.5471777237272498,
+          "roi": -0.043152439822192405,
+          "roi_ci_90": [
+            -0.056733513412778463,
+            -0.029955424396130283
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": 0.005210390051414493,
+          "market_probability": 0.44761188622133563,
+          "n": 11923,
+          "profitable": false,
+          "realised_rate": 0.4528222762727501,
+          "roi": -0.0253021202717437,
+          "roi_ci_90": [
+            -0.04096035203626221,
+            -0.008989933919238784
+          ],
+          "significant": true
+        }
+      },
+      "0.6-0.7": {
+        "favourite": {
+          "calibration_gap": 0.003254759970324983,
+          "market_probability": 0.6481661245092446,
+          "n": 11894,
+          "profitable": false,
+          "realised_rate": 0.6514208844795696,
+          "roi": -0.026424178577434,
+          "roi_ci_90": [
+            -0.03616133231265115,
+            -0.016146937180214427
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.003254759970324872,
+          "market_probability": 0.35183387549075534,
+          "n": 11894,
+          "profitable": false,
+          "realised_rate": 0.34857911552043047,
+          "roi": -0.04636357827476039,
+          "roi_ci_90": [
+            -0.06467783771815779,
+            -0.029002734894650786
+          ],
+          "significant": true
+        }
+      },
+      "0.7-0.8": {
+        "favourite": {
+          "calibration_gap": 0.01196345351161654,
+          "market_probability": 0.7471899856418226,
+          "n": 9450,
+          "profitable": false,
+          "realised_rate": 0.7591534391534391,
+          "roi": -0.013445701587301566,
+          "roi_ci_90": [
+            -0.02262683889598961,
+            -0.003949247877981345
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.011963453511616567,
+          "market_probability": 0.2528100143581774,
+          "n": 9450,
+          "profitable": false,
+          "realised_rate": 0.24084656084656084,
+          "roi": -0.08501299470899472,
+          "roi_ci_90": [
+            -0.11249099314317439,
+            -0.05815192581878521
+          ],
+          "significant": true
+        }
+      },
+      "0.8-0.9": {
+        "favourite": {
+          "calibration_gap": 0.01902573593747825,
+          "market_probability": 0.8451075279875608,
+          "n": 5763,
+          "profitable": false,
+          "realised_rate": 0.8641332639250391,
+          "roi": -0.004194901960784344,
+          "roi_ci_90": [
+            -0.012950853989473893,
+            0.004646156521301234
+          ],
+          "significant": false
+        },
+        "underdog": {
+          "calibration_gap": -0.019025735937478222,
+          "market_probability": 0.1548924720124392,
+          "n": 5763,
+          "profitable": false,
+          "realised_rate": 0.13586673607496097,
+          "roi": -0.17046739545375675,
+          "roi_ci_90": [
+            -0.21893601381994912,
+            -0.12322003428055636
+          ],
+          "significant": true
+        }
+      },
+      "0.9-1.0": {
+        "favourite": {
+          "calibration_gap": 0.029614392859564687,
+          "market_probability": 0.9290632930908486,
+          "n": 1936,
+          "profitable": true,
+          "realised_rate": 0.9586776859504132,
+          "roi": 0.00833473140495869,
+          "roi_ci_90": [
+            0.0008302529347948997,
+            0.01620252018453417
+          ],
+          "significant": true
+        },
+        "underdog": {
+          "calibration_gap": -0.0296143928595647,
+          "market_probability": 0.07093670690915148,
+          "n": 1936,
+          "profitable": false,
+          "realised_rate": 0.04132231404958678,
+          "roi": -0.46286652892561986,
+          "roi_ci_90": [
+            -0.5606547659437673,
+            -0.36618207846809836
+          ],
+          "significant": true
+        }
+      }
+    },
+    "calibration_is_self_referential": true,
+    "matches_usable": 40966,
+    "multiplicity": {
+      "cells_examined": 64,
+      "cells_profitable": 1,
+      "cells_with_interval_excluding_zero": 57,
+      "expected_by_chance_at_90pct": 6.4
+    },
+    "odds_haircut": 0.02,
+    "reference_book": "Pinnacle (devigged)",
+    "segments": {
+      "best_of": {
+        "Bo3": {
+          "favourite": {
+            "calibration_gap": 0.006281519753336684,
+            "market_probability": 0.6841127192311622,
+            "n": 40965,
+            "profitable": false,
+            "realised_rate": 0.6903942389844989,
+            "roi": -0.02350535286219944,
+            "roi_ci_90": [
+              -0.028548130966429906,
+              -0.018392754223683094
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006281519753336684,
+            "market_probability": 0.3158872807688377,
+            "n": 40965,
+            "profitable": false,
+            "realised_rate": 0.309605761015501,
+            "roi": -0.08634800390577324,
+            "roi_ci_90": [
+              -0.09780415058555128,
+              -0.07507600273462461
+            ],
+            "significant": true
+          }
+        }
+      },
+      "era": {
+        "2000_2014": {
+          "favourite": {
+            "calibration_gap": 0.007716831998216378,
+            "market_probability": 0.7005781271716737,
+            "n": 16287,
+            "profitable": false,
+            "realised_rate": 0.70829495916989,
+            "roi": -0.01753615644378953,
+            "roi_ci_90": [
+              -0.025271437850129187,
+              -0.00970379482675382
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.007716831998216378,
+            "market_probability": 0.2994218728283263,
+            "n": 16287,
+            "profitable": false,
+            "realised_rate": 0.2917050408301099,
+            "roi": -0.09119767790262173,
+            "roi_ci_90": [
+              -0.10969476495509833,
+              -0.0719613621798472
+            ],
+            "significant": true
+          }
+        },
+        "2015_2026": {
+          "favourite": {
+            "calibration_gap": 0.005305644808041743,
+            "market_probability": 0.6732469707760581,
+            "n": 24679,
+            "profitable": false,
+            "realised_rate": 0.6785526155840998,
+            "roi": -0.027484314599457032,
+            "roi_ci_90": [
+              -0.034044499215096384,
+              -0.02080130883633556
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005305644808041687,
+            "market_probability": 0.32675302922394184,
+            "n": 24679,
+            "profitable": false,
+            "realised_rate": 0.32144738441590015,
+            "roi": -0.08305340572956765,
+            "roi_ci_90": [
+              -0.09762135291567937,
+              -0.06876255232529133
+            ],
+            "significant": true
+          }
+        }
+      },
+      "hash_control": {
+        "hash_0": {
+          "favourite": {
+            "calibration_gap": 0.005450433748546146,
+            "market_probability": 0.683519001988131,
+            "n": 10208,
+            "profitable": false,
+            "realised_rate": 0.6889694357366771,
+            "roi": -0.025660862068965517,
+            "roi_ci_90": [
+              -0.037165182532593655,
+              -0.014305579136957814
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005450433748546202,
+            "market_probability": 0.3164809980118691,
+            "n": 10208,
+            "profitable": false,
+            "realised_rate": 0.3110305642633229,
+            "roi": -0.08245119905956114,
+            "roi_ci_90": [
+              -0.10987491827516221,
+              -0.05553513521733259
+            ],
+            "significant": true
+          }
+        },
+        "hash_1": {
+          "favourite": {
+            "calibration_gap": 0.003930729444448389,
+            "market_probability": 0.6844779149563375,
+            "n": 10180,
+            "profitable": false,
+            "realised_rate": 0.6884086444007859,
+            "roi": -0.027315304518664044,
+            "roi_ci_90": [
+              -0.03801564728881267,
+              -0.01614765762118621
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.003930729444448333,
+            "market_probability": 0.31552208504366247,
+            "n": 10180,
+            "profitable": false,
+            "realised_rate": 0.31159135559921414,
+            "roi": -0.08383769155206287,
+            "roi_ci_90": [
+              -0.10914751132027208,
+              -0.05951888840773518
+            ],
+            "significant": true
+          }
+        },
+        "hash_2": {
+          "favourite": {
+            "calibration_gap": 0.009055986673626282,
+            "market_probability": 0.6848921401275264,
+            "n": 10410,
+            "profitable": false,
+            "realised_rate": 0.6939481268011527,
+            "roi": -0.018427050912584057,
+            "roi_ci_90": [
+              -0.03063716242394314,
+              -0.00637497328081849
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.009055986673626337,
+            "market_probability": 0.3151078598724736,
+            "n": 10410,
+            "profitable": false,
+            "realised_rate": 0.30605187319884725,
+            "roi": -0.09250640537944284,
+            "roi_ci_90": [
+              -0.11866256369172831,
+              -0.06540690511932834
+            ],
+            "significant": true
+          }
+        },
+        "hash_3": {
+          "favourite": {
+            "calibration_gap": 0.006559439049027893,
+            "market_probability": 0.6835467765292569,
+            "n": 10168,
+            "profitable": false,
+            "realised_rate": 0.6901062155782848,
+            "roi": -0.02282211841070024,
+            "roi_ci_90": [
+              -0.03338233913087943,
+              -0.011990764787088846
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006559439049028004,
+            "market_probability": 0.3164532234707432,
+            "n": 10168,
+            "profitable": false,
+            "realised_rate": 0.30989378442171517,
+            "roi": -0.08624020062942565,
+            "roi_ci_90": [
+              -0.11051679186629836,
+              -0.06235328789098302
+            ],
+            "significant": true
+          }
+        }
+      },
+      "rank_gap": {
+        "gap_0_10": {
+          "favourite": {
+            "calibration_gap": 0.006088953187789459,
+            "market_probability": 0.6170529387041024,
+            "n": 5920,
+            "profitable": false,
+            "realised_rate": 0.6231418918918918,
+            "roi": -0.02342210135135135,
+            "roi_ci_90": [
+              -0.038492838248217295,
+              -0.0073821089698955416
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006088953187789514,
+            "market_probability": 0.3829470612958976,
+            "n": 5920,
+            "profitable": false,
+            "realised_rate": 0.3768581081081081,
+            "roi": -0.06042655405405407,
+            "roi_ci_90": [
+              -0.08635644465237612,
+              -0.035038166855815164
+            ],
+            "significant": true
+          }
+        },
+        "gap_10_30": {
+          "favourite": {
+            "calibration_gap": 0.0028251374893007997,
+            "market_probability": 0.6436869361021136,
+            "n": 10436,
+            "profitable": false,
+            "realised_rate": 0.6465120735914144,
+            "roi": -0.028071958604829434,
+            "roi_ci_90": [
+              -0.038510706311943144,
+              -0.017482427896484652
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0028251374893007997,
+            "market_probability": 0.3563130638978865,
+            "n": 10436,
+            "profitable": false,
+            "realised_rate": 0.3534879264085857,
+            "roi": -0.0499760444614795,
+            "roi_ci_90": [
+              -0.07370150245538705,
+              -0.02747792172266074
+            ],
+            "significant": true
+          }
+        },
+        "gap_30_80": {
+          "favourite": {
+            "calibration_gap": 0.008616002057710181,
+            "market_probability": 0.6945506760080856,
+            "n": 14621,
+            "profitable": false,
+            "realised_rate": 0.7031666780657958,
+            "roi": -0.020321640106695852,
+            "roi_ci_90": [
+              -0.028763541174827503,
+              -0.012088188541724538
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008616002057710181,
+            "market_probability": 0.30544932399191443,
+            "n": 14621,
+            "profitable": false,
+            "realised_rate": 0.29683332193420425,
+            "roi": -0.09561956227344232,
+            "roi_ci_90": [
+              -0.11515407186703172,
+              -0.07563120879717154
+            ],
+            "significant": true
+          }
+        },
+        "gap_80_plus": {
+          "favourite": {
+            "calibration_gap": 0.0064222983784697485,
+            "market_probability": 0.7501065096694929,
+            "n": 9841,
+            "profitable": false,
+            "realised_rate": 0.7565288080479626,
+            "roi": -0.023797036886495277,
+            "roi_ci_90": [
+              -0.032381594194468045,
+              -0.014666352489977502
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.006422298378469776,
+            "market_probability": 0.24989349033050717,
+            "n": 9841,
+            "profitable": false,
+            "realised_rate": 0.2434711919520374,
+            "roi": -0.12524509297835584,
+            "roi_ci_90": [
+              -0.15689828066120498,
+              -0.09403077648752872
+            ],
+            "significant": true
+          }
+        }
+      },
+      "round_stage": {
+        "early": {
+          "favourite": {
+            "calibration_gap": 0.008328551038730425,
+            "market_probability": 0.6875138277521387,
+            "n": 30402,
+            "profitable": false,
+            "realised_rate": 0.6958423787908691,
+            "roi": -0.02184870337477798,
+            "roi_ci_90": [
+              -0.02756744930022675,
+              -0.01602214107509841
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008328551038730259,
+            "market_probability": 0.31248617224786124,
+            "n": 30402,
+            "profitable": false,
+            "realised_rate": 0.304157621209131,
+            "roi": -0.09821128873100456,
+            "roi_ci_90": [
+              -0.1116937732458791,
+              -0.08422069001893323
+            ],
+            "significant": true
+          }
+        },
+        "late": {
+          "favourite": {
+            "calibration_gap": 0.00032349889181482183,
+            "market_probability": 0.6743262549892908,
+            "n": 10564,
+            "profitable": false,
+            "realised_rate": 0.6746497538811056,
+            "roi": -0.02836543922756532,
+            "roi_ci_90": [
+              -0.03955036050299265,
+              -0.01672329349505901
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00032349889181482183,
+            "market_probability": 0.32567374501070917,
+            "n": 10564,
+            "profitable": false,
+            "realised_rate": 0.32535024611889435,
+            "roi": -0.051987124195380555,
+            "roi_ci_90": [
+              -0.0755140291509092,
+              -0.02820599771956808
+            ],
+            "significant": true
+          }
+        }
+      },
+      "surface": {
+        "Clay": {
+          "favourite": {
+            "calibration_gap": 0.00518801768855448,
+            "market_probability": 0.6846539286797637,
+            "n": 11262,
+            "profitable": false,
+            "realised_rate": 0.6898419463683182,
+            "roi": -0.025994427277570595,
+            "roi_ci_90": [
+              -0.0345069035225261,
+              -0.01743548581599267
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.005188017688554647,
+            "market_probability": 0.3153460713202364,
+            "n": 11262,
+            "profitable": false,
+            "realised_rate": 0.31015805363168175,
+            "roi": -0.09077391582312203,
+            "roi_ci_90": [
+              -0.11153486139174859,
+              -0.07048382289230097
+            ],
+            "significant": true
+          }
+        },
+        "Grass": {
+          "favourite": {
+            "calibration_gap": -0.0023793880273326184,
+            "market_probability": 0.687980444830503,
+            "n": 4542,
+            "profitable": false,
+            "realised_rate": 0.6856010568031704,
+            "roi": -0.035533060325847646,
+            "roi_ci_90": [
+              -0.05246835156323192,
+              -0.018184075300895705
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.002379388027332674,
+            "market_probability": 0.3120195551694969,
+            "n": 4542,
+            "profitable": false,
+            "realised_rate": 0.3143989431968296,
+            "roi": -0.04546341699691766,
+            "roi_ci_90": [
+              -0.08452079917343681,
+              -0.008362950573032778
+            ],
+            "significant": true
+          }
+        },
+        "Hard": {
+          "favourite": {
+            "calibration_gap": 0.00852250869762261,
+            "market_probability": 0.6830191829640451,
+            "n": 25005,
+            "profitable": false,
+            "realised_rate": 0.6915416916616677,
+            "roi": -0.019994710657868432,
+            "roi_ci_90": [
+              -0.026743138830125378,
+              -0.013467938642924065
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.008522508697622555,
+            "market_probability": 0.3169808170359549,
+            "n": 25005,
+            "profitable": false,
+            "realised_rate": 0.3084583083383323,
+            "roi": -0.0922161367726455,
+            "roi_ci_90": [
+              -0.10555176753842421,
+              -0.07794868754982133
+            ],
+            "significant": true
+          }
+        }
+      },
+      "tier": {
+        "Grand Slam": {
+          "favourite": {
+            "calibration_gap": 0.0061157554095850886,
+            "market_probability": 0.7220835650887162,
+            "n": 8830,
+            "profitable": false,
+            "realised_rate": 0.7281993204983013,
+            "roi": -0.024575091732729332,
+            "roi_ci_90": [
+              -0.034263007457342544,
+              -0.01483157789319656
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0061157554095849775,
+            "market_probability": 0.2779164349112837,
+            "n": 8830,
+            "profitable": false,
+            "realised_rate": 0.2718006795016987,
+            "roi": -0.10265954926387318,
+            "roi_ci_90": [
+              -0.13077743366047223,
+              -0.07362780411500153
+            ],
+            "significant": true
+          }
+        },
+        "International": {
+          "favourite": {
+            "calibration_gap": 0.0028218378951990752,
+            "market_probability": 0.6698499478894042,
+            "n": 10158,
+            "profitable": false,
+            "realised_rate": 0.6726717857846033,
+            "roi": -0.02921178972238629,
+            "roi_ci_90": [
+              -0.03934309453818645,
+              -0.0191819067463851
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.0028218378951990197,
+            "market_probability": 0.3301500521105957,
+            "n": 10158,
+            "profitable": false,
+            "realised_rate": 0.3273282142153967,
+            "roi": -0.07048165977554638,
+            "roi_ci_90": [
+              -0.09169805521912536,
+              -0.04762073947695058
+            ],
+            "significant": true
+          }
+        },
+        "Premier": {
+          "favourite": {
+            "calibration_gap": 0.00860840742892155,
+            "market_probability": 0.6746214062356747,
+            "n": 9016,
+            "profitable": false,
+            "realised_rate": 0.6832298136645962,
+            "roi": -0.01813453416149069,
+            "roi_ci_90": [
+              -0.030753048722137803,
+              -0.005998497193565538
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.00860840742892155,
+            "market_probability": 0.32537859376432526,
+            "n": 9016,
+            "profitable": false,
+            "realised_rate": 0.3167701863354037,
+            "roi": -0.08050644409937889,
+            "roi_ci_90": [
+              -0.1063727093960332,
+              -0.05287792539147692
+            ],
+            "significant": true
+          }
+        },
+        "Tier 1": {
+          "favourite": {
+            "calibration_gap": 0.017354919978996186,
+            "market_probability": 0.7121283626957758,
+            "n": 987,
+            "profitable": false,
+            "realised_rate": 0.729483282674772,
+            "roi": 0.002686828774062811,
+            "roi_ci_90": [
+              -0.03073567502102607,
+              0.02826628102331682
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.017354919978996297,
+            "market_probability": 0.28787163730422427,
+            "n": 987,
+            "profitable": false,
+            "realised_rate": 0.270516717325228,
+            "roi": -0.13527065856129689,
+            "roi_ci_90": [
+              -0.19882880422874918,
+              -0.055940300735928705
+            ],
+            "significant": true
+          }
+        },
+        "Tier 2": {
+          "favourite": {
+            "calibration_gap": 0.021235658217508946,
+            "market_probability": 0.7059292290897271,
+            "n": 843,
+            "profitable": false,
+            "realised_rate": 0.727164887307236,
+            "roi": 0.00788083036773428,
+            "roi_ci_90": [
+              -0.028337518014973574,
+              0.041675340251087455
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.021235658217508946,
+            "market_probability": 0.2940707709102729,
+            "n": 843,
+            "profitable": false,
+            "realised_rate": 0.27283511269276395,
+            "roi": -0.1262202846975089,
+            "roi_ci_90": [
+              -0.2177729353452752,
+              -0.029849931934751304
+            ],
+            "significant": true
+          }
+        },
+        "Tier 3": {
+          "favourite": {
+            "calibration_gap": -0.01325442699728796,
+            "market_probability": 0.6989964250574238,
+            "n": 1031,
+            "profitable": false,
+            "realised_rate": 0.6857419980601358,
+            "roi": -0.04558781765276431,
+            "roi_ci_90": [
+              -0.06755804357326115,
+              -0.0237212848053729
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.013254426997288016,
+            "market_probability": 0.3010035749425762,
+            "n": 1031,
+            "profitable": false,
+            "realised_rate": 0.3142580019398642,
+            "roi": -0.03945053346265762,
+            "roi_ci_90": [
+              -0.09645629440309272,
+              0.019736508924033027
+            ],
+            "significant": false
+          }
+        },
+        "Tier 4": {
+          "favourite": {
+            "calibration_gap": 0.014409141926821079,
+            "market_probability": 0.6783444812615848,
+            "n": 690,
+            "profitable": false,
+            "realised_rate": 0.6927536231884058,
+            "roi": -0.008729855072463773,
+            "roi_ci_90": [
+              -0.04673176253901701,
+              0.0376883256666303
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.014409141926821023,
+            "market_probability": 0.32165551873841525,
+            "n": 690,
+            "profitable": false,
+            "realised_rate": 0.3072463768115942,
+            "roi": -0.14136727536231883,
+            "roi_ci_90": [
+              -0.23548654899237476,
+              -0.0663892615767519
+            ],
+            "significant": true
+          }
+        },
+        "Tour Championships": {
+          "favourite": {
+            "calibration_gap": -0.03612209101075681,
+            "market_probability": 0.650579922336058,
+            "n": 332,
+            "profitable": false,
+            "realised_rate": 0.6144578313253012,
+            "roi": -0.09095180722891566,
+            "roi_ci_90": [
+              -0.1578315397637385,
+              -0.0297220734735652
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.03612209101075681,
+            "market_probability": 0.349420077663942,
+            "n": 332,
+            "profitable": false,
+            "realised_rate": 0.3855421686746988,
+            "roi": 0.018793373493975894,
+            "roi_ci_90": [
+              -0.09464470427881294,
+              0.1364340240345549
+            ],
+            "significant": false
+          }
+        },
+        "WTA1000": {
+          "favourite": {
+            "calibration_gap": -0.0008260209199669744,
+            "market_probability": 0.6735717149422568,
+            "n": 2961,
+            "profitable": false,
+            "realised_rate": 0.6727456940222898,
+            "roi": -0.03616352583586627,
+            "roi_ci_90": [
+              -0.055869173810271254,
+              -0.015786415752456134
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": 0.0008260209199670299,
+            "market_probability": 0.3264282850577432,
+            "n": 2961,
+            "profitable": false,
+            "realised_rate": 0.3272543059777102,
+            "roi": -0.05965160418777441,
+            "roi_ci_90": [
+              -0.09822426336279848,
+              -0.02538230580525959
+            ],
+            "significant": true
+          }
+        },
+        "WTA250": {
+          "favourite": {
+            "calibration_gap": 0.010712370799693227,
+            "market_probability": 0.6636347874184327,
+            "n": 3906,
+            "profitable": false,
+            "realised_rate": 0.674347158218126,
+            "roi": -0.02125320020481311,
+            "roi_ci_90": [
+              -0.040283095758408265,
+              -0.0013287228716788021
+            ],
+            "significant": true
+          },
+          "underdog": {
+            "calibration_gap": -0.010712370799693227,
+            "market_probability": 0.33636521258156726,
+            "n": 3906,
+            "profitable": false,
+            "realised_rate": 0.32565284178187404,
+            "roi": -0.09881920122887866,
+            "roi_ci_90": [
+              -0.13605858936106402,
+              -0.062428681868660726
+            ],
+            "significant": true
+          }
+        },
+        "WTA500": {
+          "favourite": {
+            "calibration_gap": 0.018520927177328894,
+            "market_probability": 0.6662915156406034,
+            "n": 2186,
+            "profitable": false,
+            "realised_rate": 0.6848124428179323,
+            "roi": -0.008307685269899367,
+            "roi_ci_90": [
+              -0.03192795711633899,
+              0.015066935907102832
+            ],
+            "significant": false
+          },
+          "underdog": {
+            "calibration_gap": -0.018520927177328728,
+            "market_probability": 0.33370848435939643,
+            "n": 2186,
+            "profitable": false,
+            "realised_rate": 0.3151875571820677,
+            "roi": -0.11988234217749316,
+            "roi_ci_90": [
+              -0.16569744915680107,
+              -0.0735314281198362
+            ],
+            "significant": true
+          }
+        }
+      }
+    }
+  },
+  "consistency_Bet365": {
+    "any_confirmed": false,
+    "book": "Bet365",
+    "cells": {},
+    "checked": true
+  },
+  "consistency_Pinnacle": {
+    "any_confirmed": false,
+    "book": "Pinnacle",
+    "cells": {
+      "0.9-1.0/favourite": {
+        "ATP_Pinnacle": {
+          "n": 3383,
+          "profitable": false,
+          "roi": -0.003337363287023336
+        },
+        "WTA_Pinnacle": {
+          "n": 1936,
+          "profitable": true,
+          "roi": 0.00833473140495869
+        },
+        "confirmed_by_both_tours": false,
+        "pooled_roi": 0.0009110246286896179,
+        "verdict": "cellule chanceuse: l'autre circuit ne la confirme pas"
+      }
+    },
+    "checked": true
+  }
+}

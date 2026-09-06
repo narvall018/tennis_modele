@@ -1,0 +1,82 @@
+{
+  "protocol_version": "4.0.0",
+  "frozen_before_phase4_returns": true,
+  "created_at": "2026-09-02",
+  "data_path": "data/processed/atp_matches_enriched.csv.gz",
+  "data_sha256": "015fde1652b34d5267b1218d2f15fbf30f1cf9603d0541cd4b081aaad8a9d4a7",
+  "disclosure": "All outcomes through 2026-08-30 and the previous 2024-2026 holdout aggregates are research-exposed. Phase 4 is development only, never an independent economic confirmation.",
+  "population": "ATP men's singles present in the enriched table; all surfaces retained; non-completed matches retained in the decision population and void in the primary settlement.",
+  "feature_time_rule": "All player, surface and tournament states are read at the start of the calendar day and updated only after every match on that day has been featurized.",
+  "development_walk_forward": {
+    "test_years": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+    "train_through": "test_year_minus_2",
+    "calibration_year": "test_year_minus_1",
+    "minimum_train_rows": 10000,
+    "minimum_calibration_rows": 500
+  },
+  "primary_candidates": {
+    "market_surface_calibration": {
+      "family": "logistic",
+      "C": 0.5,
+      "features": "market logit with regularized surface slopes"
+    },
+    "structural_market_residual": {
+      "family": "logistic",
+      "C": 0.05,
+      "features": "market plus pre-match Elo, rank, age, height, handedness, form and schedule"
+    },
+    "serve_return_residual": {
+      "family": "logistic",
+      "C": 0.05,
+      "features": "structural plus empirical-Bayes serve/return and workload"
+    },
+    "surface_partial_pooling": {
+      "family": "logistic",
+      "C": 0.02,
+      "features": "serve/return model plus regularized surface interactions and prior-only tournament pace"
+    }
+  },
+  "selection_metric": "lowest pooled walk-forward log_loss; Brier score then simpler candidate order break ties",
+  "deep_learning_diagnostic_not_strategy_eligible": {
+    "name": "small_symmetric_mlp",
+    "hidden_layer_sizes": [32, 16],
+    "alpha": 0.02,
+    "learning_rate_init": 0.001,
+    "early_stopping": true,
+    "max_iter": 300,
+    "reason": "Measures whether nonlinear capacity adds predictive signal; cannot unlock betting or alter the fixed economic rule."
+  },
+  "fixed_economic_diagnostic": {
+    "price": "observed coherent player_1_odds/player_2_odds pair",
+    "minimum_edge": 0.02,
+    "minimum_expected_roi": 0.02,
+    "minimum_decimal_odds": 1.3,
+    "maximum_decimal_odds": 4.0,
+    "odds_haircut_primary": 0.02,
+    "odds_haircut_scenarios": [0.0, 0.02, 0.05],
+    "one_bet_maximum_per_match": true,
+    "retirements_primary_settlement": "void"
+  },
+  "staking_diagnostic": {
+    "kind": "flat",
+    "fraction_per_bet": 0.0025,
+    "maximum_daily_exposure": 0.02,
+    "initial_bankroll": 1000.0
+  },
+  "gate_for_prospective_paper_tracking_only": {
+    "selected_candidate_must_not_be_market_only": true,
+    "minimum_log_loss_improvement_vs_market": 0.001,
+    "years_beating_market_minimum": 7,
+    "maximum_surface_log_loss_degradation": 0.002,
+    "minimum_settled_bets": 500,
+    "positive_roi_after_2pct_haircut": true,
+    "positive_years_minimum": 7,
+    "cluster_bootstrap_confidence": 0.99,
+    "bootstrap_samples": 20000,
+    "roi_lower_bound_must_exceed": 0.0,
+    "maximum_drawdown": 0.15
+  },
+  "new_pristine_period_starts": "2026-09-03",
+  "minimum_future_resolved_bets_before_real_money_review": 500,
+  "real_money_status": "NO_BET"
+}

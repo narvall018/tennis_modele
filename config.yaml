@@ -18,10 +18,10 @@ data:
   recent_form_matches: [3, 5, 10, 20]
 
   # Sources WTA (tennis-data.co.uk)
-  wta_years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+  wta_years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
   atp_years: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
               2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-              2020, 2021, 2022, 2023, 2024, 2025]
+              2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
 # ---------------------------------------------------------------------------
 # ELO SYSTEM
@@ -215,10 +215,12 @@ models:
 # STRATÉGIES DE PARIS
 # ---------------------------------------------------------------------------
 strategies:
-  # Stratégie 1 : Ultra haute confiance (faible volume, ROI maximal)
+  # Anciennes règles exploratoires : désactivées car elles n'ont pas passé le
+  # nouveau holdout strict 2024-2026. Ne pas les réactiver sur la base de leurs
+  # anciens graphiques/backtests.
   ultra_confidence:
     name: "Ultra Confiance (≥72%)"
-    enabled: true
+    enabled: false
     # Filtres match
     model_threshold: 0.72
     min_edge: 0.05           # 5% d'edge minimum
@@ -234,12 +236,11 @@ strategies:
     kelly_fraction: 4.0
     max_stake_pct: 0.05
     min_stake_pct: 0.01
-    # Objectif : ~80-120 paris/an, ROI cible ≥ 10%
 
   # Stratégie 2 : Standard haute fréquence (volume médium)
   standard_volume:
     name: "Standard Volume (≥62%)"
-    enabled: true
+    enabled: false
     model_threshold: 0.62
     min_edge: 0.03
     min_ev: 0.02
@@ -252,12 +253,11 @@ strategies:
     kelly_fraction: 6.0
     max_stake_pct: 0.04
     min_stake_pct: 0.01
-    # Objectif : ~250-350 paris/an, ROI cible ≥ 6%
 
   # Stratégie 3 : Masse — maximum de paris rentables
   high_volume:
     name: "Haute Fréquence (≥57%)"
-    enabled: true
+    enabled: false
     model_threshold: 0.57
     min_edge: 0.02
     min_ev: 0.01
@@ -270,12 +270,11 @@ strategies:
     flat_pct: 0.015         # 1.5% flat (risque moindre par pari)
     max_stake_pct: 0.03
     min_stake_pct: 0.01
-    # Objectif : ~500-800 paris/an, ROI cible ≥ 4%
 
   # Stratégie 4 : Spécialiste surface (clay uniquement)
   clay_specialist:
     name: "Spécialiste Terre Battue"
-    enabled: true
+    enabled: false
     model_threshold: 0.60
     min_edge: 0.03
     min_ev: 0.02
@@ -313,10 +312,20 @@ strategies:
     drawdown_limit: 0.20         # Arrêt à -20% du pic bankroll
     monthly_review: true         # Révision mensuelle des seuils
 
+# Résultat de l'étude imbriquée 2012-2026. Le candidat est conservé pour audit,
+# mais il est interdit en argent réel après son échec sur le holdout final.
+rigorous_strategy:
+  artifact: "models/rigorous_strategy/frozen_strategy.json"
+  report: "models/rigorous_strategy/BACKTEST_REPORT.md"
+  status: "rejected_final_holdout"
+  real_money_enabled: false
+  paper_trading_enabled: false
+
 # ---------------------------------------------------------------------------
 # BACKTESTING
 # ---------------------------------------------------------------------------
 backtesting:
+  enabled: false            # moteur legacy; utiliser scripts/run_rigorous_backtest.py
   # Walk-forward : train sur N années, test sur 1
   method: "walk_forward"
   train_years: 4           # Fenêtre d'entraînement
@@ -352,7 +361,7 @@ backtesting:
 evaluation:
   # CLV = (cote finale Pinnacle / cote au moment du pari) - 1
   # Un CLV > 0 = pari pris à meilleure valeur que le marché final
-  clv_enabled: true
+  clv_enabled: false        # aucun snapshot horodaté entrée/clôture disponible
   clv_benchmark: "pinnacle"   # Bookmaker de référence pour CLV
 
   # Alertes performance

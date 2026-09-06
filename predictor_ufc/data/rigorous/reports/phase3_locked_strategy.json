@@ -1,0 +1,17 @@
+{
+  "created_at_utc": "2026-09-02T14:54:58.128881+00:00",
+  "protocol_sha256": "bd936fab499f7697331f8647c7fc0f2b7246a54fe1cf74a215902c9fa4d6cdfd",
+  "approved_for_pristine_holdout": false,
+  "gate_checks": {
+    "challenger_log_loss_beats_baseline": false,
+    "challenger_log_loss_beats_market": false,
+    "minimum_log_loss_improvement_vs_baseline": false,
+    "years_beating_baseline": false,
+    "minimum_bets": true,
+    "positive_roi": false,
+    "positive_years": false,
+    "maximum_drawdown": true,
+    "positive_99pct_cluster_bootstrap_lower_bound": false
+  },
+  "status": "PHASE3_REJECTED_NO_BET"
+}

@@ -1,0 +1,19 @@
+{
+  "model": "market_xgboost",
+  "model_weight": 0.7000000000000001,
+  "rule": {
+    "max_odds": 4.0,
+    "min_edge": 0.005,
+    "min_ev": 0.01,
+    "min_odds": 1.75,
+    "min_probability": 0.0
+  },
+  "stake_plan": {
+    "flat_fraction": 0.01,
+    "kelly_divisor": 1.0,
+    "kind": "flat",
+    "max_bet_fraction": 0.01,
+    "max_daily_fraction": 0.04,
+    "name": "flat_1_00pct"
+  }
+}

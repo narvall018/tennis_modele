@@ -29,6 +29,24 @@ LEGACY_TENNIS_BANKROLL = Path("bets") / "bankroll.json"
 LEGACY_UFC_BANKROLL = Path("predictor_ufc") / "bets" / "bankroll.csv"
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+try:
+    from src.app.pages import (
+        render_maintenance_page,
+        render_performance_page,
+        render_predictions_page,
+        render_staking_page,
+    )
+    RESEARCH_PAGES_AVAILABLE = True
+    RESEARCH_PAGES_ERROR = ""
+except Exception as _error:  # noqa: BLE001 - shown in the UI instead of crashing the app
+    RESEARCH_PAGES_AVAILABLE = False
+    RESEARCH_PAGES_ERROR = str(_error)
+
+
 def now_iso() -> str:
     return datetime.utcnow().isoformat(timespec="seconds")
 
@@ -1953,7 +1971,7 @@ def main() -> None:
             st.session_state.pop("unified_ufc_bets_folder", None)
             st.session_state["_goto_section"] = "Accueil"
             st.rerun()
-        sections = ["Accueil", "Tennis", "UFC"]
+        sections = ["Accueil", "Prédictions", "Mises", "Performances", "Mise à jour", "Tennis", "UFC"]
         if is_admin and username == ADMIN_USERNAME:
             sections.append("Administration")
         pending_section = st.session_state.pop("_goto_section", None)
@@ -1966,6 +1984,20 @@ def main() -> None:
     section = st.session_state["section"]
     if section == "Accueil":
         _render_unified_home(user)
+    elif section in {"Prédictions", "Mises", "Performances", "Mise à jour"}:
+        if not RESEARCH_PAGES_AVAILABLE:
+            st.error(
+                "Pages de recherche indisponibles: "
+                f"{RESEARCH_PAGES_ERROR}. Vérifier les dépendances du dépôt."
+            )
+        elif section == "Prédictions":
+            render_predictions_page(PROJECT_ROOT)
+        elif section == "Mises":
+            render_staking_page(PROJECT_ROOT)
+        elif section == "Mise à jour":
+            render_maintenance_page(PROJECT_ROOT)
+        else:
+            render_performance_page(PROJECT_ROOT)
     elif section == "Tennis":
         _render_legacy_tennis(user)
     elif section == "UFC":

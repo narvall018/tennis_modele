@@ -1,0 +1,62 @@
+{
+  "bet_rule": {
+    "description": "parier tout côté dont l'espérance est positive au prix Pinnacle",
+    "maximum_odds": 6.0,
+    "maximum_odds_justification": "La bande cote>=6 perd entre 24% et 65% dans les quatre périodes et chez toutes les sources: le modèle surestime les outsiders extrêmes. Le seuil vient toutefois de données déjà dépensées et n'est pas validé.",
+    "minimum_expected_value": 0.0,
+    "stake": "plat, 0,25% de la bankroll, exposition quotidienne plafonnée à 2%"
+  },
+  "declaration_sha256": "12a825c56bebf7c8db44bfe01678aac9324186e95da6013fc446207a6386e457",
+  "declared_at_utc": "2026-09-06T13:01:58.087847+00:00",
+  "kill_criterion": {
+    "requirement": "arrêt immédiat si le ROI prospectif est inférieur à -5% après 500 paris réglés, ou si la log-loss du mélange cesse de battre celle de Pinnacle"
+  },
+  "known_fragilities": [
+    "2 points de friction d'exécution supplémentaires annulent le rendement.",
+    "Pinnacle limite les comptes gagnants; le volume supposé n'est pas garanti.",
+    "La règle parie sur 39% à 57% des matchs, ce qui est atypique d'un edge réel.",
+    "Le seuil de cote 6 est une hypothèse issue des données de développement."
+  ],
+  "market": {
+    "bet_type": "match winner",
+    "counterparty": "Pinnacle",
+    "tour": "WTA",
+    "why_pinnacle": "Choisi a priori pour sa marge basse (~2,9% d'overround), pas parce qu'il affiche le meilleur rendement du tableau: Bet365 et le prix maximum affichent mieux et sont écartés."
+  },
+  "paper_only": true,
+  "price_capture": {
+    "collector": "scripts/collect_tennis_odds.py",
+    "no_retrospective_choice": true,
+    "rule": "dernier prix Pinnacle observé strictement avant le début du match"
+  },
+  "probability_model": {
+    "fold_rule": "train through Y-2, calibrate on Y-1",
+    "market_component": "prix moyen dévigé",
+    "model": "market_logistic",
+    "model_weight": 0.7000000000000001,
+    "source_study": "models/wta_strategy"
+  },
+  "prospective_period_starts": "2026-09-07",
+  "real_money_authorised": false,
+  "retrospective_expectation": {
+    "n_bets": 13622,
+    "note": "mesure sur données dépensées, fournie comme point de comparaison, pas comme promesse",
+    "observed_t_statistic": 0.8,
+    "positive_periods_out_of_4": 2,
+    "roi": 0.007426721479958883,
+    "roi_ci_90": [
+      -0.007104895627908079,
+      0.021387862645430383
+    ]
+  },
+  "status": "HYPOTHESE_NON_VALIDEE",
+  "success_criterion": {
+    "bets_needed_for_90pct": 35250,
+    "bets_needed_for_95pct": 58067,
+    "declared_before_any_prospective_bet": true,
+    "honest_reading": "À ce volume, la question n'est pas tranchable avant des décennies. Un résultat prospectif nettement meilleur que +0,74% serait le seul motif de reconsidérer plus tôt; un résultat conforme à +0,74% ne prouvera rien.",
+    "implied_years_at_90pct": 34,
+    "observed_annual_volume": 1045,
+    "requirement": "borne inférieure à 90% d'un bootstrap par blocs mensuels strictement positive, sur des paris prospectifs uniquement"
+  }
+}

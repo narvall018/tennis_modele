@@ -1,0 +1,55 @@
+{
+  "protocol_version": "3.0.0",
+  "frozen_before_phase3_returns": true,
+  "created_for_research_date": "2026-09-02",
+  "disclosure": "All 2015-2024 outcomes have been used in earlier research. This is a development ablation, not an independent confirmation.",
+  "development_window": ["2015-01-01", "2024-12-31"],
+  "pristine_economic_holdout": ["2025-09-13", "2026-08-29"],
+  "hypothesis": "Pre-fight UFC division and pound-for-pound ranks improve the frozen structural logistic model.",
+  "baseline": {
+    "family": "logistic",
+    "C": 0.05,
+    "features": "phase2_structural"
+  },
+  "challenger": {
+    "family": "logistic",
+    "C": 0.05,
+    "features": "phase2_structural_plus_prefight_rankings"
+  },
+  "walk_forward": {
+    "first_test_year": 2015,
+    "last_test_year": 2024,
+    "minimum_training_rows": 1000,
+    "train_uses_only_dates_strictly_before_test_year": true
+  },
+  "fixed_bet_rule": {
+    "edge_threshold": 0.03,
+    "minimum_decimal_odds": 1.25,
+    "maximum_decimal_odds": 4.0,
+    "one_side_maximum_per_fight": true
+  },
+  "staking": {
+    "method": "one_tenth_kelly",
+    "kelly_divisor": 10.0,
+    "maximum_fraction_per_bet": 0.0025,
+    "maximum_event_exposure": 0.02,
+    "minimum_stake": 0.0,
+    "simultaneous_event_settlement": true
+  },
+  "gate_before_pristine_holdout": {
+    "challenger_log_loss_must_beat_baseline": true,
+    "challenger_log_loss_must_beat_market": true,
+    "minimum_log_loss_improvement_vs_baseline": 0.001,
+    "years_beating_baseline_minimum": 7,
+    "years_total": 10,
+    "minimum_bets": 500,
+    "positive_roi": true,
+    "positive_years_minimum": 7,
+    "maximum_drawdown": 0.15,
+    "cluster_bootstrap_confidence": 0.99,
+    "roi_lower_bound_must_exceed": 0.0,
+    "bootstrap_samples": 20000
+  },
+  "line_movement_policy": "Do not evaluate completed 2025-2026 fights before the phase3 gate; collect prospectively instead.",
+  "real_money_status_until_all_gates_pass": "NO_BET"
+}

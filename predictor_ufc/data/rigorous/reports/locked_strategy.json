@@ -1,0 +1,18 @@
+{
+  "created_at_utc": "2026-09-01T15:25:24.096380+00:00",
+  "protocol_sha256": "7bb0b56e294ddf3475e45db334a3d6f2a2115cd00393708cf56e393011eb8c41",
+  "selected_model": "market_plus_c0.01",
+  "selected_model_spec": {
+    "features": "market_plus_stats",
+    "C": 0.01
+  },
+  "selected_threshold": 0.05,
+  "validation_gate_checks": {
+    "minimum_bets": true,
+    "positive_roi": true,
+    "maximum_drawdown": true,
+    "positive_95pct_cluster_bootstrap_lower_bound": false
+  },
+  "approved_for_holdout": false,
+  "status": "REJECTED_NO_BET"
+}

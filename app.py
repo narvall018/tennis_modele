@@ -231,6 +231,26 @@ def load_model_config():
         return joblib.load(v3_path)
     return joblib.load(MODELS_DIR / "model_config.pkl")
 
+
+@st.cache_data(ttl=60)
+def strategy_deployment_allowed() -> bool:
+    """Every available rigorous lock must approve before betting can be enabled."""
+    report_path = MODELS_DIR / "rigorous_strategy" / "backtest_report.json"
+    phase4_lock_path = MODELS_DIR / "rigorous_strategy" / "phase4_lock.json"
+    if not report_path.exists():
+        return False
+    try:
+        with report_path.open("r", encoding="utf-8") as handle:
+            report = json.load(handle)
+        previous_approved = bool(report.get("deployment_gate", {}).get("passed", False))
+        if phase4_lock_path.exists():
+            with phase4_lock_path.open("r", encoding="utf-8") as handle:
+                phase4_lock = json.load(handle)
+            return previous_approved and bool(phase4_lock.get("real_money_approved", False))
+        return previous_approved
+    except (OSError, ValueError, TypeError):
+        return False
+
 @st.cache_resource
 def load_player_stats():
     """Charge les stats des joueurs (v2 — utilisé pour la page stats)"""
@@ -1502,9 +1522,10 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
     # ── Stratégies ───────────────────────────────────────────────────────────
     best_bet = None
     is_eligible = False
+    betting_allowed = strategy_deployment_allowed()
 
-    if not has_odds:
-        pass  # Pas de recommandation sans cotes
+    if not has_odds or not betting_allowed:
+        pass  # Pas de cote, ou stratégie non validée sur le holdout final
     elif version == "v3":
         # Multi-stratégie v3 : StrategyManager
         strat_cfg = config.get("strategies", {})
@@ -1600,6 +1621,7 @@ def predict_match(player1, player2, surface, series, round_name, best_of,
         'elo_p2_surf': elo_p2_surf,
         'model_version': version,
         'has_odds': has_odds,
+        'betting_allowed': betting_allowed,
         'odds1': odds1,
         'odds2': odds2,
     }
@@ -1633,15 +1655,23 @@ def show_home_page():
     </div>
     """, unsafe_allow_html=True)
 
-    if v3_active:
-        st.markdown("### 📊 Performance du Modèle v3 (Backtest Walk-Forward 2015-2023)")
-        cols = st.columns(5)
+    report_path = MODELS_DIR / "rigorous_strategy" / "backtest_report.json"
+    if report_path.exists():
+        with report_path.open("r", encoding="utf-8") as handle:
+            rigorous_report = json.load(handle)
+        final = rigorous_report["final_holdout"]["average_haircut_0pct"]
+        stressed = rigorous_report["final_holdout"]["average_haircut_2pct"]
+        bootstrap = rigorous_report["final_holdout"]["bootstrap_average_haircut_2pct"]
+        st.error(
+            "Aucune stratégie argent réel n'est actuellement validée. "
+            "Le holdout 2024–2026 et la phase 4 serve/return-surface ont échoué."
+        )
+        cols = st.columns(4)
         metrics = [
-            ("0.71", "AUC Test"),
-            ("70%+", "Win Rate"),
-            ("67-110%", "ROI backtest"),
-            ("10-13", "Sharpe Ratio"),
-            ("< 10%", "Max Drawdown"),
+            (str(final["n_settled"]), "Paris holdout réglés"),
+            (f"{final['roi']:.2%}", "ROI observé"),
+            (f"{stressed['roi']:.2%}", "ROI avec décote 2%"),
+            (f"{bootstrap['roi_ci_90'][0]:.2%}", "Borne basse IC 90%"),
         ]
         for col, (value, label) in zip(cols, metrics):
             with col:
@@ -1651,55 +1681,12 @@ def show_home_page():
                     <div class="metric-label">{label}</div>
                 </div>
                 """, unsafe_allow_html=True)
-
-        st.markdown("### 🎯 Stratégies disponibles (v3)")
-        st.markdown("""
-        <div class="card">
-            <h4>📋 Multi-stratégies haute fréquence</h4>
-            <table style="width:100%;border-collapse:collapse;line-height:2;">
-                <tr style="border-bottom:1px solid #444;">
-                    <th style="text-align:left;">Stratégie</th>
-                    <th>Seuil modèle</th>
-                    <th>Volume/an</th>
-                    <th>Money Management</th>
-                </tr>
-                <tr><td>Ultra Confiance</td><td>≥ 68%</td><td>~480 paris</td><td>Kelly/4 (max 5%)</td></tr>
-                <tr><td>Standard Volume</td><td>≥ 62%</td><td>~127 paris</td><td>Flat 2%</td></tr>
-                <tr><td>Haute Fréquence</td><td>≥ 57%</td><td>~355 paris</td><td>Flat 1.5%</td></tr>
-                <tr><td>Spécialiste Clay</td><td>≥ 60%</td><td>Variable</td><td>Kelly/6</td></tr>
-            </table>
-        </div>
-        """, unsafe_allow_html=True)
+        st.caption(
+            "Les probabilités restent disponibles à titre d'analyse, mais aucune "
+            "recommandation de pari ni taille de mise n'est produite."
+        )
     else:
-        st.markdown("### 📊 Performance du Modèle v2 (Backtest 2020-2025)")
-        cols = st.columns(4)
-        metrics = [
-            ("+6.5%", "ROI"),
-            ("84%", "Win Rate"),
-            ("5/6", "Années rentables"),
-            ("1.36", "Sharpe Ratio"),
-        ]
-        for col, (value, label) in zip(cols, metrics):
-            with col:
-                st.markdown(f"""
-                <div class="metric-box">
-                    <div class="metric-value">{value}</div>
-                    <div class="metric-label">{label}</div>
-                </div>
-                """, unsafe_allow_html=True)
-
-        st.markdown("### 🎯 Stratégie : Grand Slam Late Rounds")
-        st.markdown("""
-        <div class="card">
-            <h4>📋 Règles de la stratégie</h4>
-            <ol style="line-height: 2;">
-                <li><b>Filtre tournoi</b> : Uniquement les <b>Grand Slams</b></li>
-                <li><b>Filtre round</b> : <b>Quarts, Demi-finales et Finales</b></li>
-                <li><b>Filtre modèle</b> : Probabilité modèle <b>> 60%</b></li>
-                <li><b>Mise plate</b> : 2-3% du bankroll par pari</li>
-            </ol>
-        </div>
-        """, unsafe_allow_html=True)
+        st.warning("Rapport rigoureux absent : recommandations de mise désactivées.")
     
     col1, col2 = st.columns(2)
     
@@ -2795,85 +2782,14 @@ def download_tennis_data(year):
 
 
 def transform_tennis_data(df_raw):
-    """Transforme le format tennis-data.co.uk vers notre format CSV.
-    
-    tennis-data: Winner/Loser → notre format: Player_1/Player_2/Winner
-    On randomise l'ordre P1/P2 pour éviter le biais (sinon Winner = toujours P1)
+    """Transforme un classeur Tennis-Data avec orientation déterministe.
+
+    La fonction centrale gère aussi correctement les cellules Pinnacle vides en
+    essayant ensuite Bet365, Avg puis Max.
     """
-    rows = []
-    for _, row in df_raw.iterrows():
-        # Skip incomplete matches
-        if row.get('Comment', '') != 'Completed':
-            continue
-        if pd.isna(row.get('Winner')) or pd.isna(row.get('Loser')):
-            continue
-        
-        winner = str(row['Winner']).strip()
-        loser = str(row['Loser']).strip()
-        
-        # Reconstruct score from set columns
-        score_parts = []
-        for s in range(1, 6):
-            ws, ls = row.get(f'W{s}'), row.get(f'L{s}')
-            if pd.notna(ws) and pd.notna(ls):
-                score_parts.append(f"{int(ws)}-{int(ls)}")
-        score = ' '.join(score_parts) if score_parts else ''
-        
-        # Randomize order to avoid Winner always being P1
-        if np.random.random() > 0.5:
-            p1, p2 = winner, loser
-            rank1 = row.get('WRank', -1)
-            rank2 = row.get('LRank', -1)
-            pts1 = row.get('WPts', -1)
-            pts2 = row.get('LPts', -1)
-            # Odds: PSW/PSL = Pinnacle Winner/Loser odds
-            odd1 = row.get('PSW', row.get('B365W', row.get('AvgW', -1)))
-            odd2 = row.get('PSL', row.get('B365L', row.get('AvgL', -1)))
-        else:
-            p1, p2 = loser, winner
-            rank1 = row.get('LRank', -1)
-            rank2 = row.get('WRank', -1)
-            pts1 = row.get('LPts', -1)
-            pts2 = row.get('WPts', -1)
-            odd1 = row.get('PSL', row.get('B365L', row.get('AvgL', -1)))
-            odd2 = row.get('PSW', row.get('B365W', row.get('AvgW', -1)))
-            # Invert score
-            score_parts_inv = []
-            for s in range(1, 6):
-                ws, ls = row.get(f'W{s}'), row.get(f'L{s}')
-                if pd.notna(ws) and pd.notna(ls):
-                    score_parts_inv.append(f"{int(ls)}-{int(ws)}")
-            score = ' '.join(score_parts_inv) if score_parts_inv else ''
-        
-        # Clean values
-        rank1 = int(rank1) if pd.notna(rank1) and rank1 != -1 else -1
-        rank2 = int(rank2) if pd.notna(rank2) and rank2 != -1 else -1
-        pts1 = int(pts1) if pd.notna(pts1) and pts1 != -1 else -1
-        pts2 = int(pts2) if pd.notna(pts2) and pts2 != -1 else -1
-        odd1 = float(odd1) if pd.notna(odd1) else -1.0
-        odd2 = float(odd2) if pd.notna(odd2) else -1.0
-        
-        rows.append({
-            'Tournament': row.get('Tournament', ''),
-            'Date': pd.to_datetime(row['Date']).strftime('%Y-%m-%d'),
-            'Series': row.get('Series', ''),
-            'Court': row.get('Court', 'Outdoor'),
-            'Surface': row.get('Surface', ''),
-            'Round': row.get('Round', ''),
-            'Best of': int(row.get('Best of', 3)),
-            'Player_1': p1,
-            'Player_2': p2,
-            'Winner': winner,
-            'Rank_1': rank1,
-            'Rank_2': rank2,
-            'Pts_1': pts1,
-            'Pts_2': pts2,
-            'Odd_1': odd1,
-            'Odd_2': odd2,
-            'Score': score
-        })
-    
-    return pd.DataFrame(rows)
+    from src.data.tennis_pipeline import transform_tennis_data_raw
+
+    return transform_tennis_data_raw(df_raw)
 
 
 def check_data_freshness():
@@ -3006,113 +2922,10 @@ def update_main_csv(df_new):
 
 
 def recalculate_all_elo(progress_callback=None):
-    """Recalcule TOUS les Elo (global K=32, surface K=40) sur le dataset complet,
-    puis met à jour elo_ratings.pkl, player_stats.pkl, et recent_matches.csv"""
-    csv_path = DATA_DIR / "atp_tennis.csv"
-    df = pd.read_csv(csv_path)
-    df['Date'] = pd.to_datetime(df['Date'])
-    df = df.sort_values('Date').reset_index(drop=True)
-    
-    if progress_callback:
-        progress_callback("🧮 Calcul des Elo globaux (K=32)...")
-    
-    # === Global Elo (K=32) ===
-    K_GLOBAL = 32
-    INITIAL_ELO = 1500
-    elo_global = {}
-    
-    for _, row in df.iterrows():
-        p1, p2, winner = row['Player_1'], row['Player_2'], row['Winner']
-        r1 = elo_global.get(p1, INITIAL_ELO)
-        r2 = elo_global.get(p2, INITIAL_ELO)
-        
-        exp1 = 1 / (1 + 10 ** ((r2 - r1) / 400))
-        s1 = 1.0 if winner == p1 else 0.0
-        
-        elo_global[p1] = r1 + K_GLOBAL * (s1 - exp1)
-        elo_global[p2] = r2 + K_GLOBAL * ((1 - s1) - (1 - exp1))
-    
-    if progress_callback:
-        progress_callback("🎾 Calcul des Elo par surface (K=40)...")
-    
-    # === Surface Elo (K=40) ===
-    K_SURFACE = 40
-    surfaces = df['Surface'].unique()
-    elo_surface = {s: {} for s in surfaces}
-    
-    for _, row in df.iterrows():
-        surface = row['Surface']
-        p1, p2, winner = row['Player_1'], row['Player_2'], row['Winner']
-        
-        e1 = elo_surface[surface].get(p1, INITIAL_ELO)
-        e2 = elo_surface[surface].get(p2, INITIAL_ELO)
-        
-        exp1 = 1 / (1 + 10 ** ((e2 - e1) / 400))
-        s1 = 1.0 if winner == p1 else 0.0
-        
-        elo_surface[surface][p1] = e1 + K_SURFACE * (s1 - exp1)
-        elo_surface[surface][p2] = e2 + K_SURFACE * ((1 - s1) - (1 - exp1))
-    
-    if progress_callback:
-        progress_callback("💾 Sauvegarde elo_ratings.pkl...")
-    
-    # === Save elo_ratings.pkl ===
-    elo_data = {
-        'global': elo_global,
-        'surface': {s: dict(v) for s, v in elo_surface.items()}
-    }
-    joblib.dump(elo_data, MODELS_DIR / "elo_ratings.pkl")
-    
-    if progress_callback:
-        progress_callback("💾 Sauvegarde player_stats.pkl...")
-    
-    # === Save player_stats.pkl ===
-    player_stats = {}
-    for player, elo in elo_global.items():
-        player_stats[player] = {
-            'elo_global': elo,
-            'elo_by_surface': {}
-        }
-        for surface in surfaces:
-            if player in elo_surface.get(surface, {}):
-                player_stats[player]['elo_by_surface'][surface] = elo_surface[surface][player]
-    
-    joblib.dump(player_stats, MODELS_DIR / "player_stats.pkl")
+    """Recalcule tous les artefacts Elo depuis un état vierge."""
+    from src.data.tennis_pipeline import recalculate_elo_artifacts
 
-    # === Update TennisEloEngine v3 ===
-    v3_elo_path = MODELS_DIR / "elo_engine_v3.pkl"
-    if v3_elo_path.exists():
-        try:
-            from src.features.elo_system import TennisEloEngine as _TElo
-            if progress_callback:
-                progress_callback("🔄 Mise à jour TennisEloEngine v3...")
-            elo_engine = _TElo.load(str(v3_elo_path))
-            elo_engine.fit(df, progress_callback=progress_callback)
-            elo_engine.save(str(v3_elo_path))
-            if progress_callback:
-                progress_callback("✅ TennisEloEngine v3 mis à jour")
-        except Exception as _e:
-            if progress_callback:
-                progress_callback(f"⚠️ TennisEloEngine v3 non mis à jour : {_e}")
-
-    if progress_callback:
-        progress_callback("💾 Sauvegarde recent_matches.csv...")
-    
-    # === Save recent_matches.csv (last ~12 months) ===
-    cutoff = pd.Timestamp.now() - pd.Timedelta(days=365)
-    recent = df[df['Date'] >= cutoff][[
-        'Date', 'Tournament', 'Series', 'Surface', 'Round', 'Best of',
-        'Player_1', 'Player_2', 'Winner', 'Rank_1', 'Rank_2', 'Pts_1', 'Pts_2',
-        'Score'
-    ]].copy()
-    recent.to_csv(MODELS_DIR / "recent_matches.csv", index=False)
-    
-    return {
-        'total_players': len(elo_global),
-        'total_matches': len(df),
-        'recent_matches': len(recent),
-        'top_players': sorted(elo_global.items(), key=lambda x: x[1], reverse=True)[:10]
-    }
+    return recalculate_elo_artifacts(BASE_DIR, progress_callback=progress_callback)
 
 
 def _get_secret_or_env(key, default=None):
@@ -3439,7 +3252,10 @@ def show_update_page():
     """Page de mise à jour des données — inspirée de l'app UFC"""
     
     st.title("🔄 Mise à jour des données")
-    st.markdown("Télécharge les derniers résultats ATP depuis **tennis-data.co.uk** et recalcule tous les Elo.")
+    st.markdown(
+        "Met à jour les cotes historiques et les statistiques ATP détaillées, "
+        "contrôle leur qualité, puis recalcule tous les Elo."
+    )
 
     st.markdown("### ☁️ Mode hébergé (GitHub)")
     gh_cfg = get_github_update_config()
@@ -3526,41 +3342,33 @@ def show_update_page():
                     st.text(l)
         
         try:
-            # Step 1: Download new matches
             progress_bar.progress(10)
-            log_progress("📡 Recherche de nouveaux matchs...")
-            df_new = fetch_new_matches(progress_callback=log_progress)
-            
-            if df_new.empty:
-                progress_bar.progress(100)
-                st.success("✅ Les données sont déjà à jour ! Aucun nouveau match trouvé.")
-            else:
-                # Step 2: Update CSV
-                progress_bar.progress(40)
-                log_progress(f"💾 Ajout de {len(df_new)} nouveaux matchs au dataset...")
-                df_combined = update_main_csv(df_new)
-                
-                # Step 3: Recalculate Elo
-                progress_bar.progress(50)
-                log_progress("🧮 Recalcul de tous les Elo...")
-                result = recalculate_all_elo(progress_callback=log_progress)
-                
-                # Step 4: Clear cache
-                progress_bar.progress(90)
-                log_progress("🗑️ Vidage du cache...")
-                progress_bar.progress(100)
+            log_progress("📡 Téléchargement des cotes, matchs, statistiques et classements...")
+            from src.data.tennis_pipeline import run_data_update
 
-                st.success(f"""✅ Mise à jour terminée !
+            quality = run_data_update(BASE_DIR)
+            changes = quality["publication_changes"]
 
-- **{len(df_new)}** nouveaux matchs ajoutés
-- **{result['total_matches']:,}** matchs total dans le dataset
+            progress_bar.progress(55)
+            log_progress("✅ Contrôles qualité validés — recalcul des Elo...")
+            result = recalculate_all_elo(progress_callback=log_progress)
+
+            progress_bar.progress(95)
+            log_progress("🗑️ Invalidation des caches...")
+            progress_bar.progress(100)
+
+            st.success(f"""✅ Mise à jour terminée !
+
+- **{changes['rows_added']}** matchs ajoutés et **{changes['rows_removed']}** lignes retirées/révisées
+- **{result['total_matches']:,}** matchs ATP avec cotes dans la table compatible
+- **{quality['rich_match_dataset']['rows']:,}** matchs dans la table statistique enrichie
+- **{quality['legacy_odds_dataset']['odds']['coverage']:.1%}** de couverture globale des cotes
 - **{result['total_players']:,}** joueurs avec ratings Elo
-- **{result['recent_matches']}** matchs dans recent_matches.csv
-                """)
+            """)
 
-                st.cache_data.clear()
-                st.cache_resource.clear()
-                st.rerun()
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.rerun()
         
         except Exception as e:
             st.error(f"❌ Erreur pendant la mise à jour: {e}")
@@ -3600,8 +3408,9 @@ def show_update_page():
     <div class="card">
         <h4>ℹ️ Source des données</h4>
         <ul>
-            <li><b>Source</b> : <a href="http://www.tennis-data.co.uk/alldata.htm" target="_blank">tennis-data.co.uk</a></li>
-            <li><b>Format</b> : Fichiers Excel par année (ATP)</li>
+            <li><b>Cotes historiques</b> : tennis-data.co.uk via miroir Kaggle quotidien</li>
+            <li><b>Statistiques détaillées</b> : TennisMyLife (matchs en cours inclus)</li>
+            <li><b>Contrôles</b> : fraîcheur, doublons, vainqueurs, couverture des cotes et rapprochement des sources</li>
             <li><b>Elo Global</b> : K-factor = 32, Elo initial = 1500</li>
             <li><b>Elo Surface</b> : K-factor = 40, Elo initial = 1500</li>
             <li><b>Matchs récents</b> : Derniers 12 mois (pour form, H2H, fatigue)</li>

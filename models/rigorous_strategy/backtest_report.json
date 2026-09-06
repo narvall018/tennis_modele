@@ -1,0 +1,1555 @@
+{
+  "blend_comparison_development": [
+    {
+      "auc": 0.7921613287494854,
+      "brier": 0.18634702965376448,
+      "log_loss": 0.5510518455664414,
+      "model_weight": 0.0,
+      "n": 12555
+    },
+    {
+      "auc": 0.7922006119139544,
+      "brier": 0.1862229557066359,
+      "log_loss": 0.5506119128888164,
+      "model_weight": 0.1,
+      "n": 12555
+    },
+    {
+      "auc": 0.7922370275089241,
+      "brier": 0.18612021849201538,
+      "log_loss": 0.550231390430755,
+      "model_weight": 0.2,
+      "n": 12555
+    },
+    {
+      "auc": 0.7922455033338158,
+      "brier": 0.1860388180099029,
+      "log_loss": 0.549913100886992,
+      "model_weight": 0.30000000000000004,
+      "n": 12555
+    },
+    {
+      "auc": 0.7922223090106089,
+      "brier": 0.1859787542602985,
+      "log_loss": 0.5496603671680911,
+      "model_weight": 0.4,
+      "n": 12555
+    },
+    {
+      "auc": 0.792168891012413,
+      "brier": 0.18594002724320213,
+      "log_loss": 0.54947715244215,
+      "model_weight": 0.5,
+      "n": 12555
+    },
+    {
+      "auc": 0.7920994095496764,
+      "brier": 0.18592263695861388,
+      "log_loss": 0.549368260987478,
+      "model_weight": 0.6000000000000001,
+      "n": 12555
+    },
+    {
+      "auc": 0.7920084340040553,
+      "brier": 0.18592658340653367,
+      "log_loss": 0.5493396374991282,
+      "model_weight": 0.7000000000000001,
+      "n": 12555
+    },
+    {
+      "auc": 0.7918948985532579,
+      "brier": 0.18595186658696156,
+      "log_loss": 0.5493988348664248,
+      "model_weight": 0.8,
+      "n": 12555
+    },
+    {
+      "auc": 0.7917452012747032,
+      "brier": 0.18599848649989748,
+      "log_loss": 0.5495557912406456,
+      "model_weight": 0.9,
+      "n": 12555
+    },
+    {
+      "auc": 0.7915976990825351,
+      "brier": 0.1860664431453415,
+      "log_loss": 0.549824230139972,
+      "model_weight": 1.0,
+      "n": 12555
+    }
+  ],
+  "data_audit": {
+    "completed_rows": 68779,
+    "feature_cache_reused_by_explicit_request": true,
+    "label_p1_rate": 0.4987739774972327,
+    "max_date": "2026-08-29",
+    "min_date": "2000-01-03",
+    "noncompleted_rows": 2590,
+    "rows": 71369,
+    "source_path": "/home/julien/Documents/tenis_modele/tennis_modele/data/atp_tennis.csv",
+    "source_sha256": "260c867f2fad537c08739185f6f64cf6f336cece2b5aa4c63855fb3f1fa129d4"
+  },
+  "deployment_gate": {
+    "meaning": "no real-money deployment",
+    "passed": false,
+    "requirements": {
+      "at_least_50_final_settled_bets": true,
+      "at_least_two_positive_final_years": false,
+      "max_drawdown_at_most_25pct": false,
+      "positive_90pct_month_block_bootstrap_lower_bound": false,
+      "positive_final_roi_after_2pct_haircut": false,
+      "validation_gate": true
+    }
+  },
+  "final_holdout": {
+    "average_haircut_0pct": {
+      "available_markets": 7360,
+      "average_odds": 2.337672413793104,
+      "hit_rate": 0.33620689655172414,
+      "n_bets": 119,
+      "n_settled": 116,
+      "n_void": 3,
+      "odds_haircut": 0.0,
+      "price_source": "average",
+      "profit_units": -25.290000000000003,
+      "roi": -0.21801724137931036,
+      "standard_error": 0.10307114759563153,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.3047222222222223,
+          "hit_rate": 0.4444444444444444,
+          "n_bets": 37,
+          "n_settled": 36,
+          "n_void": 1,
+          "profit_units": 0.6800000000000002,
+          "roi": 0.018888888888888893,
+          "standard_error": 0.19399589988212596
+        },
+        "2025": {
+          "average_odds": 2.2663414634146344,
+          "hit_rate": 0.2926829268292683,
+          "n_bets": 41,
+          "n_settled": 41,
+          "n_void": 0,
+          "profit_units": -13.379999999999999,
+          "roi": -0.3263414634146341,
+          "standard_error": 0.16646275350534306
+        },
+        "2026": {
+          "average_odds": 2.443076923076923,
+          "hit_rate": 0.28205128205128205,
+          "n_bets": 41,
+          "n_settled": 39,
+          "n_void": 2,
+          "profit_units": -12.59,
+          "roi": -0.32282051282051283,
+          "standard_error": 0.17603787038813348
+        }
+      }
+    },
+    "average_haircut_2pct": {
+      "available_markets": 7360,
+      "average_odds": 2.337672413793104,
+      "hit_rate": 0.33620689655172414,
+      "n_bets": 119,
+      "n_settled": 116,
+      "n_void": 3,
+      "odds_haircut": 0.02,
+      "price_source": "average",
+      "profit_units": -26.3242,
+      "roi": -0.22693275862068968,
+      "standard_error": 0.10188560993049185,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.3047222222222223,
+          "hit_rate": 0.4444444444444444,
+          "n_bets": 37,
+          "n_settled": 36,
+          "n_void": 1,
+          "profit_units": 0.2663999999999995,
+          "roi": 0.0073999999999999864,
+          "standard_error": 0.19178342927904837
+        },
+        "2025": {
+          "average_odds": 2.2663414634146344,
+          "hit_rate": 0.2926829268292683,
+          "n_bets": 41,
+          "n_settled": 41,
+          "n_void": 0,
+          "profit_units": -13.692399999999997,
+          "roi": -0.333960975609756,
+          "standard_error": 0.1645647862963298
+        },
+        "2026": {
+          "average_odds": 2.443076923076923,
+          "hit_rate": 0.28205128205128205,
+          "n_bets": 41,
+          "n_settled": 39,
+          "n_void": 2,
+          "profit_units": -12.8982,
+          "roi": -0.3307230769230769,
+          "standard_error": 0.17397074189233278
+        }
+      }
+    },
+    "average_haircut_2pct_official_retirement_result": {
+      "average_odds": 2.3387288135593223,
+      "hit_rate": 0.3389830508474576,
+      "n_bets": 119,
+      "n_settled": 118,
+      "n_void": 1,
+      "profit_units": -25.932599999999997,
+      "roi": -0.21976779661016946,
+      "standard_error": 0.10130592360632464
+    },
+    "average_haircut_5pct": {
+      "available_markets": 7360,
+      "average_odds": 2.337672413793104,
+      "hit_rate": 0.33620689655172414,
+      "n_bets": 119,
+      "n_settled": 116,
+      "n_void": 3,
+      "odds_haircut": 0.05,
+      "price_source": "average",
+      "profit_units": -27.8755,
+      "roi": -0.2403060344827586,
+      "standard_error": 0.10010747687096332,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.3047222222222223,
+          "hit_rate": 0.4444444444444444,
+          "n_bets": 37,
+          "n_settled": 36,
+          "n_void": 1,
+          "profit_units": -0.35399999999999965,
+          "roi": -0.009833333333333324,
+          "standard_error": 0.18846514456070043
+        },
+        "2025": {
+          "average_odds": 2.2663414634146344,
+          "hit_rate": 0.2926829268292683,
+          "n_bets": 41,
+          "n_settled": 41,
+          "n_void": 0,
+          "profit_units": -14.161000000000001,
+          "roi": -0.34539024390243905,
+          "standard_error": 0.16171809116427138
+        },
+        "2026": {
+          "average_odds": 2.443076923076923,
+          "hit_rate": 0.28205128205128205,
+          "n_bets": 41,
+          "n_settled": 39,
+          "n_void": 2,
+          "profit_units": -13.360500000000002,
+          "roi": -0.3425769230769231,
+          "standard_error": 0.17087025657242802
+        }
+      }
+    },
+    "bet365_haircut_0pct": {
+      "available_markets": 7327,
+      "average_odds": 2.6001639344262295,
+      "hit_rate": 0.3770491803278688,
+      "n_bets": 437,
+      "n_settled": 427,
+      "n_void": 10,
+      "odds_haircut": 0.0,
+      "price_source": "bet365",
+      "profit_units": -11.239999999999998,
+      "roi": -0.026323185011709598,
+      "standard_error": 0.06227982084854952,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.5145098039215683,
+          "hit_rate": 0.3464052287581699,
+          "n_bets": 157,
+          "n_settled": 153,
+          "n_void": 4,
+          "profit_units": -21.26,
+          "roi": -0.13895424836601308,
+          "standard_error": 0.09785545155847764
+        },
+        "2025": {
+          "average_odds": 2.352391304347826,
+          "hit_rate": 0.42391304347826086,
+          "n_bets": 95,
+          "n_settled": 92,
+          "n_void": 3,
+          "profit_units": -0.5699999999999994,
+          "roi": -0.006195652173913037,
+          "standard_error": 0.12226753955034347
+        },
+        "2026": {
+          "average_odds": 2.797417582417582,
+          "hit_rate": 0.3791208791208791,
+          "n_bets": 185,
+          "n_settled": 182,
+          "n_void": 3,
+          "profit_units": 10.59,
+          "roi": 0.05818681318681319,
+          "standard_error": 0.10372675900321782
+        }
+      }
+    },
+    "bet365_haircut_2pct": {
+      "available_markets": 7327,
+      "average_odds": 2.6001639344262295,
+      "hit_rate": 0.3770491803278688,
+      "n_bets": 437,
+      "n_settled": 427,
+      "n_void": 10,
+      "odds_haircut": 0.02,
+      "price_source": "bet365",
+      "profit_units": -16.33520000000001,
+      "roi": -0.03825573770491806,
+      "standard_error": 0.061491555070382634,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.5145098039215683,
+          "hit_rate": 0.3464052287581699,
+          "n_bets": 157,
+          "n_settled": 153,
+          "n_void": 4,
+          "profit_units": -22.8348,
+          "roi": -0.14924705882352943,
+          "standard_error": 0.09665518414711965
+        },
+        "2025": {
+          "average_odds": 2.352391304347826,
+          "hit_rate": 0.42391304347826086,
+          "n_bets": 95,
+          "n_settled": 92,
+          "n_void": 3,
+          "profit_units": -1.6186000000000025,
+          "roi": -0.017593478260869592,
+          "standard_error": 0.12085136901083299
+        },
+        "2026": {
+          "average_odds": 2.797417582417582,
+          "hit_rate": 0.3791208791208791,
+          "n_bets": 185,
+          "n_settled": 182,
+          "n_void": 3,
+          "profit_units": 8.118199999999995,
+          "roi": 0.044605494505494475,
+          "standard_error": 0.10235226244051733
+        }
+      }
+    },
+    "bet365_haircut_5pct": {
+      "available_markets": 7327,
+      "average_odds": 2.6001639344262295,
+      "hit_rate": 0.3770491803278688,
+      "n_bets": 437,
+      "n_settled": 427,
+      "n_void": 10,
+      "odds_haircut": 0.05,
+      "price_source": "bet365",
+      "profit_units": -23.978000000000023,
+      "roi": -0.05615456674473073,
+      "standard_error": 0.06030951793826164,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.5145098039215683,
+          "hit_rate": 0.3464052287581699,
+          "n_bets": 157,
+          "n_settled": 153,
+          "n_void": 4,
+          "profit_units": -25.19700000000001,
+          "roi": -0.164686274509804,
+          "standard_error": 0.09485524700999678
+        },
+        "2025": {
+          "average_odds": 2.352391304347826,
+          "hit_rate": 0.42391304347826086,
+          "n_bets": 95,
+          "n_settled": 92,
+          "n_void": 3,
+          "profit_units": -3.191500000000003,
+          "roi": -0.03469021739130438,
+          "standard_error": 0.11872734270797662
+        },
+        "2026": {
+          "average_odds": 2.797417582417582,
+          "hit_rate": 0.3791208791208791,
+          "n_bets": 185,
+          "n_settled": 182,
+          "n_void": 3,
+          "profit_units": 4.410499999999992,
+          "roi": 0.02423351648351644,
+          "standard_error": 0.10029109260038974
+        }
+      }
+    },
+    "bootstrap_average_haircut_2pct": {
+      "months": 30,
+      "probability_roi_positive": 0.0038,
+      "roi_ci_90": [
+        -0.3508717184202593,
+        -0.09757300119842488
+      ],
+      "roi_ci_95": [
+        -0.3700498061403509,
+        -0.07143139908256879
+      ],
+      "samples": 5000
+    },
+    "maximum_haircut_0pct": {
+      "available_markets": 7354,
+      "average_odds": 2.516316113161132,
+      "hit_rate": 0.4009840098400984,
+      "n_bets": 1694,
+      "n_settled": 1626,
+      "n_void": 68,
+      "odds_haircut": 0.0,
+      "price_source": "maximum",
+      "profit_units": -30.410000000000004,
+      "roi": -0.018702337023370236,
+      "standard_error": 0.030553497236318318,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.490623268698061,
+          "hit_rate": 0.4279778393351801,
+          "n_bets": 747,
+          "n_settled": 722,
+          "n_void": 25,
+          "profit_units": 28.119999999999997,
+          "roi": 0.038947368421052626,
+          "standard_error": 0.04590184506071399
+        },
+        "2025": {
+          "average_odds": 2.368274428274428,
+          "hit_rate": 0.40332640332640335,
+          "n_bets": 510,
+          "n_settled": 481,
+          "n_void": 29,
+          "profit_units": -30.96,
+          "roi": -0.06436590436590436,
+          "standard_error": 0.052872389473246524
+        },
+        "2026": {
+          "average_odds": 2.728510638297872,
+          "hit_rate": 0.35224586288416077,
+          "n_bets": 437,
+          "n_settled": 423,
+          "n_void": 14,
+          "profit_units": -27.569999999999997,
+          "roi": -0.065177304964539,
+          "standard_error": 0.06351103302083716
+        }
+      }
+    },
+    "maximum_haircut_2pct": {
+      "available_markets": 7354,
+      "average_odds": 2.516316113161132,
+      "hit_rate": 0.4009840098400984,
+      "n_bets": 1694,
+      "n_settled": 1626,
+      "n_void": 68,
+      "odds_haircut": 0.02,
+      "price_source": "maximum",
+      "profit_units": -49.28180000000001,
+      "roi": -0.03030861008610087,
+      "standard_error": 0.03017926333170474,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.490623268698061,
+          "hit_rate": 0.4279778393351801,
+          "n_bets": 747,
+          "n_settled": 722,
+          "n_void": 25,
+          "profit_units": 19.297599999999996,
+          "roi": 0.026727977839335174,
+          "standard_error": 0.045343029467143796
+        },
+        "2025": {
+          "average_odds": 2.368274428274428,
+          "hit_rate": 0.40332640332640335,
+          "n_bets": 510,
+          "n_settled": 481,
+          "n_void": 29,
+          "profit_units": -36.080799999999996,
+          "roi": -0.07501205821205821,
+          "standard_error": 0.052254957914914246
+        },
+        "2026": {
+          "average_odds": 2.728510638297872,
+          "hit_rate": 0.35224586288416077,
+          "n_bets": 437,
+          "n_settled": 423,
+          "n_void": 14,
+          "profit_units": -32.4986,
+          "roi": -0.07682884160756502,
+          "standard_error": 0.06269277287435224
+        }
+      }
+    },
+    "maximum_haircut_5pct": {
+      "available_markets": 7354,
+      "average_odds": 2.516316113161132,
+      "hit_rate": 0.4009840098400984,
+      "n_bets": 1694,
+      "n_settled": 1626,
+      "n_void": 68,
+      "odds_haircut": 0.05,
+      "price_source": "maximum",
+      "profit_units": -77.58950000000007,
+      "roi": -0.047718019680196844,
+      "standard_error": 0.02961810845349441,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.490623268698061,
+          "hit_rate": 0.4279778393351801,
+          "n_bets": 747,
+          "n_settled": 722,
+          "n_void": 25,
+          "profit_units": 6.063999999999979,
+          "roi": 0.008398891966758974,
+          "standard_error": 0.04450509748544981
+        },
+        "2025": {
+          "average_odds": 2.368274428274428,
+          "hit_rate": 0.40332640332640335,
+          "n_bets": 510,
+          "n_settled": 481,
+          "n_void": 29,
+          "profit_units": -43.762000000000015,
+          "roi": -0.09098128898128902,
+          "standard_error": 0.05132906892374253
+        },
+        "2026": {
+          "average_odds": 2.728510638297872,
+          "hit_rate": 0.35224586288416077,
+          "n_bets": 437,
+          "n_settled": 423,
+          "n_void": 14,
+          "profit_units": -39.891500000000015,
+          "roi": -0.09430614657210405,
+          "standard_error": 0.06146575635056285
+        }
+      }
+    },
+    "pinnacle_haircut_0pct": {
+      "available_markets": 5292,
+      "average_odds": 2.4152966714905935,
+      "hit_rate": 0.42547033285094066,
+      "n_bets": 722,
+      "n_settled": 691,
+      "n_void": 31,
+      "odds_haircut": 0.0,
+      "price_source": "pinnacle",
+      "profit_units": 6.850000000000005,
+      "roi": 0.009913169319826345,
+      "standard_error": 0.04564041008629286,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.4784318766066837,
+          "hit_rate": 0.44473007712082263,
+          "n_bets": 402,
+          "n_settled": 389,
+          "n_void": 13,
+          "profit_units": 30.319999999999993,
+          "roi": 0.0779434447300771,
+          "standard_error": 0.06281057542699454
+        },
+        "2025": {
+          "average_odds": 2.3260070671378092,
+          "hit_rate": 0.3992932862190813,
+          "n_bets": 300,
+          "n_settled": 283,
+          "n_void": 17,
+          "profit_units": -23.53,
+          "roi": -0.08314487632508834,
+          "standard_error": 0.06780156055293572
+        },
+        "2026": {
+          "average_odds": 2.4526315789473685,
+          "hit_rate": 0.42105263157894735,
+          "n_bets": 20,
+          "n_settled": 19,
+          "n_void": 1,
+          "profit_units": 0.05999999999999961,
+          "roi": 0.003157894736842085,
+          "standard_error": 0.27888463379296397
+        }
+      }
+    },
+    "pinnacle_haircut_2pct": {
+      "available_markets": 5292,
+      "average_odds": 2.4152966714905935,
+      "hit_rate": 0.42547033285094066,
+      "n_bets": 722,
+      "n_settled": 691,
+      "n_void": 31,
+      "odds_haircut": 0.02,
+      "price_source": "pinnacle",
+      "profit_units": -1.2270000000000039,
+      "roi": -0.0017756874095513804,
+      "standard_error": 0.045096159364220734,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.4784318766066837,
+          "hit_rate": 0.44473007712082263,
+          "n_bets": 402,
+          "n_settled": 389,
+          "n_void": 13,
+          "profit_units": 25.3936,
+          "roi": 0.06527917737789203,
+          "standard_error": 0.06204567929260612
+        },
+        "2025": {
+          "average_odds": 2.3260070671378092,
+          "hit_rate": 0.3992932862190813,
+          "n_bets": 300,
+          "n_settled": 283,
+          "n_void": 17,
+          "profit_units": -26.459400000000002,
+          "roi": -0.09349611307420495,
+          "standard_error": 0.06702170008965459
+        },
+        "2026": {
+          "average_odds": 2.4526315789473685,
+          "hit_rate": 0.42105263157894735,
+          "n_bets": 20,
+          "n_settled": 19,
+          "n_void": 1,
+          "profit_units": -0.16120000000000045,
+          "roi": -0.008484210526315813,
+          "standard_error": 0.27562093781209474
+        }
+      }
+    },
+    "pinnacle_haircut_5pct": {
+      "available_markets": 5292,
+      "average_odds": 2.4152966714905935,
+      "hit_rate": 0.42547033285094066,
+      "n_bets": 722,
+      "n_settled": 691,
+      "n_void": 31,
+      "odds_haircut": 0.05,
+      "price_source": "pinnacle",
+      "profit_units": -13.34250000000002,
+      "roi": -0.019308972503617974,
+      "standard_error": 0.04428003703648087,
+      "yearly": {
+        "2024": {
+          "average_odds": 2.4784318766066837,
+          "hit_rate": 0.44473007712082263,
+          "n_bets": 402,
+          "n_settled": 389,
+          "n_void": 13,
+          "profit_units": 18.003999999999987,
+          "roi": 0.04628277634961436,
+          "standard_error": 0.06089874954500538
+        },
+        "2025": {
+          "average_odds": 2.3260070671378092,
+          "hit_rate": 0.3992932862190813,
+          "n_bets": 300,
+          "n_settled": 283,
+          "n_void": 17,
+          "profit_units": -30.853500000000007,
+          "roi": -0.10902296819787989,
+          "standard_error": 0.06585214913697032
+        },
+        "2026": {
+          "average_odds": 2.4526315789473685,
+          "hit_rate": 0.42105263157894735,
+          "n_bets": 20,
+          "n_settled": 19,
+          "n_void": 1,
+          "profit_units": -0.4930000000000012,
+          "roi": -0.025947368421052695,
+          "standard_error": 0.2707258353321343
+        }
+      }
+    },
+    "staking": {
+      "final_bankroll": 763.2500454896768,
+      "initial_bankroll": 1000.0,
+      "max_drawdown": 0.2895558721266243,
+      "n_bets": 119,
+      "n_settled": 116,
+      "profit": -236.74995451032316,
+      "return": -0.2367499545103232,
+      "roi_on_stakes": -0.22628863440914745,
+      "total_staked": 1046.229984676387
+    }
+  },
+  "fold_metrics": [
+    {
+      "auc": 0.7719985781456945,
+      "brier": 0.19402759864395697,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5676270291862753,
+      "model": "logistic",
+      "n": 2515,
+      "temperature": 1.0981465149808427,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.7593096702326916,
+      "brier": 0.1988051046500553,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5790775672968278,
+      "model": "logistic",
+      "n": 2546,
+      "temperature": 1.0861009262856707,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7595652359496008,
+      "brier": 0.1990633465941035,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5805517255180634,
+      "model": "logistic",
+      "n": 2449,
+      "temperature": 0.9887576411259461,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7758075702039017,
+      "brier": 0.19272206866801084,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.5649461384958916,
+      "model": "logistic",
+      "n": 2528,
+      "temperature": 0.986177135098457,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.7567053912485702,
+      "brier": 0.2006303292030353,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5862635219030212,
+      "model": "logistic",
+      "n": 2527,
+      "temperature": 1.070650351034627,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7740870847812253,
+      "brier": 0.193266929378894,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5662827555442728,
+      "model": "hist_gradient_boosting",
+      "n": 2515,
+      "temperature": 1.1175149281154981,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.7617837736093582,
+      "brier": 0.19836316244076657,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5782931200637783,
+      "model": "hist_gradient_boosting",
+      "n": 2546,
+      "temperature": 1.1100507852200705,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7604102473809314,
+      "brier": 0.19881965113492991,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5805653325472195,
+      "model": "hist_gradient_boosting",
+      "n": 2449,
+      "temperature": 1.0006159477729568,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7756298071145294,
+      "brier": 0.19264049045464998,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.5649773517769342,
+      "model": "hist_gradient_boosting",
+      "n": 2528,
+      "temperature": 0.9904353656616574,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.756989154360869,
+      "brier": 0.20036500742335522,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5852894396528913,
+      "model": "hist_gradient_boosting",
+      "n": 2527,
+      "temperature": 1.1028636992800118,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7977652972460265,
+      "brier": 0.18332854243054944,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5428659706449598,
+      "model": "market_logistic",
+      "n": 2512,
+      "temperature": 1.0714392537238633,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.7855974632843792,
+      "brier": 0.18866311618625317,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5557896202004532,
+      "model": "market_logistic",
+      "n": 2544,
+      "temperature": 1.0021207080168102,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7887017935917692,
+      "brier": 0.1873036919323538,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5521168469894732,
+      "model": "market_logistic",
+      "n": 2448,
+      "temperature": 0.9577101195918098,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7988753091489276,
+      "brier": 0.18287307661027333,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.540732622517145,
+      "model": "market_logistic",
+      "n": 2526,
+      "temperature": 1.0225488136934793,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.785901431991688,
+      "brier": 0.18878388878360894,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5578279005402877,
+      "model": "market_logistic",
+      "n": 2525,
+      "temperature": 1.0608061570792173,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7990197259467973,
+      "brier": 0.1828534744273634,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5420695466306064,
+      "model": "market_hist_gradient_boosting",
+      "n": 2512,
+      "temperature": 1.1191043767951119,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.7846947164120062,
+      "brier": 0.18897631353899672,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5565345945818668,
+      "model": "market_hist_gradient_boosting",
+      "n": 2544,
+      "temperature": 1.0228829858546746,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7897430660266846,
+      "brier": 0.18692559688353663,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5511693043318417,
+      "model": "market_hist_gradient_boosting",
+      "n": 2448,
+      "temperature": 0.9733335384635701,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7989774967792089,
+      "brier": 0.18291825022231292,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.5414885129207689,
+      "model": "market_hist_gradient_boosting",
+      "n": 2526,
+      "temperature": 1.049267392921669,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.7854465625674463,
+      "brier": 0.1888887584943246,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5581113252565129,
+      "model": "market_hist_gradient_boosting",
+      "n": 2525,
+      "temperature": 1.0822571165295691,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7744194622000539,
+      "brier": 0.19310731831143427,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5657318045095004,
+      "model": "xgboost",
+      "n": 2515,
+      "temperature": 1.0925688307166483,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.7611999617374884,
+      "brier": 0.19833940254473711,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5781770623121405,
+      "model": "xgboost",
+      "n": 2546,
+      "temperature": 1.0905845515563883,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7599727355427681,
+      "brier": 0.19899498573831556,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5807456355323175,
+      "model": "xgboost",
+      "n": 2449,
+      "temperature": 0.9909781386416874,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7755039959139527,
+      "brier": 0.19277025366197545,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.5652387881884264,
+      "model": "xgboost",
+      "n": 2528,
+      "temperature": 0.9791931461234147,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.7572359593636189,
+      "brier": 0.20030870150940286,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5852135378205597,
+      "model": "xgboost",
+      "n": 2527,
+      "temperature": 1.0627583169899857,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7982294073339538,
+      "brier": 0.18313452145589879,
+      "calibration_max_date": "2011-11-27",
+      "calibration_min_date": "2011-01-02",
+      "log_loss": 0.5426433441482524,
+      "model": "market_xgboost",
+      "n": 2512,
+      "temperature": 1.0889993869115615,
+      "test_min_date": "2012-01-01",
+      "test_year": 2012,
+      "train_max_date": "2010-11-28"
+    },
+    {
+      "auc": 0.785132645997132,
+      "brier": 0.18889275651042337,
+      "calibration_max_date": "2012-12-31",
+      "calibration_min_date": "2012-01-01",
+      "log_loss": 0.5565893123690332,
+      "model": "market_xgboost",
+      "n": 2544,
+      "temperature": 1.0088249378470884,
+      "test_min_date": "2013-01-01",
+      "test_year": 2013,
+      "train_max_date": "2011-11-27"
+    },
+    {
+      "auc": 0.7908143751664534,
+      "brier": 0.18651101393731964,
+      "calibration_max_date": "2013-12-31",
+      "calibration_min_date": "2013-01-01",
+      "log_loss": 0.5503276443901105,
+      "model": "market_xgboost",
+      "n": 2448,
+      "temperature": 0.9799258349539886,
+      "test_min_date": "2014-01-01",
+      "test_year": 2014,
+      "train_max_date": "2012-12-31"
+    },
+    {
+      "auc": 0.7984471241705091,
+      "brier": 0.1830306281362415,
+      "calibration_max_date": "2014-11-15",
+      "calibration_min_date": "2014-01-01",
+      "log_loss": 0.5418024501280799,
+      "model": "market_xgboost",
+      "n": 2526,
+      "temperature": 1.0438710491636904,
+      "test_min_date": "2015-01-05",
+      "test_year": 2015,
+      "train_max_date": "2013-12-31"
+    },
+    {
+      "auc": 0.7857229349555546,
+      "brier": 0.18874169284725664,
+      "calibration_max_date": "2015-11-22",
+      "calibration_min_date": "2015-01-05",
+      "log_loss": 0.5576890517820183,
+      "model": "market_xgboost",
+      "n": 2525,
+      "temperature": 1.0670608140354034,
+      "test_min_date": "2016-01-04",
+      "test_year": 2016,
+      "train_max_date": "2014-11-15"
+    },
+    {
+      "auc": 0.7586385638411091,
+      "brier": 0.19922249207924944,
+      "calibration_max_date": "2016-11-20",
+      "calibration_min_date": "2016-01-04",
+      "log_loss": 0.5820242777786861,
+      "model": "market_xgboost",
+      "n": 2528,
+      "temperature": 0.9718228023451095,
+      "test_min_date": "2017-01-01",
+      "test_year": 2017,
+      "train_max_date": "2015-11-22"
+    },
+    {
+      "auc": 0.7507587253414264,
+      "brier": 0.20228254825176853,
+      "calibration_max_date": "2017-12-31",
+      "calibration_min_date": "2017-01-01",
+      "log_loss": 0.5880620957817221,
+      "model": "market_xgboost",
+      "n": 2568,
+      "temperature": 0.9125995670876209,
+      "test_min_date": "2018-01-01",
+      "test_year": 2018,
+      "train_max_date": "2016-11-20"
+    },
+    {
+      "auc": 0.7442548025875813,
+      "brier": 0.20455018624281784,
+      "calibration_max_date": "2018-12-31",
+      "calibration_min_date": "2018-01-01",
+      "log_loss": 0.5927734620962173,
+      "model": "market_xgboost",
+      "n": 2512,
+      "temperature": 0.9937944381446469,
+      "test_min_date": "2019-01-01",
+      "test_year": 2019,
+      "train_max_date": "2017-12-31"
+    },
+    {
+      "auc": 0.7688000314436568,
+      "brier": 0.1955244962414659,
+      "calibration_max_date": "2019-11-17",
+      "calibration_min_date": "2019-01-01",
+      "log_loss": 0.571671128042129,
+      "model": "market_xgboost",
+      "n": 1236,
+      "temperature": 0.9691714976441983,
+      "test_min_date": "2020-01-06",
+      "test_year": 2020,
+      "train_max_date": "2018-12-31"
+    },
+    {
+      "auc": 0.7480797274228885,
+      "brier": 0.20367623825229786,
+      "calibration_max_date": "2020-11-22",
+      "calibration_min_date": "2020-01-06",
+      "log_loss": 0.5908859387548778,
+      "model": "market_xgboost",
+      "n": 2407,
+      "temperature": 0.9898355499502225,
+      "test_min_date": "2021-01-07",
+      "test_year": 2021,
+      "train_max_date": "2019-11-17"
+    },
+    {
+      "auc": 0.7623670321349832,
+      "brier": 0.19789972473875098,
+      "calibration_max_date": "2021-11-21",
+      "calibration_min_date": "2021-01-07",
+      "log_loss": 0.5775833328513268,
+      "model": "market_xgboost",
+      "n": 2543,
+      "temperature": 0.935122458514316,
+      "test_min_date": "2022-01-03",
+      "test_year": 2022,
+      "train_max_date": "2020-11-22"
+    },
+    {
+      "auc": 0.7494892813584764,
+      "brier": 0.2021588218478075,
+      "calibration_max_date": "2022-11-20",
+      "calibration_min_date": "2022-01-03",
+      "log_loss": 0.586097694461976,
+      "model": "market_xgboost",
+      "n": 2612,
+      "temperature": 1.0242065361509818,
+      "test_min_date": "2023-01-01",
+      "test_year": 2023,
+      "train_max_date": "2021-11-21"
+    },
+    {
+      "auc": 0.7593078698126147,
+      "brier": 0.19865764399850405,
+      "calibration_max_date": "2023-12-31",
+      "calibration_min_date": "2023-01-01",
+      "log_loss": 0.5791533720746168,
+      "model": "market_xgboost",
+      "n": 2628,
+      "temperature": 0.9761063372580422,
+      "test_min_date": "2024-01-01",
+      "test_year": 2024,
+      "train_max_date": "2022-11-20"
+    },
+    {
+      "auc": 0.7429378713510721,
+      "brier": 0.20541463316068792,
+      "calibration_max_date": "2024-12-31",
+      "calibration_min_date": "2024-01-01",
+      "log_loss": 0.5951099581103103,
+      "model": "market_xgboost",
+      "n": 2489,
+      "temperature": 1.0641679524551302,
+      "test_min_date": "2025-01-01",
+      "test_year": 2025,
+      "train_max_date": "2023-12-31"
+    },
+    {
+      "auc": 0.7407771234683316,
+      "brier": 0.20586514534292044,
+      "calibration_max_date": "2025-11-16",
+      "calibration_min_date": "2025-01-01",
+      "log_loss": 0.5968354852939503,
+      "model": "market_xgboost",
+      "n": 1958,
+      "temperature": 0.91980843171738,
+      "test_min_date": "2026-01-04",
+      "test_year": 2026,
+      "train_max_date": "2024-12-31"
+    }
+  ],
+  "frozen_strategy": {
+    "model": "market_xgboost",
+    "model_weight": 0.7000000000000001,
+    "rule": {
+      "max_odds": 4.0,
+      "min_edge": 0.005,
+      "min_ev": 0.01,
+      "min_odds": 1.75,
+      "min_probability": 0.0
+    },
+    "stake_plan": {
+      "flat_fraction": 0.01,
+      "kelly_divisor": 1.0,
+      "kind": "flat",
+      "max_bet_fraction": 0.01,
+      "max_daily_fraction": 0.04,
+      "name": "flat_1_00pct"
+    }
+  },
+  "market_comparison": {
+    "development": {
+      "blend_auc": 0.7920084340040553,
+      "blend_gain_vs_market": 0.0017122080673132034,
+      "blend_log_loss": 0.5493396374991282,
+      "market_auc": 0.7921613287494854,
+      "market_log_loss": 0.5510518455664414,
+      "model_log_loss": 0.549824230139972,
+      "n": 12555
+    },
+    "holdout": {
+      "blend_auc": 0.7491433501275065,
+      "blend_gain_vs_market": 5.54855447448821e-05,
+      "blend_log_loss": 0.589082083570282,
+      "market_auc": 0.749954969943736,
+      "market_log_loss": 0.5891375691150269,
+      "model_log_loss": 0.5896604420854008,
+      "n": 7075
+    },
+    "price_source": "average",
+    "tuning": {
+      "blend_auc": 0.7535610975180428,
+      "blend_gain_vs_market": 0.0010490532158533572,
+      "blend_log_loss": 0.5853580669512842,
+      "market_auc": 0.7529377750448449,
+      "market_log_loss": 0.5864071201671376,
+      "model_log_loss": 0.5853836824104195,
+      "n": 8844
+    },
+    "validation": {
+      "blend_auc": 0.7530859896430487,
+      "blend_gain_vs_market": 0.0012748899660454116,
+      "blend_log_loss": 0.5848017386679483,
+      "market_auc": 0.7527098972804731,
+      "market_log_loss": 0.5860766286339937,
+      "model_log_loss": 0.584758535831605,
+      "n": 7562
+    }
+  },
+  "model_comparison_development": [
+    {
+      "auc": 0.7644044740783644,
+      "brier": 0.1970707879614361,
+      "log_loss": 0.5757407845061016,
+      "model": "logistic",
+      "n": 12555
+    },
+    {
+      "auc": 0.765524653307041,
+      "brier": 0.19671570951820258,
+      "log_loss": 0.5751344904918938,
+      "model": "hist_gradient_boosting",
+      "n": 12555
+    },
+    {
+      "auc": 0.7913125281776769,
+      "brier": 0.18619007683870437,
+      "log_loss": 0.5498682761308528,
+      "model": "market_logistic",
+      "n": 12555
+    },
+    {
+      "auc": 0.7915873073151901,
+      "brier": 0.18611494590484862,
+      "log_loss": 0.5498842092128441,
+      "model": "market_hist_gradient_boosting",
+      "n": 12555
+    },
+    {
+      "auc": 0.7654538395664396,
+      "brier": 0.19672364279196247,
+      "log_loss": 0.5750643805977498,
+      "model": "xgboost",
+      "n": 12555
+    },
+    {
+      "auc": 0.7915976990825351,
+      "brier": 0.1860664431453415,
+      "log_loss": 0.549824230139972,
+      "model": "market_xgboost",
+      "n": 12555
+    }
+  ],
+  "protocol": {
+    "development_note": "Market-residual candidate families were added during 2012-2016 development after pure sports models optimally received zero blend weight; no tuning, validation, or final-holdout return had been inspected at that point.",
+    "final_holdout_years": [
+      2024,
+      2025,
+      2026
+    ],
+    "fold_rule": "train through Y-2, calibrate on Y-1, test on Y",
+    "missing_odds": "excluded, never imputed",
+    "model_development_years": [
+      2012,
+      2013,
+      2014,
+      2015,
+      2016
+    ],
+    "primary_price": "Tennis-Data market average pre-match decimal odds",
+    "primary_settlement": "all non-completed matches void",
+    "strategy_tuning_years": [
+      2017,
+      2018,
+      2019,
+      2020
+    ],
+    "strategy_validation_years": [
+      2021,
+      2022,
+      2023
+    ]
+  },
+  "tuning": {
+    "available_markets": 9139,
+    "average_odds": 2.5630150753768843,
+    "hit_rate": 0.46733668341708545,
+    "n_bets": 205,
+    "n_settled": 199,
+    "n_void": 6,
+    "odds_haircut": 0.0,
+    "price_source": "average",
+    "profit_units": 33.58,
+    "roi": 0.1687437185929648,
+    "standard_error": 0.09111575470541017,
+    "yearly": {
+      "2017": {
+        "average_odds": 2.633939393939394,
+        "hit_rate": 0.5757575757575758,
+        "n_bets": 33,
+        "n_settled": 33,
+        "n_void": 0,
+        "profit_units": 14.96,
+        "roi": 0.45333333333333337,
+        "standard_error": 0.23255606470768123
+      },
+      "2018": {
+        "average_odds": 2.685540540540541,
+        "hit_rate": 0.43243243243243246,
+        "n_bets": 79,
+        "n_settled": 74,
+        "n_void": 5,
+        "profit_units": 8.480000000000002,
+        "roi": 0.11459459459459462,
+        "standard_error": 0.15392593905079477
+      },
+      "2019": {
+        "average_odds": 2.4238333333333335,
+        "hit_rate": 0.55,
+        "n_bets": 61,
+        "n_settled": 60,
+        "n_void": 1,
+        "profit_units": 20.4,
+        "roi": 0.33999999999999997,
+        "standard_error": 0.1610489977026152
+      },
+      "2020": {
+        "average_odds": 2.4675000000000002,
+        "hit_rate": 0.28125,
+        "n_bets": 32,
+        "n_settled": 32,
+        "n_void": 0,
+        "profit_units": -10.26,
+        "roi": -0.320625,
+        "standard_error": 0.19543166525998368
+      }
+    }
+  },
+  "validation": {
+    "gate_passed": true,
+    "observed_odds": {
+      "available_markets": 7814,
+      "average_odds": 2.412469879518072,
+      "hit_rate": 0.4397590361445783,
+      "n_bets": 170,
+      "n_settled": 166,
+      "n_void": 4,
+      "odds_haircut": 0.0,
+      "price_source": "average",
+      "profit_units": 5.130000000000001,
+      "roi": 0.03090361445783133,
+      "standard_error": 0.09181699269824785,
+      "yearly": {
+        "2021": {
+          "average_odds": 2.3932786885245907,
+          "hit_rate": 0.47540983606557374,
+          "n_bets": 61,
+          "n_settled": 61,
+          "n_void": 0,
+          "profit_units": 7.870000000000001,
+          "roi": 0.12901639344262297,
+          "standard_error": 0.155217581273851
+        },
+        "2022": {
+          "average_odds": 2.450461538461539,
+          "hit_rate": 0.4,
+          "n_bets": 67,
+          "n_settled": 65,
+          "n_void": 2,
+          "profit_units": -4.85,
+          "roi": -0.07461538461538461,
+          "standard_error": 0.14389884884259793
+        },
+        "2023": {
+          "average_odds": 2.38,
+          "hit_rate": 0.45,
+          "n_bets": 42,
+          "n_settled": 40,
+          "n_void": 2,
+          "profit_units": 2.1099999999999994,
+          "roi": 0.052749999999999984,
+          "standard_error": 0.1882074644627231
+        }
+      }
+    },
+    "odds_haircut_2pct": {
+      "available_markets": 7814,
+      "average_odds": 2.412469879518072,
+      "hit_rate": 0.4397590361445783,
+      "n_bets": 170,
+      "n_settled": 166,
+      "n_void": 4,
+      "odds_haircut": 0.02,
+      "price_source": "average",
+      "profit_units": 3.1674000000000024,
+      "roi": 0.01908072289156628,
+      "standard_error": 0.0907431985424808,
+      "yearly": {
+        "2021": {
+          "average_odds": 2.3932786885245907,
+          "hit_rate": 0.47540983606557374,
+          "n_bets": 61,
+          "n_settled": 61,
+          "n_void": 0,
+          "profit_units": 7.072599999999998,
+          "roi": 0.11594426229508194,
+          "standard_error": 0.1533852913012394
+        },
+        "2022": {
+          "average_odds": 2.450461538461539,
+          "hit_rate": 0.4,
+          "n_bets": 67,
+          "n_settled": 65,
+          "n_void": 2,
+          "profit_units": -5.532999999999998,
+          "roi": -0.08512307692307688,
+          "standard_error": 0.14222680882284114
+        },
+        "2023": {
+          "average_odds": 2.38,
+          "hit_rate": 0.45,
+          "n_bets": 42,
+          "n_settled": 40,
+          "n_void": 2,
+          "profit_units": 1.6277999999999992,
+          "roi": 0.04069499999999998,
+          "standard_error": 0.18602111914669728
+        }
+      }
+    },
+    "positive_years_after_haircut": 2,
+    "stake_comparison_after_haircut": [
+      {
+        "admissible": true,
+        "final_bankroll": 1007.2160900455099,
+        "initial_bankroll": 1000.0,
+        "max_drawdown": 0.030094386064960833,
+        "n_bets": 170,
+        "n_settled": 166,
+        "plan": "flat_0_25pct",
+        "profit": 7.216090045509873,
+        "return": 0.0072160900455098265,
+        "roi_on_stakes": 0.017312666459995223,
+        "score": 0.007190178645728469,
+        "total_staked": 416.8098578104027
+      },
+      {
+        "admissible": true,
+        "final_bankroll": 1013.0088946098082,
+        "initial_bankroll": 1000.0,
+        "max_drawdown": 0.05939919588458099,
+        "n_bets": 170,
+        "n_settled": 166,
+        "plan": "flat_0_50pct",
+        "profit": 13.00889460980818,
+        "return": 0.013008894609808141,
+        "roi_on_stakes": 0.015547196459497047,
+        "score": 0.012925005691777297,
+        "total_staked": 836.7357191181752
+      },
+      {
+        "admissible": true,
+        "final_bankroll": 1020.2375634987299,
+        "initial_bankroll": 1000.0,
+        "max_drawdown": 0.11570886048135541,
+        "n_bets": 170,
+        "n_settled": 166,
+        "plan": "flat_1_00pct",
+        "profit": 20.237563498729855,
+        "return": 0.02023756349872996,
+        "roi_on_stakes": 0.012026117388126402,
+        "score": 0.020035505568841455,
+        "total_staked": 1682.8010941179837
+      },
+      {
+        "admissible": true,
+        "final_bankroll": 994.0960811385212,
+        "initial_bankroll": 1000.0,
+        "max_drawdown": 0.010158698879807186,
+        "n_bets": 170,
+        "n_settled": 166,
+        "plan": "kelly_1_24",
+        "profit": -5.9039188614788145,
+        "return": -0.005903918861478785,
+        "roi_on_stakes": -0.10502260379658293,
+        "score": -0.005921415891794488,
+        "total_staked": 56.215696888587516
+      },
+      {
+        "admissible": true,
+        "final_bankroll": 991.1392302764413,
+        "initial_bankroll": 1000.0,
+        "max_drawdown": 0.015211067145268759,
+        "n_bets": 170,
+        "n_settled": 166,
+        "plan": "kelly_1_16",
+        "profit": -8.860769723558747,
+        "return": -0.008860769723558759,
+        "roi_on_stakes": -0.10530061182499528,
+        "score": -0.008900259791606939,
+        "total_staked": 84.14737170078996
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "protocol_version": "1.0.0",
+  "frozen_before_return_analysis": true,
+  "orientation": "deterministic_sha256_parity_swap",
+  "model_selection": ["2015-01-01", "2018-12-31"],
+  "strategy_selection": ["2019-01-01", "2021-12-31"],
+  "validation": ["2022-01-01", "2024-12-31"],
+  "final_holdout": ["2025-09-13", "2026-08-29"],
+  "legacy_odds_use": "research_and_validation_only_unverified_snapshot",
+  "holdout_quote": {
+    "bookmaker_priority": ["Pinnacle", "BetOnline.ag"],
+    "cutoff_hours_before_event_date": 24,
+    "maximum_quote_age_days": 14,
+    "no_line_shopping": true
+  },
+  "model_candidates": {
+    "market_recal_c0.1": {"features": "market", "C": 0.1},
+    "market_recal_c1": {"features": "market", "C": 1.0},
+    "market_recal_c10": {"features": "market", "C": 10.0},
+    "market_plus_c0.01": {"features": "market_plus_stats", "C": 0.01},
+    "market_plus_c0.1": {"features": "market_plus_stats", "C": 0.1},
+    "market_plus_c1": {"features": "market_plus_stats", "C": 1.0}
+  },
+  "bet_rule": {
+    "edge_threshold_candidates": [0.02, 0.03, 0.05, 0.08, 0.1],
+    "minimum_decimal_odds": 1.25,
+    "maximum_decimal_odds": 5.0,
+    "minimum_selection_bets": 80,
+    "one_side_maximum_per_fight": true
+  },
+  "staking": {
+    "method": "one_eighth_kelly",
+    "maximum_fraction_per_bet": 0.005,
+    "maximum_event_exposure": 0.03,
+    "minimum_stake": 0.0,
+    "simultaneous_event_settlement": true
+  },
+  "validation_gate": {
+    "minimum_bets": 80,
+    "positive_roi": true,
+    "maximum_drawdown": 0.2,
+    "cluster_bootstrap_confidence": 0.95,
+    "roi_lower_bound_must_exceed": 0.0,
+    "bootstrap_samples": 5000
+  }
+}
+

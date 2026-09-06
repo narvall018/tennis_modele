@@ -1,0 +1,256 @@
+{
+  "protocol": {
+    "protocol_version": "3.0.0",
+    "frozen_before_phase3_returns": true,
+    "created_for_research_date": "2026-09-02",
+    "disclosure": "All 2015-2024 outcomes have been used in earlier research. This is a development ablation, not an independent confirmation.",
+    "development_window": [
+      "2015-01-01",
+      "2024-12-31"
+    ],
+    "pristine_economic_holdout": [
+      "2025-09-13",
+      "2026-08-29"
+    ],
+    "hypothesis": "Pre-fight UFC division and pound-for-pound ranks improve the frozen structural logistic model.",
+    "baseline": {
+      "family": "logistic",
+      "C": 0.05,
+      "features": "phase2_structural"
+    },
+    "challenger": {
+      "family": "logistic",
+      "C": 0.05,
+      "features": "phase2_structural_plus_prefight_rankings"
+    },
+    "walk_forward": {
+      "first_test_year": 2015,
+      "last_test_year": 2024,
+      "minimum_training_rows": 1000,
+      "train_uses_only_dates_strictly_before_test_year": true
+    },
+    "fixed_bet_rule": {
+      "edge_threshold": 0.03,
+      "minimum_decimal_odds": 1.25,
+      "maximum_decimal_odds": 4.0,
+      "one_side_maximum_per_fight": true
+    },
+    "staking": {
+      "method": "one_tenth_kelly",
+      "kelly_divisor": 10.0,
+      "maximum_fraction_per_bet": 0.0025,
+      "maximum_event_exposure": 0.02,
+      "minimum_stake": 0.0,
+      "simultaneous_event_settlement": true
+    },
+    "gate_before_pristine_holdout": {
+      "challenger_log_loss_must_beat_baseline": true,
+      "challenger_log_loss_must_beat_market": true,
+      "minimum_log_loss_improvement_vs_baseline": 0.001,
+      "years_beating_baseline_minimum": 7,
+      "years_total": 10,
+      "minimum_bets": 500,
+      "positive_roi": true,
+      "positive_years_minimum": 7,
+      "maximum_drawdown": 0.15,
+      "cluster_bootstrap_confidence": 0.99,
+      "roi_lower_bound_must_exceed": 0.0,
+      "bootstrap_samples": 20000
+    },
+    "line_movement_policy": "Do not evaluate completed 2025-2026 fights before the phase3 gate; collect prospectively instead.",
+    "real_money_status_until_all_gates_pass": "NO_BET"
+  },
+  "disclosure": "Development ablation only; 2015-2024 is already research-exposed.",
+  "ranking_coverage": {
+    "fights": 4397,
+    "at_least_one_division_rank": 1403,
+    "two_division_ranks": 911
+  },
+  "baseline_probability": {
+    "n": 4397,
+    "log_loss": 0.6121131305393083,
+    "market_log_loss": 0.6128503978776774,
+    "log_loss_improvement": 0.0007372673383690964,
+    "brier": 0.2122293336311978,
+    "market_brier": 0.2125639041206582,
+    "auc": 0.7231290150945817
+  },
+  "rank_challenger_probability": {
+    "n": 4397,
+    "log_loss": 0.612896611718938,
+    "market_log_loss": 0.6128503978776774,
+    "log_loss_improvement": -4.621384126057837e-05,
+    "brier": 0.21257994493271032,
+    "market_brier": 0.2125639041206582,
+    "auc": 0.7221292656012885
+  },
+  "log_loss_improvement_vs_baseline": -0.0007834811796296748,
+  "yearly_probability_comparison": {
+    "2015": {
+      "n": 439,
+      "baseline_log_loss": 0.6329140946911941,
+      "rank_challenger_log_loss": 0.6326546805703533,
+      "market_log_loss": 0.6295449503208307,
+      "challenger_minus_baseline": -0.00025941412084073967
+    },
+    "2016": {
+      "n": 461,
+      "baseline_log_loss": 0.6214467283150402,
+      "rank_challenger_log_loss": 0.6194503759304185,
+      "market_log_loss": 0.6247670968279606,
+      "challenger_minus_baseline": -0.0019963523846217024
+    },
+    "2017": {
+      "n": 417,
+      "baseline_log_loss": 0.6031503531440069,
+      "rank_challenger_log_loss": 0.605076465748063,
+      "market_log_loss": 0.6123123624206265,
+      "challenger_minus_baseline": 0.0019261126040560628
+    },
+    "2018": {
+      "n": 448,
+      "baseline_log_loss": 0.6041294782086265,
+      "rank_challenger_log_loss": 0.6080938947700983,
+      "market_log_loss": 0.6007960291823208,
+      "challenger_minus_baseline": 0.00396441656147184
+    },
+    "2019": {
+      "n": 481,
+      "baseline_log_loss": 0.6282803933022271,
+      "rank_challenger_log_loss": 0.6297521918749815,
+      "market_log_loss": 0.6282673678855134,
+      "challenger_minus_baseline": 0.0014717985727544791
+    },
+    "2020": {
+      "n": 417,
+      "baseline_log_loss": 0.613724051734959,
+      "rank_challenger_log_loss": 0.6161302010544085,
+      "market_log_loss": 0.614992996833919,
+      "challenger_minus_baseline": 0.002406149319449491
+    },
+    "2021": {
+      "n": 477,
+      "baseline_log_loss": 0.6305217851627238,
+      "rank_challenger_log_loss": 0.6303771153477857,
+      "market_log_loss": 0.6293974596796573,
+      "challenger_minus_baseline": -0.00014466981493810316
+    },
+    "2022": {
+      "n": 477,
+      "baseline_log_loss": 0.6067391310187671,
+      "rank_challenger_log_loss": 0.6061807444958267,
+      "market_log_loss": 0.6046745349039253,
+      "challenger_minus_baseline": -0.0005583865229403795
+    },
+    "2023": {
+      "n": 412,
+      "baseline_log_loss": 0.5788423951410023,
+      "rank_challenger_log_loss": 0.5809708679364696,
+      "market_log_loss": 0.5864990366891352,
+      "challenger_minus_baseline": 0.00212847279546724
+    },
+    "2024": {
+      "n": 368,
+      "baseline_log_loss": 0.5928782054120696,
+      "rank_challenger_log_loss": 0.5919190970465569,
+      "market_log_loss": 0.5893636692162039,
+      "challenger_minus_baseline": -0.0009591083655127175
+    }
+  },
+  "years_beating_baseline": 5,
+  "fixed_rule_economic_diagnostic": {
+    "bets": 1297,
+    "events": 400,
+    "wins": 686,
+    "win_rate": 0.5289128758673862,
+    "average_odds": 2.0707263023830693,
+    "average_edge": 0.08539622170021352,
+    "profit_units": -6.588089073590377,
+    "roi": -0.005079482709013398,
+    "roi_bootstrap_0.99": {
+      "low": -0.07789518440812729,
+      "median": -0.005270145016851692,
+      "high": 0.06650305750259025
+    },
+    "positive_years": 6,
+    "yearly": {
+      "2015": {
+        "bets": 149,
+        "wins": 78,
+        "profit_units": 0.34145847445912403,
+        "roi": 0.0022916676138196243
+      },
+      "2016": {
+        "bets": 127,
+        "wins": 72,
+        "profit_units": 11.56502417793067,
+        "roi": 0.0910631825033911
+      },
+      "2017": {
+        "bets": 147,
+        "wins": 79,
+        "profit_units": 11.697230487841907,
+        "roi": 0.07957299651593133
+      },
+      "2018": {
+        "bets": 152,
+        "wins": 71,
+        "profit_units": -21.938123210806236,
+        "roi": -0.1443297579658305
+      },
+      "2019": {
+        "bets": 139,
+        "wins": 78,
+        "profit_units": 5.3718863775269865,
+        "roi": 0.03864666458652508
+      },
+      "2020": {
+        "bets": 114,
+        "wins": 57,
+        "profit_units": -7.525883984668787,
+        "roi": -0.06601652618130514
+      },
+      "2021": {
+        "bets": 147,
+        "wins": 76,
+        "profit_units": 0.06544583195879294,
+        "roi": 0.0004452097412162785
+      },
+      "2022": {
+        "bets": 128,
+        "wins": 65,
+        "profit_units": -7.450660415030431,
+        "roi": -0.058208284492425245
+      },
+      "2023": {
+        "bets": 101,
+        "wins": 62,
+        "profit_units": 12.676323612222427,
+        "roi": 0.12550815457645967
+      },
+      "2024": {
+        "bets": 93,
+        "wins": 48,
+        "profit_units": -11.390790425024829,
+        "roi": -0.12248161747338525
+      }
+    },
+    "initial_bankroll": 1000.0,
+    "final_bankroll": 992.305179017885,
+    "return": -0.007694820982114936,
+    "max_drawdown": 0.07867581629882885,
+    "total_staked": 3237.8453941222306
+  },
+  "gate_checks": {
+    "challenger_log_loss_beats_baseline": false,
+    "challenger_log_loss_beats_market": false,
+    "minimum_log_loss_improvement_vs_baseline": false,
+    "years_beating_baseline": false,
+    "minimum_bets": true,
+    "positive_roi": false,
+    "positive_years": false,
+    "maximum_drawdown": true,
+    "positive_99pct_cluster_bootstrap_lower_bound": false
+  },
+  "approved_for_pristine_holdout": false
+}

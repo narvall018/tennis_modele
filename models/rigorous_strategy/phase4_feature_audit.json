@@ -1,0 +1,12 @@
+{
+  "source_path": "/home/julien/Documents/tenis_modele/tennis_modele/data/processed/atp_matches_enriched.csv.gz",
+  "source_sha256": "015fde1652b34d5267b1218d2f15fbf30f1cf9603d0541cd4b081aaad8a9d4a7",
+  "rows": 79637,
+  "completed_rows": 76814,
+  "valid_market_rows": 54381,
+  "date_min": "2000-01-03",
+  "date_max": "2026-08-30",
+  "label_p1_rate": 0.4987505807601994,
+  "snapshot_protocol": "start_of_calendar_day_then_batch_update",
+  "serve_history_coverage": 0.8617853510303
+}
