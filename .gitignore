@@ -39,5 +39,15 @@ models/**/*.csv
 !data/quality/*.json
 !data/data_manifest.json
 
+# Les artefacts dont l'app a besoin au démarrage sont versionnés malgré la règle
+# ci-dessus: 1,7 Mo au total, et sans eux un déploiement Streamlit Cloud n'affiche
+# que « modèle absent ». Ils restent régénérables depuis la page Mise à jour.
+!models/football/football_model.joblib
+!models/football/team_states.parquet
+!models/ufc/ufc_descriptor_model.joblib
+!models/ufc/fighter_states.parquet
+!models/tennis/atp_player_ratings.parquet
+!models/tennis/wta_player_ratings.parquet
+
 catboost_info/
 *.png

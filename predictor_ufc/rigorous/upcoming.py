@@ -232,8 +232,18 @@ def collect_upcoming(base_dir: Path, limit: int = 4) -> dict[str, Any]:
     base_dir = Path(base_dir).resolve()
     processed = base_dir / "data" / "rigorous" / "processed"
     features_path = processed / "features.parquet"
-    if not features_path.exists():
-        return {"available": False, "reason": "features.parquet absent; lancer update-data"}
+    table_path = base_dir.parent / "models" / "ufc" / "fighter_states.parquet"
+    # Either source of fighter state is enough. A deployment ships the frozen
+    # table without the multi-hundred-megabyte fight history, and requiring both
+    # would make the page fail there for no reason.
+    if not table_path.exists() and not features_path.exists():
+        return {
+            "available": False,
+            "reason": (
+                "Ni models/ufc/fighter_states.parquet ni features.parquet: "
+                "lancer l'entraînement UFC depuis la page Mise à jour."
+            ),
+        }
 
     client = UFCStatsClient()
     events = fetch_upcoming_events(client, limit=limit)
@@ -247,7 +257,6 @@ def collect_upcoming(base_dir: Path, limit: int = 4) -> dict[str, Any]:
 
     # Replaying every fight to score a dozen bouts is the slow path; use the
     # portable table the trainer froze whenever it is there.
-    table_path = base_dir.parent / "models" / "ufc" / "fighter_states.parquet"
     if table_path.exists():
         descriptors = features_from_state_table(fights, pd.read_parquet(table_path))
     else:
