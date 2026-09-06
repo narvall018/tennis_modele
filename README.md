@@ -205,12 +205,34 @@ Trois sections s'ajoutent au carnet de paris existant :
 |---|---|
 | **Prédictions** | **Football** : rencontres à venir avec probabilités, prix et écart modèle-marché, classées par recommandation. **UFC** : cartes programmées lues sur UFCStats avec les probabilités du modèle — aucune clé requise, seul le *prix* en demanderait une. **Tennis** : le seul sport sans calendrier gratuit, la page dit précisément ce qu'il faudrait. |
 | **Mises** | Kelly fractionné, plafonné par pari et par jour, avec un plancher d'écart. Sous le plancher la mise est **zéro**, avec le motif affiché. |
+| **Mise à jour** | Lance les sept pipelines avec l'interpréteur de l'app, avec l'âge de chaque artefact. |
 | **Performances** | Ce que chaque sport a réellement mesuré, lu directement dans les JSON des études — jamais ressaisi, donc impossible à faire diverger. |
 
 Le modèle football n'utilise pas la cote : l'app a besoin d'une opinion
 comparable à un prix, et un modèle nourri au prix ne pourrait que l'approuver.
 Sa log-loss sur des saisons jamais vues est de 1,01985 contre 1,00025 pour le
 marché — il est moins bon, et l'app le dit.
+
+### Déploiement Streamlit Cloud
+
+Secrets à renseigner (format TOML) :
+
+```toml
+ODDS_API_KEY = "votre_clé_the_odds_api"
+GITHUB_TOKEN = "github_pat_..."
+```
+
+Version Python : **3.11 ou 3.12** (pas 3.14, les roues compilées manquent).
+Fichier principal : `unified_app.py`.
+
+Le `GITHUB_TOKEN` est un *fine-grained personal access token* limité à ce dépôt,
+avec une seule permission : **Contents — Read and write**. Il sert à conserver
+les paris : le système de fichiers de Cloud est éphémère, donc le carnet SQLite
+y est effacé à chaque redéploiement. La copie durable est écrite dans le dépôt,
+sur une branche `ledger` **qui n'est pas déployée** — sans quoi enregistrer un
+pari redémarrerait l'application.
+
+Le dépôt est déduit de `.git/config`; `GITHUB_REPO` ne sert qu'à le forcer.
 
 Les trois sections portent le même bandeau : **aucune stratégie rentable
 démontrée, argent réel non autorisé**. L'écart affiché sur un match n'est pas un

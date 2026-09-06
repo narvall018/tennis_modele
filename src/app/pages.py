@@ -20,6 +20,12 @@ import pandas as pd
 import streamlit as st
 
 from src.app.evidence import all_evidence, global_verdict, model_registry
+from src.app.github_ledger import (
+    append_bet,
+    ensure_branch,
+    ledger_frame,
+    load_config,
+)
 from src.app.ledger import record_recommendation
 from src.app.maintenance import TASKS, artefact_status, run_task
 from src.app.predictions import (
@@ -597,14 +603,60 @@ def _render_ledger_recording(root: Path, staked: pd.DataFrame, user_id: int | No
     amount = st.number_input(
         "Mise (€)", min_value=0.01, value=float(max(row["mise"], 0.01)), step=0.5,
     )
-    if st.button("Enregistrer ce pari", type="primary"):
-        ok, message = record_recommendation(
-            root / "bets" / "unified_app.db", int(user_id), row.to_dict(), float(amount)
+    config, source = load_config(root)
+    destinations = st.multiselect(
+        "Où enregistrer", ["Carnet local (SQLite)", "Dépôt GitHub (durable)"],
+        default=(["Carnet local (SQLite)", "Dépôt GitHub (durable)"]
+                 if config.configured else ["Carnet local (SQLite)"]),
+        help="Sur Streamlit Cloud le carnet local est effacé à chaque redéploiement; "
+             "seule la copie GitHub survit.",
+    )
+    if not config.configured:
+        st.info(
+            "GitHub non configuré. Ajoutez dans les secrets Streamlit un token à "
+            "permission « Contents: Read and write » :\n\n"
+            '```toml\nGITHUB_TOKEN = "github_pat_..."\n'
+            f'GITHUB_REPO = "{config.repository or "utilisateur/depot"}"\n```'
         )
-        if ok:
-            st.success(message)
+    else:
+        st.caption(
+            f"GitHub: `{config.repository}` · branche `{config.branch}` · "
+            f"token lu depuis les {source}. La branche du carnet n'est pas déployée, "
+            "donc un enregistrement ne redémarre pas l'app."
+        )
+
+    if st.button("Enregistrer ce pari", type="primary"):
+        payload = row.to_dict()
+        payload["utilisateur"] = int(user_id)
+        payload["mise"] = float(amount)
+        results: list[str] = []
+        failed = False
+        if "Carnet local (SQLite)" in destinations:
+            ok, message = record_recommendation(
+                root / "bets" / "unified_app.db", int(user_id), payload, float(amount)
+            )
+            results.append(f"Local: {message}")
+            failed |= not ok
+        if "Dépôt GitHub (durable)" in destinations:
+            created, branch_message = ensure_branch(config)
+            if not created:
+                results.append(f"GitHub: {branch_message}")
+                failed = True
+            else:
+                ok, message = append_bet(config, payload)
+                results.append(f"GitHub: {message}")
+                failed |= not ok
+        for line in results:
+            (st.error if failed else st.success)(line)
+
+    with st.expander("Paris enregistrés sur GitHub"):
+        if not config.configured:
+            st.caption("Configurez GITHUB_TOKEN pour lire le carnet durable.")
         else:
-            st.error(message)
+            frame, message = ledger_frame(config)
+            st.caption(message)
+            if not frame.empty:
+                st.dataframe(frame, hide_index=True, use_container_width=True)
 
 
 def render_maintenance_page(root: Path) -> None:
