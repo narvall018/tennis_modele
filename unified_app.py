@@ -34,6 +34,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
+    from src.app.ledger import migrate_sports
     from src.app.pages import (
         render_maintenance_page,
         render_performance_page,
@@ -1948,6 +1949,10 @@ def main() -> None:
 
     if not st.session_state.get("_unified_db_initialized"):
         init_database()
+        if RESEARCH_PAGES_AVAILABLE:
+            # The ledger predates football; widen the constraint before use.
+            with db_conn() as _conn:
+                migrate_sports(_conn)
         st.session_state["_unified_db_initialized"] = True
 
     user = current_user()
@@ -1993,7 +1998,7 @@ def main() -> None:
         elif section == "Prédictions":
             render_predictions_page(PROJECT_ROOT)
         elif section == "Mises":
-            render_staking_page(PROJECT_ROOT)
+            render_staking_page(PROJECT_ROOT, user_id=int(user["id"]))
         elif section == "Mise à jour":
             render_maintenance_page(PROJECT_ROOT)
         else:

@@ -20,6 +20,7 @@ import pandas as pd
 import streamlit as st
 
 from src.app.evidence import all_evidence, global_verdict, model_registry
+from src.app.ledger import record_recommendation
 from src.app.maintenance import TASKS, artefact_status, run_task
 from src.app.predictions import (
     betting_candidates,
@@ -440,7 +441,7 @@ def _render_football(block) -> None:
     st.caption(f"Source : {block.meta.get('source')} · récupéré {block.meta.get('fetched_at_utc')}")
 
 
-def render_staking_page(root: Path) -> None:
+def render_staking_page(root: Path, user_id: int | None = None) -> None:
     st.title("Taille de mise")
     render_verdict_banner()
     st.caption(
@@ -568,6 +569,42 @@ def render_staking_page(root: Path) -> None:
         "mesuré est +0,74 % avec un intervalle contenant zéro. Le suivi doit rester "
         "sur papier."
     )
+
+    _render_ledger_recording(root, staked, user_id)
+
+
+def _render_ledger_recording(root: Path, staked: pd.DataFrame, user_id: int | None) -> None:
+    """Write a proposed stake into the app's bet ledger."""
+    st.subheader("Enregistrer dans le carnet")
+    if user_id is None:
+        st.info("Connectez-vous pour enregistrer une mise.")
+        return
+    st.caption(
+        "La cote et la probabilité sont figées au moment de l'enregistrement. Un "
+        "carnet dont les cotes suivent le marché ne peut plus répondre à la seule "
+        "question qu'il sert à trancher: ce pari a-t-il payé ?"
+    )
+
+    labels = {
+        f"{row.sport} · {row.rencontre} → {row.pari} @ {row.cote_pari:.2f} "
+        f"({row.mise:.2f} €)": index
+        for index, row in staked.iterrows()
+    }
+    chosen = st.selectbox("Pari à enregistrer", ["—"] + list(labels))
+    if chosen == "—":
+        return
+    row = staked.loc[labels[chosen]]
+    amount = st.number_input(
+        "Mise (€)", min_value=0.01, value=float(max(row["mise"], 0.01)), step=0.5,
+    )
+    if st.button("Enregistrer ce pari", type="primary"):
+        ok, message = record_recommendation(
+            root / "bets" / "unified_app.db", int(user_id), row.to_dict(), float(amount)
+        )
+        if ok:
+            st.success(message)
+        else:
+            st.error(message)
 
 
 def render_maintenance_page(root: Path) -> None:
