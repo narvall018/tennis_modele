@@ -1,4 +1,11 @@
-# Le combiné boosté : la première piste que je n'arrive pas à tuer
+# Le combiné boosté : fermé par le barème réel
+
+> **Correction du 2026-09-07.** Ce rapport concluait à une piste sérieuse en
+> supposant que les barèmes montent plus vite que la marge empilée. Le barème
+> réel — *+4 % par tranche de 6 sélections, cote minimale 1,30* — fait l'inverse.
+> La conclusion est renversée ; le détail est en fin de document, sous « Le
+> barème réel ». Ce qui précède reste exact, sauf la fenêtre annoncée à 8 jambes,
+> qui n'existe pas.
 
 Onze pistes sont mortes du même diagnostic — un biais réel, systématiquement plus
 petit que la marge à franchir. Celle-ci est différente, et il faut dire d'emblée
@@ -113,3 +120,57 @@ Je dois être précis sur la limite, parce qu'elle est sérieuse :
 positif *par arithmétique* plutôt que par prédiction — ce qui est précisément ce
 qui le rend crédible. Mais il repose sur un barème que je n'ai pas lu. Tant que
 les CGU ne sont pas vérifiées, c'est une piste sérieuse, pas une stratégie.
+
+
+## Le barème réel, et pourquoi il ferme la piste
+
+Le barème effectivement proposé est : **+4 % de boost par tranche de 6
+sélections supplémentaires, cote minimale 1,30 par jambe.** Soit une pente de
+**0,67 point par sélection**.
+
+Les deux paramètres dont dépendait tout le rapport sont donc connus, et ils
+tombent tous les deux du mauvais côté.
+
+**La cote minimale de 1,30 rend inéligible ce qui portait le résultat.** La
+tranche 1,15–1,35, à r = 0,9890, disparaît. Il faut viser 1,30–1,50, où
+r = 0,9774 — 1,2 point de rendement en moins, sur chaque jambe.
+
+**Et la pente va dans le mauvais sens.** J'avais supposé que les barèmes montent
+plus vite que la marge. C'est l'inverse : la marge s'empile **géométriquement**
+(`r^n`) tandis que le boost monte **linéairement**.
+
+| jambes | boost offert | boost requis | écart |
+|---|---|---|---|
+| 6 | 4,0 % | 17,1 % | −13,1 % |
+| 12 | 8,0 % | 32,1 % | −24,1 % |
+| 24 | 16,0 % | 73,0 % | −57,0 % |
+| 40 | 26,7 % | 149,2 % | −122,5 % |
+
+**L'écart ne se referme jamais — il s'élargit à chaque sélection ajoutée.** Il
+n'existe aucun nombre de jambes où le barème rattrape la marge. La « fenêtre qui
+s'ouvre vers 8 jambes » était exactement à l'envers : chaque sélection
+supplémentaire détruit de la valeur, et le boost promis en rend le quart.
+
+La seule fenêtre concevable serait un boost de base déjà élevé au nombre minimal
+de sélections. Il faudrait, cote minimale 1,30 :
+
+| jambes | 3 | 4 | 5 | 6 | 8 |
+|---|---|---|---|---|---|
+| boost de base requis | 11,3 % | 13,1 % | 15,0 % | 17,1 % | 21,6 % |
+
+Autrement dit : si le boost à 6 sélections n'est pas **déjà** supérieur à 17 %
+avant l'incrément de 4 %, il n'y a rien. Et un boost de base à deux chiffres pour
+six sélections ne correspond à aucune offre que j'aie vue.
+
+### Ce que ça laisse debout
+
+Le mécanisme reste juste, et le biais favori-outsider est bien réel et bien
+mesuré — 0,9890 sur la tranche courte, stable sur vingt-six ans. Ce qui est faux
+est mon hypothèse sur la forme du barème, que j'avais reconstituée depuis de la
+copie marketing faute d'avoir les conditions générales.
+
+C'est précisément la réserve que le rapport signalait comme « l'hypothèse la plus
+lourde ». Elle a cédé au premier chiffre réel.
+
+**Treizième piste fermée.** Et fermée proprement : par une donnée vérifiable, en
+une seule confrontation, sans avoir engagé un euro.
