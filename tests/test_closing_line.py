@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 
 from src.backtesting.closing_line import (
     TakenPrice,
+    save_log,
     clv_frame,
     clv_summary,
     load_log,
@@ -54,29 +55,50 @@ class RecordingTests(unittest.TestCase):
 
 
 class SettlementTests(unittest.TestCase):
-    def test_a_match_not_yet_started_cannot_have_a_closing_price(self):
-        """A price taken before the close is not a closing price."""
+    def test_a_pending_match_only_refreshes_its_rolling_price(self):
+        """Before kick-off there is no close yet, only a latest quote."""
         future = (datetime.now(timezone.utc) + timedelta(hours=3)).isoformat()
         with TemporaryDirectory() as directory:
             root = Path(directory)
             record_taken(root, _taken(commence=future))
-            updated, _ = settle_with_closing(root, {"m1|A": (2.00, 0.5)})
-            self.assertEqual(updated, 0)
+            closed, _ = settle_with_closing(root, {"m1|A": (2.00, 0.5)})
+            self.assertEqual(closed, 0)
+            self.assertEqual(load_log(root)[0]["latest_prematch_price"], 2.00)
+            self.assertIsNone(load_log(root)[0]["closing_price"])
 
-    def test_a_started_match_is_closed_once(self):
+    def test_an_in_play_quote_never_becomes_the_close(self):
+        """After kick-off the price follows the score; the last pre-match one wins."""
         with TemporaryDirectory() as directory:
             root = Path(directory)
-            record_taken(root, _taken())
-            self.assertEqual(settle_with_closing(root, {"m1|A": (2.00, 0.5)})[0], 1)
-            self.assertEqual(settle_with_closing(root, {"m1|A": (1.90, 0.5)})[0], 0)
-            self.assertEqual(load_log(root)[0]["closing_price"], 2.00)
+            # Logged while still pending, then refreshed twice before the start.
+            future = (datetime.now(timezone.utc) + timedelta(seconds=1)).isoformat()
+            record_taken(root, _taken(commence=future))
+            settle_with_closing(root, {"m1|A": (2.05, 0.49)})
+            settle_with_closing(root, {"m1|A": (1.98, 0.51)})
+            # Now mark it started and offer a wildly different in-play price.
+            entries = load_log(root)
+            entries[0]["commence_time"] = (
+                datetime.now(timezone.utc) - timedelta(minutes=5)
+            ).isoformat()
+            save_log(root, entries)
+            closed, _ = settle_with_closing(root, {"m1|A": (7.00, 0.14)})
+            self.assertEqual(closed, 1)
+            self.assertEqual(load_log(root)[0]["closing_price"], 1.98)
 
 
 class SummaryTests(unittest.TestCase):
     def _log(self, root: Path, pairs):
+        """Log a decision, refresh it while pending, then let it start."""
         for index, (taken, closing) in enumerate(pairs):
-            record_taken(root, _taken(key=f"m{index}", price=taken))
+            future = (datetime.now(timezone.utc) + timedelta(seconds=1)).isoformat()
+            record_taken(root, _taken(key=f"m{index}", price=taken, commence=future))
             settle_with_closing(root, {f"m{index}|A": (closing, 1 / closing)})
+            entries = load_log(root)
+            entries[-1]["commence_time"] = (
+                datetime.now(timezone.utc) - timedelta(minutes=1)
+            ).isoformat()
+            save_log(root, entries)
+            settle_with_closing(root, {})
 
     def test_beating_the_close_shows_positive_clv(self):
         with TemporaryDirectory() as directory:

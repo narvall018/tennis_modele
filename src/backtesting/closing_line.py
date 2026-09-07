@@ -101,32 +101,47 @@ def record_taken(root: Path, taken: TakenPrice) -> tuple[bool, str]:
 
 
 def settle_with_closing(
-    root: Path, closing: dict[str, tuple[float, float]]
+    root: Path, observed: dict[str, tuple[float, float]]
 ) -> tuple[int, str]:
-    """Attach the closing price to every entry still waiting for one.
+    """Track the last pre-match price, and promote it once the match begins.
 
-    ``closing`` maps an entry id to (closing price, closing no-vig probability).
-    Only entries whose match has started are eligible: a price taken before the
-    close is not a closing price.
+    The closing line is the last price available *before* play starts. Reading a
+    quote after kick-off would capture an in-play price, which follows the score
+    and answers a different question entirely. So each call refreshes a rolling
+    pre-match quote, and only the transition to "started" turns it into a close.
+
+    ``observed`` maps an entry id to (price, no-vig probability) seen now.
     """
     entries = load_log(root)
     now = datetime.now(timezone.utc)
-    updated = 0
+    refreshed = 0
+    closed = 0
     for entry in entries:
         if entry.get("closing_price") is not None:
             continue
-        pair = closing.get(entry["id"])
-        if pair is None:
-            continue
         started = pd.to_datetime(entry.get("commence_time"), utc=True, errors="coerce")
-        if pd.notna(started) and started > now:
+        in_play = pd.notna(started) and started <= now
+        pair = observed.get(entry["id"])
+        if not in_play:
+            if pair is not None:
+                entry["latest_prematch_price"] = float(pair[0])
+                entry["latest_prematch_probability"] = float(pair[1])
+                entry["latest_prematch_at_utc"] = now.isoformat()
+                refreshed += 1
             continue
-        entry["closing_price"], entry["closing_probability"] = float(pair[0]), float(pair[1])
-        entry["closed_at_utc"] = now.isoformat()
-        updated += 1
-    if updated:
+        # The match has begun: whatever was last seen before it is the close.
+        last = entry.get("latest_prematch_price")
+        if last is None:
+            continue
+        entry["closing_price"] = float(last)
+        entry["closing_probability"] = float(
+            entry.get("latest_prematch_probability") or 0.0
+        )
+        entry["closed_at_utc"] = entry.get("latest_prematch_at_utc") or now.isoformat()
+        closed += 1
+    if refreshed or closed:
         save_log(root, entries)
-    return updated, f"{updated} ligne(s) closes"
+    return closed, f"{refreshed} prix rafraîchi(s), {closed} ligne(s) close(s)"
 
 
 def clv_frame(root: Path) -> pd.DataFrame:
