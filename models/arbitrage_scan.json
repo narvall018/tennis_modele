@@ -1,0 +1,52 @@
+{
+  "scanned_at_utc": "2026-09-07T16:07:18.125888+00:00",
+  "regions": "eu,uk,us,au",
+  "sports": [
+    "tennis_wta_us_open"
+  ],
+  "remaining_requests": 325,
+  "opportunities": [
+    {
+      "sport": "tennis_wta_us_open",
+      "événement": "Mirra Andreeva vs Anastasia Potapova",
+      "gain_garanti": 0.12206593406593402,
+      "overround": 0.8912132252125201,
+      "fraîcheur_pire_min": 0.26692018333333334,
+      "assez_frais": true,
+      "sans_exchange": false,
+      "books_accessibles": false,
+      "books": "smarkets / pinnacle",
+      "cotes": "2.54 / 2.01",
+      "vu_a": "2026-09-07T16:07:18.032678+00:00",
+      "exploitable": false
+    },
+    {
+      "sport": "tennis_wta_us_open",
+      "événement": "Iga Swiatek vs Qinwen Zheng",
+      "gain_garanti": 0.011274934952298477,
+      "overround": 0.9888507718696397,
+      "fraîcheur_pire_min": 1.68358685,
+      "assez_frais": true,
+      "sans_exchange": false,
+      "books_accessibles": false,
+      "books": "matchbook / draftkings",
+      "cotes": "1.06 / 22.00",
+      "vu_a": "2026-09-07T16:07:18.044692+00:00",
+      "exploitable": false
+    },
+    {
+      "sport": "tennis_wta_us_open",
+      "événement": "Iva Jović vs Coco Gauff",
+      "gain_garanti": 0.005118110236220552,
+      "overround": 0.9949079514296906,
+      "fraîcheur_pire_min": 0.2502535166666667,
+      "assez_frais": true,
+      "sans_exchange": false,
+      "books_accessibles": false,
+      "books": "smarkets / betfair_ex_uk",
+      "cotes": "1.38 / 3.70",
+      "vu_a": "2026-09-07T16:07:18.083387+00:00",
+      "exploitable": false
+    }
+  ]
+}
