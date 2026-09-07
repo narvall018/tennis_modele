@@ -102,3 +102,51 @@ de comptes, et cela ne se démontre pas depuis un carnet Python.
 Aucun pari n'est placé, et le scanner n'en propose aucun. Il mesure si
 l'opportunité survit à ses propres contraintes — la question que les données
 historiques ne pouvaient pas trancher, faute de prix simultanés.
+
+---
+
+## Value betting au meilleur prix accessible — mesuré, pas concluant
+
+Même instrument, question voisine : plutôt que de parier les deux côtés, ne
+prendre qu'un côté quand un book accessible le paie **au-dessus de la valeur
+juste de Pinnacle**.
+
+La version historique de ce test perdait 3,5 % à 14 %, mais elle comparait la
+cote de clôture de Bet365 à celle de Pinnacle — une seule marge contre une autre.
+Prendre le meilleur de quarante cotes simultanées est une autre proposition.
+
+| Périmètre | Cotes examinées | Au-dessus de la juste valeur | EV moyenne |
+|---|---:|---:|---:|
+| Books accessibles depuis la France | 44 | 8 | **−0,62 %** |
+| Hors exchange, toutes juridictions | 66 | 21 | +0,43 % |
+| Tous books | 70 | 27 | +1,10 % |
+
+**Chez les opérateurs réellement accessibles, l'EV moyenne est négative.** Et les
+plus grosses « valeurs » sont invraisemblables — Potapova à 2,74 quand Pinnacle
+la juge à 1,93 serait un avantage de 42 %, ce qui n'existe pas sur un marché
+liquide. Ce sont les mêmes artefacts que les gros arbitrages : cotes périmées,
+offres d'exchange sans profondeur, erreurs de saisie.
+
+Restent des valeurs de 1 à 3 % chez coolbet, nordicbet et onexbet. Elles sont
+plausibles, et **invérifiables rétrospectivement** : il n'existe aucun historique
+de quarante cotes simultanées à backtester.
+
+## Le vrai obstacle, et l'instrument qui le lève
+
+`RAPPORT_RENTABILITE.md` calcule qu'établir un avantage de +0,74 % demande
+**35 250 paris, soit trente-quatre ans**. Aucune stratégie ne se pilote sur un
+retour aussi lent, et c'est ce délai — plus que les résultats eux-mêmes — qui a
+fermé les neuf pistes.
+
+La valeur de clôture (`src/backtesting/closing_line.py`) est la réponse
+professionnelle à ce problème. Elle ne mesure pas un profit mais si le prix pris
+valait mieux que celui sur lequel le marché a fini. Deux propriétés :
+
+- **elle converge en centaines de paris, pas en dizaines de milliers**, la cote de
+  clôture étant une cible bien moins bruitée qu'une victoire ou une défaite ;
+- **un CLV négatif écarte un avantage immédiatement**, sans attendre que le ROI
+  devienne significatif.
+
+Elle ne prouve rien dans l'autre sens : battre la clôture et perdre quand même à
+cause des commissions et des plafonds reste possible. Mais c'est le test à faire
+avant d'engager une année de suivi papier.
