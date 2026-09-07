@@ -112,8 +112,29 @@ def record(root: Path, accessible_only: bool) -> int:
     return stored
 
 
+# The closing reference is one sharp book, not the best of a pool. Comparing a
+# price taken among accessible operators against the best of every operator
+# would make the drift positive by construction: the closing pool would simply
+# be larger. Pinnacle is the reference this project has treated as truth
+# throughout.
+REFERENCE_BOOK = "pinnacle"
+
+
+def _reference_quote(event: dict, now: pd.Timestamp) -> pd.DataFrame:
+    """Pinnacle's two-way quote, or the market median when it is absent."""
+    frame = _quotes(event, now, accessible_only=False)
+    if frame.empty:
+        return frame
+    sharp = frame[frame["book"] == REFERENCE_BOOK]
+    if len(sharp) == 2:
+        return sharp
+    median = frame.groupby("outcome", as_index=False)["price"].median()
+    median["book"] = "consensus"
+    return median if len(median) == 2 else frame.iloc[0:0]
+
+
 def close(root: Path) -> int:
-    """Attach the last pre-match price to anything starting within the hour."""
+    """Refresh the pre-match reference price for everything still pending."""
     now = pd.Timestamp.now("UTC")
     pending = [entry for entry in load_log(root) if not entry.get("closing_price")]
     if not pending:
@@ -126,16 +147,15 @@ def close(root: Path) -> int:
         if not response.ok:
             continue
         for event in response.events:
-            frame = _quotes(event, now, accessible_only=False)
-            if frame.empty:
+            reference = _reference_quote(event, now)
+            if len(reference) != 2:
                 continue
-            best = frame.loc[frame.groupby("outcome")["price"].idxmax()]
-            inverse = 1.0 / best.set_index("outcome")["price"]
+            inverse = 1.0 / reference.set_index("outcome")["price"]
             probability = inverse / inverse.sum()
             key = _event_key(sport, event)
-            for row in best.itertuples(index=False):
+            for row in reference.itertuples(index=False):
                 closing[f"{key}|{row.outcome}"] = (
-                    row.price, float(probability[row.outcome])
+                    float(row.price), float(probability[row.outcome])
                 )
     updated, message = settle_with_closing(root, closing)
     print(message)
