@@ -122,16 +122,22 @@ def active_sports(root: Path) -> OddsResponse:
     return _request("sports/", key, {})
 
 
-def fetch_h2h_odds(root: Path, sport_key: str, regions: str = DEFAULT_REGIONS) -> OddsResponse:
-    """One request, one sport. Each call costs quota, so callers must cache."""
+def fetch_market_odds(root: Path, sport_key: str, market: str,
+                      regions: str = DEFAULT_REGIONS) -> OddsResponse:
+    """One request, one sport, one market. Each call costs quota, so cache."""
     key, _ = resolve_api_key(root)
     if not key:
         return OddsResponse(False, error="aucune clé disponible")
     return _request(
         f"sports/{sport_key}/odds",
         key,
-        {"regions": regions, "markets": DEFAULT_MARKET, "oddsFormat": "decimal"},
+        {"regions": regions, "markets": market, "oddsFormat": "decimal"},
     )
+
+
+def fetch_h2h_odds(root: Path, sport_key: str, regions: str = DEFAULT_REGIONS) -> OddsResponse:
+    """The moneyline, which is what every model here prices."""
+    return fetch_market_odds(root, sport_key, DEFAULT_MARKET, regions)
 
 
 def _is_ignored(name: str) -> bool:

@@ -150,3 +150,65 @@ valait mieux que celui sur lequel le marché a fini. Deux propriétés :
 Elle ne prouve rien dans l'autre sens : battre la clôture et perdre quand même à
 cause des commissions et des plafonds reste possible. Mais c'est le test à faire
 avant d'engager une année de suivi papier.
+
+## Douzième piste : les middles, et pourquoi ils ne sont pas une piste
+
+Il restait une classe de marché non testée. Un *middle* n'est pas un pari
+directionnel : on prend Over sur une ligne basse chez un opérateur et Under sur
+une ligne plus haute chez un autre, et tout résultat tombant entre les deux
+**gagne les deux jambes**. C'est la seule structure de ce projet où les deux
+côtés peuvent gagner, et comme l'arbitrage elle ne demande aucune prévision.
+
+`src/backtesting/middles.py` scanne les marchés de totaux avec les mêmes gardes
+que l'arbitrage — fraîcheur, exchange, accessibilité depuis la France — plus une
+qui lui est propre : l'écart doit pouvoir contenir un résultat entier. Over 2,5
+contre Under 2,75 est un intervalle arithmétique et rien de plus.
+
+Le scan a trouvé **13 middles**, dont 2 chez des opérateurs accessibles : un
+38,5 / 39,5 à 1,92 / 1,92 sur Gea–van de Zandschulp, un second sur
+Shelton–Alcaraz. Un tel middle gagne double si le match finit sur exactement 39
+jeux, et coûte 4 % de la mise sinon. Il vaut donc le coup si et seulement si
+
+    P(exactement 39) × 0,92 > (1 − P) × 0,04    →    **P > 4,17 %**
+
+C'est une propriété du tennis, pas des cotes. Les tables historiques répondent
+directement (`scripts/run_middle_study.py`, 17 123 matchs best-of-5) :
+
+| test | P(pile) | verdict |
+|---|---|---|
+| sans conditionnement, ligne 39 | 3,22 % | sous le seuil |
+| conditionnellement à une prévision hors échantillon | **3,63 %** — IC 95 % [3,17 %, 4,16 %] | seuil hors intervalle |
+
+L'objection sérieuse était que **ma prévision est plus bruitée que la ligne d'un
+book** (erreur absolue 7,51 jeux), donc que je sous-estime P. Elle est testable :
+j'ai dégradé ma propre prévision exprès. Passer d'une erreur de 7,51 à 12,08
+jeux — 61 % de dégradation — ne fait perdre que **0,16 point** de P(pile). La
+courbe est plate : ce qui limite P n'est pas la finesse de la ligne mais la
+dispersion intrinsèque d'un match de tennis, qu'aucun book ne peut réduire.
+Affiner au-delà de ma prévision ne rattrape donc pas les 0,6 point manquants.
+
+### Le piège que j'ai failli rapporter
+
+En déplaçant le middle sous la ligne prévue, P(pile) monte : 4,91 % à −8 jeux,
+avec une borne basse d'intervalle à 4,52 %, au-dessus du seuil. Résultat
+apparemment positif, et faux.
+
+Il tenait les cotes figées à 1,92 / 1,92 en éloignant la ligne de la prévision.
+Or un book qui attend 35 jeux ne cote pas Over 26,5 à 1,92 — il le cote 1,18. En
+facturant chaque jambe à son vrai prix, l'EV devient **exactement −4,50 % à tous
+les décalages**, c'est-à-dire la marge, et cesse complètement de dépendre de la
+ligne. C'était le même pari vu de plus loin.
+
+### Ce que ça règle
+
+Un middle **n'a aucun avantage propre**. Toute combinaison de paris justement
+cotés rend la marge en négatif, où qu'on place les lignes. Sa seule valeur
+possible vient de deux books en désaccord sur la ligne — donc d'un prix meilleur
+que le vrai. C'est **exactement l'arbitrage**, avec exactement les mêmes
+obstacles : cotes périmées, profondeur inconnue, opérateurs hors juridiction.
+
+Le middle n'est donc pas une douzième piste. C'est la onzième sous un autre
+angle, et elle bute sur le même mur. La dernière classe de marché non testée est
+fermée, et pour une raison structurelle plutôt que par manque de puissance
+statistique — ce qui, pour une fois, est une réponse définitive et non un
+« il faudrait trente-quatre ans pour le savoir ».
