@@ -1,0 +1,36 @@
+{
+  "band": [
+    1.1,
+    1.3
+  ],
+  "historical": [
+    {
+      "source": "Bet365",
+      "overround": 0.06549085151301903,
+      "r": 0.9898706082852649
+    },
+    {
+      "source": "Pinnacle",
+      "overround": 0.030151446370651813,
+      "r": 1.0079995185363504
+    },
+    {
+      "source": "Max panel",
+      "overround": 0.017477457509424976,
+      "r": 1.0156445115810675
+    }
+  ],
+  "slope": -0.5316721193770141,
+  "intercept": 1.0245524194986462,
+  "break_even_overround": 0.04617962575772344,
+  "measured_overrounds": {
+    "betclic_fr": 0.09170624771647784,
+    "netbet_fr": 0.0883677795442499,
+    "pmu_fr": 0.07338249736271374,
+    "unibet_fr": 0.10971874129768855,
+    "winamax_fr": 0.15286767692151493,
+    "MEILLEUR DES 5 FRANÇAIS": 0.06749159804520577,
+    "pinnacle (hors France)": 0.05158219659688901
+  },
+  "evidence": "EXPLORATORY; live overrounds are a single snapshot"
+}
