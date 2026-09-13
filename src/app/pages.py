@@ -207,6 +207,16 @@ def render_predictions_page(root: Path) -> None:
         "large signale le plus souvent que c'est le modèle qui se trompe, pas le prix: "
         "mesuré, le modèle football vaut −0,00080 de log-loss contre le marché."
     )
+    st.warning(
+        "**« Cote au-dessus de la cote requise » ne veut pas dire value bet.** "
+        "L'égalité est exacte selon le modèle — mais le modèle est moins bon que "
+        "le prix. Sur les paris où il contredit le marché, le taux de réussite "
+        "mesuré est de **32,0 % contre 33,6 % implicites**: c'est le marché qui "
+        "a raison. Lisez donc l'écart comme la distance au seuil, pas comme un "
+        "feu vert — et classez par *score*, qui annule les désaccords "
+        "invraisemblables, jamais par écart brut.",
+        icon="⚠️",
+    )
 
     slot = f"charger_{sport}"
     if not st.session_state.get(slot):
@@ -288,12 +298,17 @@ def _render_tennis(block) -> None:
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
             "cote requise": st.column_config.NumberColumn(
                 "cote requise", format="%.2f",
-                help="Cote à partir de laquelle ce pari devient gagnant, soit "
-                     "l'inverse de la probabilité du modèle. Au-dessus: value "
-                     "bet; en dessous: le prix est meilleur que le modèle."),
+                help="Cote à partir de laquelle ce pari serait gagnant SI la "
+                     "probabilité du modèle était juste — soit son inverse. Le "
+                     "modèle étant mesuré moins bon que le prix, un dépassement "
+                     "indique le plus souvent une erreur du modèle, pas une "
+                     "occasion."),
             "écart": st.column_config.NumberColumn(
                 "écart", format="%+.2f",
-                help="Cote proposée moins cote requise. Positif = value bet."),
+                help="Cote proposée moins cote requise. Positif signifie "
+                     "espérance positive selon le modèle; ce n'est un value bet "
+                     "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
+                     "démontrer."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -378,12 +393,17 @@ def _render_ufc(block) -> None:
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
             "cote requise": st.column_config.NumberColumn(
                 "cote requise", format="%.2f",
-                help="Cote à partir de laquelle ce pari devient gagnant, soit "
-                     "l'inverse de la probabilité du modèle. Au-dessus: value "
-                     "bet; en dessous: le prix est meilleur que le modèle."),
+                help="Cote à partir de laquelle ce pari serait gagnant SI la "
+                     "probabilité du modèle était juste — soit son inverse. Le "
+                     "modèle étant mesuré moins bon que le prix, un dépassement "
+                     "indique le plus souvent une erreur du modèle, pas une "
+                     "occasion."),
             "écart": st.column_config.NumberColumn(
                 "écart", format="%+.2f",
-                help="Cote proposée moins cote requise. Positif = value bet."),
+                help="Cote proposée moins cote requise. Positif signifie "
+                     "espérance positive selon le modèle; ce n'est un value bet "
+                     "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
+                     "démontrer."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -466,12 +486,17 @@ def _render_football(block) -> None:
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
             "cote requise": st.column_config.NumberColumn(
                 "cote requise", format="%.2f",
-                help="Cote à partir de laquelle ce pari devient gagnant, soit "
-                     "l'inverse de la probabilité du modèle. Au-dessus: value "
-                     "bet; en dessous: le prix est meilleur que le modèle."),
+                help="Cote à partir de laquelle ce pari serait gagnant SI la "
+                     "probabilité du modèle était juste — soit son inverse. Le "
+                     "modèle étant mesuré moins bon que le prix, un dépassement "
+                     "indique le plus souvent une erreur du modèle, pas une "
+                     "occasion."),
             "écart": st.column_config.NumberColumn(
                 "écart", format="%+.2f",
-                help="Cote proposée moins cote requise. Positif = value bet."),
+                help="Cote proposée moins cote requise. Positif signifie "
+                     "espérance positive selon le modèle; ce n'est un value bet "
+                     "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
+                     "démontrer."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -1065,12 +1090,17 @@ def _render_profitability(root: Path, family: str, bankroll: float,
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
             "cote requise": st.column_config.NumberColumn(
                 "cote requise", format="%.2f",
-                help="Cote à partir de laquelle ce pari devient gagnant, soit "
-                     "l'inverse de la probabilité du modèle. Au-dessus: value "
-                     "bet; en dessous: le prix est meilleur que le modèle."),
+                help="Cote à partir de laquelle ce pari serait gagnant SI la "
+                     "probabilité du modèle était juste — soit son inverse. Le "
+                     "modèle étant mesuré moins bon que le prix, un dépassement "
+                     "indique le plus souvent une erreur du modèle, pas une "
+                     "occasion."),
             "écart": st.column_config.NumberColumn(
                 "écart", format="%+.2f",
-                help="Cote proposée moins cote requise. Positif = value bet."),
+                help="Cote proposée moins cote requise. Positif signifie "
+                     "espérance positive selon le modèle; ce n'est un value bet "
+                     "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
+                     "démontrer."),
             "surmarge": st.column_config.NumberColumn(
                 "surmarge", format="%.2f%%",
                 help="Marge de cet opérateur sur ce marché précis, calculée sur "

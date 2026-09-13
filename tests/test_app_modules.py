@@ -165,6 +165,16 @@ class RequiredOddsTests(unittest.TestCase):
         self.assertLess(block.rows["écart_au_seuil"].iloc[1], 0)
 
 
+class ValueBetCaveatTests(unittest.TestCase):
+    """La colonne ne doit pas pouvoir se lire comme un feu vert."""
+
+    def test_the_page_says_the_threshold_is_not_a_value_bet(self):
+        source = (PROJECT_ROOT / "src" / "app" / "pages.py").read_text(encoding="utf-8")
+        self.assertIn("ne veut pas dire value bet", source)
+        self.assertIn("32,0 %", source,
+                      "le taux de réussite mesuré doit figurer à côté du seuil")
+
+
 class ProfitabilityTests(unittest.TestCase):
     """Le seuil doit refuser d'exister là où aucune cote n'est jouable."""
 
