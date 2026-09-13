@@ -71,3 +71,34 @@ Le script tient un registre de quota (`models/prospective/quota_ledger.json`) et
 refuse de dépasser le budget quotidien fixé, le palier gratuit donnant 500
 requêtes par mois. La clé se lit depuis un `.env` local, que `.gitignore`
 couvre — le dépôt étant public, rien de sensible n'y est écrit.
+
+
+## Dernière idée structurelle : un côté épargné ?
+
+La surmarge est une moyenne sur les deux côtés. Si les opérateurs français
+chargeaient surtout les outsiders — comme le fait le biais favori-outsider
+ailleurs — le côté favori pourrait être bien moins cher que l'affiche.
+
+Marge effective par côté, mesurée contre Pinnacle dévigué :
+
+| book | côté favori | côté outsider | part au favori |
+|---|---:|---:|---:|
+| **Betclic** | **7,42 %** | 7,49 % | 50 % |
+| Unibet | 8,12 % | 10,05 % | 45 % |
+| Winamax | 8,79 % | 12,24 % | 42 % |
+| Netbet | 8,97 % | 8,46 % | 51 % |
+| PMU | 9,30 % | 6,78 % | 58 % |
+| *Pinnacle (référence)* | *3,32 %* | *3,32 %* | *50 %* |
+| *Matchbook* | *2,77 %* | *0,40 %* | *87 %* |
+
+**Non.** Les cinq opérateurs répartissent leur marge à peu près également, entre
+42 % et 58 % sur le favori. Le meilleur côté favori accessible est Betclic à
+**7,42 %**, soit 4,1 points de plus que Pinnacle, quand il en faudrait zéro.
+
+À noter, à l'inverse : Matchbook et l'exchange Betfair mettent 83 à 87 % de leur
+marge — déjà minuscule — sur le favori, laissant le côté outsider à 0,4-0,6 %.
+Un marché où les prix sont faits par les parieurs n'a pas de biais
+favori-outsider : c'est le book qui le crée.
+
+Cette piste était la dernière qui ne demandait ni promotion ni changement de
+juridiction. Elle est fermée.
