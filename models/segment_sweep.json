@@ -1,0 +1,286 @@
+{
+  "gate": 0.001,
+  "evidence": "EXPLORATORY_REUSED_HISTORY; no independent confirmation claimed",
+  "cells": [
+    {
+      "sport": "atp",
+      "découpage": "surface",
+      "cellule": "Grass",
+      "n": 945,
+      "gain": 0.002478314453063194,
+      "erreur_type": 0.0022888355492992783,
+      "t": 1.0827839745070038
+    },
+    {
+      "sport": "atp",
+      "découpage": "surface",
+      "cellule": "Clay",
+      "n": 2476,
+      "gain": -6.2104529428706405e-06,
+      "erreur_type": 0.0012456433089302575,
+      "t": -0.004985739415406244
+    },
+    {
+      "sport": "atp",
+      "découpage": "surface",
+      "cellule": "Hard",
+      "n": 4600,
+      "gain": 0.0009951564671415321,
+      "erreur_type": 0.0006932363018095813,
+      "t": 1.4355227280277116
+    },
+    {
+      "sport": "atp",
+      "découpage": "niveau",
+      "cellule": "0.5",
+      "n": 3437,
+      "gain": 0.0011661512908036065,
+      "erreur_type": 0.0008828370791543032,
+      "t": 1.320913358012442
+    },
+    {
+      "sport": "atp",
+      "découpage": "niveau",
+      "cellule": "1.0",
+      "n": 1356,
+      "gain": -0.0007326696083446293,
+      "erreur_type": 0.001906795098155554,
+      "t": -0.38424139492142695
+    },
+    {
+      "sport": "atp",
+      "découpage": "niveau",
+      "cellule": "0.65",
+      "n": 1250,
+      "gain": 0.0022854064077780837,
+      "erreur_type": 0.0030171102255766888,
+      "t": 0.7574819071587788
+    },
+    {
+      "sport": "atp",
+      "découpage": "niveau",
+      "cellule": "0.85",
+      "n": 1885,
+      "gain": -0.0015362458100460514,
+      "erreur_type": 0.0017880139139832977,
+      "t": -0.8591911942249024
+    },
+    {
+      "sport": "atp",
+      "découpage": "prix",
+      "cellule": "léger favori",
+      "n": 1731,
+      "gain": 0.0008105826469448905,
+      "erreur_type": 0.0016400784302608206,
+      "t": 0.4942340756325806
+    },
+    {
+      "sport": "atp",
+      "découpage": "prix",
+      "cellule": "outsider",
+      "n": 1606,
+      "gain": 0.0021709845497493263,
+      "erreur_type": 0.0021068550618034134,
+      "t": 1.0304384905770498
+    },
+    {
+      "sport": "atp",
+      "découpage": "prix",
+      "cellule": "léger outsider",
+      "n": 1734,
+      "gain": -0.0006654032081807605,
+      "erreur_type": 0.0017687756139686411,
+      "t": -0.37619424585336775
+    },
+    {
+      "sport": "atp",
+      "découpage": "prix",
+      "cellule": "pile ou face",
+      "n": 1310,
+      "gain": -0.0003630427393957588,
+      "erreur_type": 0.0025172723775441696,
+      "t": -0.14422068212973455
+    },
+    {
+      "sport": "atp",
+      "découpage": "prix",
+      "cellule": "favori",
+      "n": 1640,
+      "gain": 0.0004468985264196601,
+      "erreur_type": 0.0017847072334977686,
+      "t": 0.2504043901608464
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "France",
+      "n": 2020,
+      "gain": -0.001991035199769362,
+      "erreur_type": 0.002600803623992333,
+      "t": -0.7655461494294009
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Scotland",
+      "n": 2314,
+      "gain": -0.003508884534069983,
+      "erreur_type": 0.0023945609661654254,
+      "t": -1.4653561064636413
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Belgium",
+      "n": 926,
+      "gain": -0.0001856561573210828,
+      "erreur_type": 0.0038787679064830236,
+      "t": -0.04786472452006594
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Turkey",
+      "n": 1040,
+      "gain": -0.012079673672922635,
+      "erreur_type": 0.008428592308522468,
+      "t": -1.4331780718244518
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Germany",
+      "n": 1836,
+      "gain": -0.00018581017287398982,
+      "erreur_type": 0.0015717849155878311,
+      "t": -0.11821603008863255
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "England",
+      "n": 7772,
+      "gain": 0.0006198621409132208,
+      "erreur_type": 0.0008891140684653601,
+      "t": 0.6971682969578055
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Netherlands",
+      "n": 944,
+      "gain": -0.0005953617838708686,
+      "erreur_type": 0.003909941150953131,
+      "t": -0.15226873267024402
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Portugal",
+      "n": 934,
+      "gain": 0.007010665889417179,
+      "erreur_type": 0.00538058868596578,
+      "t": 1.3029551780650206
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Spain",
+      "n": 2521,
+      "gain": 0.000588309281675177,
+      "erreur_type": 0.0016635187820830126,
+      "t": 0.35365352529324146
+    },
+    {
+      "sport": "football",
+      "découpage": "pays",
+      "cellule": "Italy",
+      "n": 2284,
+      "gain": -0.00040235898197779434,
+      "erreur_type": 0.0015490728950590343,
+      "t": -0.259741799925084
+    },
+    {
+      "sport": "football",
+      "découpage": "rang_division",
+      "cellule": "1",
+      "n": 10618,
+      "gain": 0.0014794175969425661,
+      "erreur_type": 0.0008701460411749837,
+      "t": 1.7001945960069704
+    },
+    {
+      "sport": "football",
+      "découpage": "rang_division",
+      "cellule": "2",
+      "n": 6641,
+      "gain": 0.0003600057837107942,
+      "erreur_type": 0.0005627267793374143,
+      "t": 0.6397523575023122
+    },
+    {
+      "sport": "football",
+      "découpage": "rang_division",
+      "cellule": "3",
+      "n": 2183,
+      "gain": 0.0006829583258579337,
+      "erreur_type": 0.0017382046810924974,
+      "t": 0.39291018675009
+    },
+    {
+      "sport": "football",
+      "découpage": "rang_division",
+      "cellule": "4",
+      "n": 2201,
+      "gain": -0.004291169767385526,
+      "erreur_type": 0.0014852468340418312,
+      "t": -2.8891963739844386
+    },
+    {
+      "sport": "football",
+      "découpage": "rang_division",
+      "cellule": "5",
+      "n": 1660,
+      "gain": -0.0005627486191739901,
+      "erreur_type": 0.0020267226350180914,
+      "t": -0.27766434807147
+    },
+    {
+      "sport": "football",
+      "découpage": "prix",
+      "cellule": "outsider",
+      "n": 9980,
+      "gain": -8.543774509556092e-05,
+      "erreur_type": 0.0004852108399182199,
+      "t": -0.17608375177677618
+    },
+    {
+      "sport": "football",
+      "découpage": "prix",
+      "cellule": "léger outsider",
+      "n": 12676,
+      "gain": 0.00013134107551916537,
+      "erreur_type": 0.0005068192547648594,
+      "t": 0.2591477618191549
+    },
+    {
+      "sport": "ufc",
+      "découpage": "prix",
+      "cellule": "léger favori",
+      "n": 351,
+      "gain": -0.01650293407937962,
+      "erreur_type": 0.01003242170186109,
+      "t": -1.6449601671267668
+    },
+    {
+      "sport": "ufc",
+      "découpage": "prix",
+      "cellule": "léger outsider",
+      "n": 323,
+      "gain": -0.004543047503755524,
+      "erreur_type": 0.007632403984558858,
+      "t": -0.5952315303207978
+    }
+  ],
+  "null_probability_best_cell": 0.7593
+}
