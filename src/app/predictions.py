@@ -50,6 +50,51 @@ class SportPredictions:
     meta: dict[str, Any]
     unavailable_reason: str = ""
 
+    def __post_init__(self) -> None:
+        """Ajouter la cote qu'il faudrait pour que le pari vaille le coup.
+
+        Les trois sports produisent `p_pari`; la question « à partir de quelle
+        cote est-ce un value bet » a donc une réponse unique et se calcule ici
+        plutôt que trois fois.
+        """
+        add_required_odds(self.rows)
+
+
+# Décote appliquée aux gains pour la cote « nette ». Deux points est ce que
+# `edge_too_small_to_prove` retient comme friction d'exécution plausible, et
+# c'est exactement ce qui annulait le +0,74 % du meilleur avantage mesuré ici.
+EXECUTION_HAIRCUT = 0.02
+
+
+def required_odds(probability: float, haircut: float = 0.0) -> float:
+    """Cote à partir de laquelle un pari de probabilité `probability` est gagnant.
+
+    Sans friction, c'est l'inverse de la probabilité. Avec une décote `haircut`
+    sur les gains, il faut résoudre p x (O-1) x (1-h) = 1-p.
+    """
+    if not np.isfinite(probability) or not 0.0 < probability < 1.0:
+        return float("nan")
+    if haircut <= 0.0:
+        return 1.0 / probability
+    return 1.0 + (1.0 - probability) / (probability * (1.0 - haircut))
+
+
+def add_required_odds(frame: pd.DataFrame) -> pd.DataFrame:
+    """Poser `cote_requise` et `cote_requise_nette` à côté de la cote proposée."""
+    if frame is None or not isinstance(frame, pd.DataFrame) or "p_pari" not in frame:
+        return frame
+    probabilities = pd.to_numeric(frame["p_pari"], errors="coerce").to_numpy(dtype=float)
+    frame["cote_requise"] = [required_odds(value) for value in probabilities]
+    frame["cote_requise_nette"] = [
+        required_odds(value, EXECUTION_HAIRCUT) for value in probabilities
+    ]
+    if "cote_pari" in frame:
+        offered = pd.to_numeric(frame["cote_pari"], errors="coerce").to_numpy(dtype=float)
+        # Positif quand le prix proposé dépasse le seuil: c'est la définition
+        # d'un value bet, lue directement plutôt que déduite de l'espérance.
+        frame["écart_au_seuil"] = offered - frame["cote_requise"].to_numpy(dtype=float)
+    return frame
+
 
 # A recommendation is only as good as the state behind it. Below this many
 # recorded matches a team's rolling descriptors are mostly noise, so its
@@ -563,8 +608,8 @@ def all_predictions(root: Path) -> list[SportPredictions]:
 
 # Columns every sport must expose for the staking page to treat them alike.
 CANDIDATE_COLUMNS = [
-    "sport", "quand", "rencontre", "pari", "cote_pari", "p_pari",
-    "espérance", "score",
+    "sport", "quand", "rencontre", "pari", "cote_pari", "cote_requise",
+    "cote_requise_nette", "écart_au_seuil", "p_pari", "espérance", "score",
 ]
 
 
@@ -598,6 +643,12 @@ def betting_candidates(block: SportPredictions) -> pd.DataFrame:
         "rencontre": label.to_numpy(),
         "pari": frame["pari"].to_numpy(),
         "cote_pari": pd.to_numeric(frame["cote_pari"], errors="coerce").to_numpy(),
+        "cote_requise": pd.to_numeric(
+            frame.get("cote_requise", np.nan), errors="coerce").to_numpy(),
+        "cote_requise_nette": pd.to_numeric(
+            frame.get("cote_requise_nette", np.nan), errors="coerce").to_numpy(),
+        "écart_au_seuil": pd.to_numeric(
+            frame.get("écart_au_seuil", np.nan), errors="coerce").to_numpy(),
         "p_pari": pd.to_numeric(frame["p_pari"], errors="coerce").to_numpy(),
         "espérance": pd.to_numeric(frame["espérance"], errors="coerce").to_numpy(),
         "score": pd.to_numeric(frame["score"], errors="coerce").to_numpy(),

@@ -264,11 +264,13 @@ def _render_tennis(block) -> None:
         view.insert(0, "rang", range(1, len(view) + 1))
     display = view[[column for column in [
         "rang", "début", "compétition", "favori", "adversaire",
-        "pari", "cote_pari", "p_pari", "espérance", "score",
+        "pari", "cote_pari", "cote_requise", "écart_au_seuil",
+        "p_pari", "espérance", "score",
         "cote_favori", "cote_adversaire",
         "p_marché_favori", "p_modèle_favori", "écart", "books",
     ] if column in view.columns]].rename(
-        columns={"cote_pari": "cote", "p_pari": "P(pari)", "espérance": "EV"}
+        columns={"cote_pari": "cote", "cote_requise": "cote requise",
+                 "écart_au_seuil": "écart", "p_pari": "P(pari)", "espérance": "EV"}
     )
     st.dataframe(
         display, hide_index=True, use_container_width=True,
@@ -284,6 +286,14 @@ def _render_tennis(block) -> None:
             "cote_adversaire": st.column_config.NumberColumn("cote adv.", format="%.2f"),
             "books": st.column_config.NumberColumn("books", format="%d"),
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
+            "cote requise": st.column_config.NumberColumn(
+                "cote requise", format="%.2f",
+                help="Cote à partir de laquelle ce pari devient gagnant, soit "
+                     "l'inverse de la probabilité du modèle. Au-dessus: value "
+                     "bet; en dessous: le prix est meilleur que le modèle."),
+            "écart": st.column_config.NumberColumn(
+                "écart", format="%+.2f",
+                help="Cote proposée moins cote requise. Positif = value bet."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -344,11 +354,13 @@ def _render_ufc(block) -> None:
         view.insert(0, "rang", range(1, len(view) + 1))
     wanted = [
         "rang", "date", "combattant_1", "combattant_2", "catégorie",
-        "pari", "cote_pari", "p_pari", "espérance", "score",
+        "pari", "cote_pari", "cote_requise", "écart_au_seuil",
+        "p_pari", "espérance", "score",
         "p_combattant_1", "cote_1", "cote_2", "p_marché_1", "écart",
     ]
     display = view[[column for column in wanted if column in view.columns]].rename(
         columns={"p_combattant_1": "P(combattant 1)", "cote_pari": "cote",
+                 "cote_requise": "cote requise", "écart_au_seuil": "écart",
                  "p_pari": "P(pari)", "espérance": "EV"}
     )
     st.dataframe(
@@ -364,6 +376,14 @@ def _render_ufc(block) -> None:
             "p_marché_1": st.column_config.NumberColumn("P(1) marché", format="%.3f"),
             "écart": st.column_config.NumberColumn("écart", format="%+.3f"),
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
+            "cote requise": st.column_config.NumberColumn(
+                "cote requise", format="%.2f",
+                help="Cote à partir de laquelle ce pari devient gagnant, soit "
+                     "l'inverse de la probabilité du modèle. Au-dessus: value "
+                     "bet; en dessous: le prix est meilleur que le modèle."),
+            "écart": st.column_config.NumberColumn(
+                "écart", format="%+.2f",
+                help="Cote proposée moins cote requise. Positif = value bet."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -424,11 +444,13 @@ def _render_football(block) -> None:
     view.insert(0, "rang", range(1, len(view) + 1))
     display = view[[
         "rang", "date", "heure", "division", "domicile", "extérieur",
-        "pari", "cote_pari", "p_pari", "espérance", "score",
+        "pari", "cote_pari", "cote_requise", "écart_au_seuil",
+        "p_pari", "espérance", "score",
         "p_domicile", "p_nul", "p_extérieur",
     ]].rename(columns={
         "p_domicile": "P(dom)", "p_nul": "P(nul)", "p_extérieur": "P(ext)",
-        "cote_pari": "cote", "p_pari": "P(pari)", "espérance": "EV",
+        "cote_pari": "cote", "cote_requise": "cote requise",
+        "écart_au_seuil": "écart", "p_pari": "P(pari)", "espérance": "EV",
     })
     st.dataframe(
         display,
@@ -442,6 +464,14 @@ def _render_football(block) -> None:
             "P(ext)": st.column_config.ProgressColumn("P(ext)", min_value=0, max_value=1,
                                                       format="%.2f"),
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
+            "cote requise": st.column_config.NumberColumn(
+                "cote requise", format="%.2f",
+                help="Cote à partir de laquelle ce pari devient gagnant, soit "
+                     "l'inverse de la probabilité du modèle. Au-dessus: value "
+                     "bet; en dessous: le prix est meilleur que le modèle."),
+            "écart": st.column_config.NumberColumn(
+                "écart", format="%+.2f",
+                help="Cote proposée moins cote requise. Positif = value bet."),
             "P(pari)": st.column_config.ProgressColumn(
                 "P(pari)", min_value=0, max_value=1, format="%.2f"
             ),
@@ -1033,6 +1063,14 @@ def _render_profitability(root: Path, family: str, bankroll: float,
         use_container_width=True,
         column_config={
             "cote": st.column_config.NumberColumn("cote", format="%.2f"),
+            "cote requise": st.column_config.NumberColumn(
+                "cote requise", format="%.2f",
+                help="Cote à partir de laquelle ce pari devient gagnant, soit "
+                     "l'inverse de la probabilité du modèle. Au-dessus: value "
+                     "bet; en dessous: le prix est meilleur que le modèle."),
+            "écart": st.column_config.NumberColumn(
+                "écart", format="%+.2f",
+                help="Cote proposée moins cote requise. Positif = value bet."),
             "surmarge": st.column_config.NumberColumn(
                 "surmarge", format="%.2f%%",
                 help="Marge de cet opérateur sur ce marché précis, calculée sur "

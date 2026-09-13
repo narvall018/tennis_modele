@@ -124,6 +124,47 @@ class PageSourceTests(unittest.TestCase):
 
 
 
+class RequiredOddsTests(unittest.TestCase):
+    """La cote requise est la réponse à « à partir de combien c'est un value bet »."""
+
+    def test_the_break_even_price_is_the_inverse_probability(self):
+        from src.app.predictions import required_odds
+        self.assertAlmostEqual(required_odds(0.80), 1.25, places=6)
+        self.assertAlmostEqual(required_odds(0.50), 2.00, places=6)
+
+    def test_friction_raises_the_bar(self):
+        from src.app.predictions import EXECUTION_HAIRCUT, required_odds
+        for probability in (0.8, 0.5, 0.25):
+            self.assertGreater(required_odds(probability, EXECUTION_HAIRCUT),
+                               required_odds(probability))
+
+    def test_a_value_bet_is_exactly_a_positive_expectation(self):
+        """Cote > cote requise et espérance > 0 doivent toujours coïncider."""
+        from src.app.predictions import required_odds
+        for probability in (0.2, 0.45, 0.7, 0.9):
+            threshold = required_odds(probability)
+            for odds in (threshold * 0.95, threshold * 1.05):
+                expected = probability * odds - 1.0
+                self.assertEqual(odds > threshold, expected > 0)
+
+    def test_impossible_probabilities_have_no_threshold(self):
+        import math
+        from src.app.predictions import required_odds
+        for bad in (0.0, 1.0, -0.2, float("nan")):
+            self.assertTrue(math.isnan(required_odds(bad)))
+
+    def test_the_column_is_added_for_every_sport(self):
+        import pandas as pd
+        from src.app.predictions import SportPredictions
+        frame = pd.DataFrame({"p_pari": [0.8, 0.4], "cote_pari": [1.30, 2.10]})
+        block = SportPredictions("Test", True, frame, {})
+        for column in ("cote_requise", "cote_requise_nette", "écart_au_seuil"):
+            self.assertIn(column, block.rows.columns)
+        # 1,30 contre un seuil de 1,25 est un value bet; 2,10 contre 2,50 non.
+        self.assertGreater(block.rows["écart_au_seuil"].iloc[0], 0)
+        self.assertLess(block.rows["écart_au_seuil"].iloc[1], 0)
+
+
 class ProfitabilityTests(unittest.TestCase):
     """Le seuil doit refuser d'exister là où aucune cote n'est jouable."""
 
