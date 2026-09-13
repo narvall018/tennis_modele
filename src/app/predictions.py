@@ -299,7 +299,9 @@ def tennis_predictions(root: Path) -> SportPredictions:
         return SportPredictions(
             "Tennis", False, pd.DataFrame(), {},
             "Aucune clé The Odds API trouvée. Le palier gratuit (500 requêtes/mois) "
-            "suffit: définir ODDS_API_KEY, ou la placer dans les secrets Streamlit.",
+            "suffit: écrire ODDS_API_KEY=... dans un fichier .env à la racine (il "
+            "est ignoré par git), définir la variable d'environnement, ou la "
+            "placer dans les secrets Streamlit pour le déploiement.",
         )
 
     catalogue = active_sports(root)

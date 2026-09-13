@@ -72,12 +72,39 @@ def _key_from_legacy_app(root: Path) -> str:
         return ""
 
 
+def _key_from_env_file(root: Path) -> str:
+    """Read the key from a local `.env`, which `.gitignore` keeps out of the repo.
+
+    This is the right home for a key on a machine: the repository is public, so
+    anything committed is published. `.env` gives the same convenience as the
+    embedded constant without that consequence.
+    """
+    env_path = root / ".env"
+    if not env_path.exists():
+        return ""
+    try:
+        lines = env_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except OSError:
+        return ""
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        if name.strip() in ("ODDS_API_KEY", "TENNIS_ODDS_API_KEY", "UFC_ODDS_API_KEY"):
+            return value.strip().strip('"').strip("'")
+    return ""
+
+
 def resolve_api_key(root: Path) -> tuple[str, str]:
     """Return the key and where it came from, without ever logging its value."""
     for variable in ("ODDS_API_KEY", "TENNIS_ODDS_API_KEY", "UFC_ODDS_API_KEY"):
         value = os.environ.get(variable, "").strip()
         if value:
             return value, f"variable d'environnement {variable}"
+    value = _key_from_env_file(root)
+    if value:
+        return value, "fichier .env local"
     try:
         import streamlit as st
 
@@ -97,7 +124,8 @@ def _request(path: str, key: str, params: dict[str, Any]) -> OddsResponse:
     try:
         response = requests.get(f"{BASE_URL}/{path}", params=query, timeout=30)
     except requests.RequestException as error:
-        return OddsResponse(False, error=f"réseau: {error}")
+        # Requests exceptions may contain the request URL, including apiKey.
+        return OddsResponse(False, error=f"réseau: {type(error).__name__}")
     remaining = response.headers.get("x-requests-remaining")
     used = response.headers.get("x-requests-used")
     if response.status_code == 401:
