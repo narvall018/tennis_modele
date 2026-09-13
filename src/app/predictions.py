@@ -66,6 +66,25 @@ class SportPredictions:
 EXECUTION_HAIRCUT = 0.02
 
 
+def rename_for_display(frame: pd.DataFrame, mapping: dict[str, str]) -> pd.DataFrame:
+    """Renommer pour l'affichage, en refusant de produire deux colonnes homonymes.
+
+    Streamlit convertit chaque table en Arrow, qui rejette les noms dupliqués
+    avec une erreur illisible côté utilisateur — la page tombe sans dire
+    laquelle. C'est arrivé en renommant `écart_au_seuil` en « écart » alors que
+    « écart » désignait déjà l'écart modèle-marché. Mieux vaut échouer ici, avec
+    les noms fautifs.
+    """
+    renamed = frame.rename(columns=mapping)
+    names = list(renamed.columns)
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        raise ValueError(
+            f"renommage d'affichage ambigu, colonnes homonymes: {duplicates}"
+        )
+    return renamed
+
+
 def required_odds(probability: float, haircut: float = 0.0) -> float:
     """Cote à partir de laquelle un pari de probabilité `probability` est gagnant.
 

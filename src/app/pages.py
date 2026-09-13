@@ -30,6 +30,7 @@ from src.app.ledger import record_recommendation
 from src.app.maintenance import TASKS, artefact_status, run_task
 from src.app.predictions import (
     betting_candidates,
+    rename_for_display as _rename_for_display,
     football_predictions,
     tennis_predictions,
     ufc_predictions,
@@ -278,10 +279,10 @@ def _render_tennis(block) -> None:
         "p_pari", "espérance", "score",
         "cote_favori", "cote_adversaire",
         "p_marché_favori", "p_modèle_favori", "écart", "books",
-    ] if column in view.columns]].rename(
-        columns={"cote_pari": "cote", "cote_requise": "cote requise",
-                 "écart_au_seuil": "écart", "p_pari": "P(pari)", "espérance": "EV"}
-    )
+    ] if column in view.columns]]
+    display = _rename_for_display(display, {
+        "cote_pari": "cote", "cote_requise": "cote requise",
+        "écart_au_seuil": "écart seuil", "p_pari": "P(pari)", "espérance": "EV"})
     st.dataframe(
         display, hide_index=True, use_container_width=True,
         column_config={
@@ -303,8 +304,8 @@ def _render_tennis(block) -> None:
                      "modèle étant mesuré moins bon que le prix, un dépassement "
                      "indique le plus souvent une erreur du modèle, pas une "
                      "occasion."),
-            "écart": st.column_config.NumberColumn(
-                "écart", format="%+.2f",
+            "écart seuil": st.column_config.NumberColumn(
+                "écart seuil", format="%+.2f",
                 help="Cote proposée moins cote requise. Positif signifie "
                      "espérance positive selon le modèle; ce n'est un value bet "
                      "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
@@ -373,11 +374,11 @@ def _render_ufc(block) -> None:
         "p_pari", "espérance", "score",
         "p_combattant_1", "cote_1", "cote_2", "p_marché_1", "écart",
     ]
-    display = view[[column for column in wanted if column in view.columns]].rename(
-        columns={"p_combattant_1": "P(combattant 1)", "cote_pari": "cote",
-                 "cote_requise": "cote requise", "écart_au_seuil": "écart",
-                 "p_pari": "P(pari)", "espérance": "EV"}
-    )
+    display = _rename_for_display(
+        view[[column for column in wanted if column in view.columns]],
+        {"p_combattant_1": "P(combattant 1)", "cote_pari": "cote",
+         "cote_requise": "cote requise", "écart_au_seuil": "écart seuil",
+         "p_pari": "P(pari)", "espérance": "EV"})
     st.dataframe(
         display, hide_index=True, use_container_width=True,
         column_config={
@@ -398,8 +399,8 @@ def _render_ufc(block) -> None:
                      "modèle étant mesuré moins bon que le prix, un dépassement "
                      "indique le plus souvent une erreur du modèle, pas une "
                      "occasion."),
-            "écart": st.column_config.NumberColumn(
-                "écart", format="%+.2f",
+            "écart seuil": st.column_config.NumberColumn(
+                "écart seuil", format="%+.2f",
                 help="Cote proposée moins cote requise. Positif signifie "
                      "espérance positive selon le modèle; ce n'est un value bet "
                      "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
@@ -467,10 +468,11 @@ def _render_football(block) -> None:
         "pari", "cote_pari", "cote_requise", "écart_au_seuil",
         "p_pari", "espérance", "score",
         "p_domicile", "p_nul", "p_extérieur",
-    ]].rename(columns={
+    ]]
+    display = _rename_for_display(display, {
         "p_domicile": "P(dom)", "p_nul": "P(nul)", "p_extérieur": "P(ext)",
         "cote_pari": "cote", "cote_requise": "cote requise",
-        "écart_au_seuil": "écart", "p_pari": "P(pari)", "espérance": "EV",
+        "écart_au_seuil": "écart seuil", "p_pari": "P(pari)", "espérance": "EV",
     })
     st.dataframe(
         display,
@@ -491,8 +493,8 @@ def _render_football(block) -> None:
                      "modèle étant mesuré moins bon que le prix, un dépassement "
                      "indique le plus souvent une erreur du modèle, pas une "
                      "occasion."),
-            "écart": st.column_config.NumberColumn(
-                "écart", format="%+.2f",
+            "écart seuil": st.column_config.NumberColumn(
+                "écart seuil", format="%+.2f",
                 help="Cote proposée moins cote requise. Positif signifie "
                      "espérance positive selon le modèle; ce n'est un value bet "
                      "que si le modèle a raison, ce que ce dépôt n'a jamais pu "
@@ -1095,8 +1097,8 @@ def _render_profitability(root: Path, family: str, bankroll: float,
                      "modèle étant mesuré moins bon que le prix, un dépassement "
                      "indique le plus souvent une erreur du modèle, pas une "
                      "occasion."),
-            "écart": st.column_config.NumberColumn(
-                "écart", format="%+.2f",
+            "écart seuil": st.column_config.NumberColumn(
+                "écart seuil", format="%+.2f",
                 help="Cote proposée moins cote requise. Positif signifie "
                      "espérance positive selon le modèle; ce n'est un value bet "
                      "que si le modèle a raison, ce que ce dépôt n'a jamais pu "

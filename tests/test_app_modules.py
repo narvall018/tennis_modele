@@ -165,6 +165,38 @@ class RequiredOddsTests(unittest.TestCase):
         self.assertLess(block.rows["écart_au_seuil"].iloc[1], 0)
 
 
+class DisplayColumnTests(unittest.TestCase):
+    """Deux colonnes homonymes cassent la conversion Arrow de Streamlit.
+
+    C'est arrivé en renommant `écart_au_seuil` en « écart » alors que « écart »
+    désignait déjà l'écart modèle-marché: la page tennis levait un ValueError
+    que l'utilisateur ne pouvait pas interpréter. Le garde-fou échoue désormais
+    à l'endroit fautif, en nommant les colonnes en cause.
+    """
+
+    def test_a_clashing_rename_is_refused(self):
+        import pandas as pd
+        from src.app.predictions import rename_for_display as _rename_for_display
+        frame = pd.DataFrame({"écart": [0.1], "écart_au_seuil": [0.2]})
+        with self.assertRaises(ValueError) as raised:
+            _rename_for_display(frame, {"écart_au_seuil": "écart"})
+        self.assertIn("écart", str(raised.exception))
+
+    def test_a_clean_rename_passes_through(self):
+        import pandas as pd
+        from src.app.predictions import rename_for_display as _rename_for_display
+        frame = pd.DataFrame({"écart": [0.1], "écart_au_seuil": [0.2]})
+        renamed = _rename_for_display(frame, {"écart_au_seuil": "écart seuil"})
+        self.assertEqual(list(renamed.columns), ["écart", "écart seuil"])
+
+    def test_the_three_tables_use_the_guard(self):
+        source = (PROJECT_ROOT / "src" / "app" / "pages.py").read_text(encoding="utf-8")
+        # La définition vit dans predictions.py; pages.py n'en a que les appels.
+        self.assertGreaterEqual(source.count("_rename_for_display("), 3,
+                                "les trois tables doivent passer par le garde-fou")
+        self.assertNotIn('"écart_au_seuil": "écart"', source)
+
+
 class ValueBetCaveatTests(unittest.TestCase):
     """La colonne ne doit pas pouvoir se lire comme un feu vert."""
 
