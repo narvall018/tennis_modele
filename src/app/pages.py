@@ -35,6 +35,12 @@ from src.app.predictions import (
     ufc_predictions,
 )
 from src.app.staking import PLANS, apply_daily_cap, stake_for_bet
+from src.app.profitability import (
+    MINIMUM_EDGE,
+    assess,
+    break_even_odds,
+    market_overround,
+)
 from src.backtesting.arbitrage import EXCHANGES, classify, scan
 
 
@@ -874,3 +880,185 @@ def render_arbitrage_page(root: Path) -> None:
         "- Les gros écarts (>3 %) changent de paire d'opérateurs à chaque passe: "
         "ce sont des artefacts. Les petits persistent au centième près."
     )
+
+
+# Fractions de Kelly proposées. Le plein Kelly suppose l'avantage connu; ici il
+# est mesuré à 0,2 point près, donc le proposer serait malhonnête.
+KELLY_CHOICES = {"Quart de Kelly (prudent)": 0.25, "Demi-Kelly": 0.5,
+                 "Kelly complet (déconseillé)": 1.0}
+SCREEN_SPORTS = 10
+
+
+@st.cache_data(ttl=180, show_spinner="Relevé des cotes…")
+def _screen_prices(root_text: str, sports: tuple[str, ...], regions: str):
+    """Toutes les cotes du périmètre, avec la surmarge de chaque opérateur."""
+    from src.app.odds_api import fetch_h2h_odds
+
+    root = Path(root_text)
+    rows, remaining, errors = [], None, []
+    now = pd.Timestamp.now("UTC")
+    for sport in sports:
+        response = fetch_h2h_odds(root, sport, regions=regions)
+        if not response.ok:
+            errors.append(f"{sport}: {response.error}")
+            continue
+        remaining = response.remaining if response.remaining is not None else remaining
+        for event in response.events:
+            starts = pd.to_datetime(event.get("commence_time"), utc=True, errors="coerce")
+            if pd.isna(starts) or starts <= now:
+                continue          # un prix en direct n'est pas une offre d'avant-match
+            label = f"{event.get('home_team')} — {event.get('away_team')}"
+            for book in event.get("bookmakers") or []:
+                for market in book.get("markets") or []:
+                    if market.get("key") != "h2h":
+                        continue
+                    prices = [o.get("price") for o in market.get("outcomes") or []]
+                    overround = market_overround(prices)
+                    if overround is None:
+                        continue
+                    for outcome in market.get("outcomes") or []:
+                        price = outcome.get("price")
+                        if not isinstance(price, (int, float)) or price <= 1.0:
+                            continue
+                        rows.append({
+                            "sport": sport, "événement": label,
+                            "début": str(event.get("commence_time", ""))[:16],
+                            "opérateur": book.get("key"),
+                            "sélection": outcome.get("name"),
+                            "cote": float(price), "surmarge": overround,
+                        })
+    return pd.DataFrame(rows), remaining, errors
+
+
+def render_profitability_page(root: Path) -> None:
+    """À partir de quelle cote un pari cesse de perdre, et combien y mettre."""
+    st.title("Seuil de rentabilité")
+    st.caption(
+        "Aucun modèle de ce dépôt ne bat le marché — treize études le disent. "
+        "Cette page ne prédit donc rien. Elle calcule une autre quantité, "
+        "mesurée celle-là: le rendement d'un pari selon sa cote et selon la "
+        "marge de l'opérateur qui la propose."
+    )
+    st.info(
+        "**Le principe.** La marge d'un book n'est pas répartie: elle est posée "
+        "sur les outsiders. Sur 191 458 matchs, une jambe à 1,15 rend 0,985 et "
+        "une jambe à 10,00 rend 0,755. Il existe donc, chez chaque opérateur, "
+        "une cote au-delà de laquelle plus rien n'est jouable — et chez la "
+        "plupart, cette cote n'existe pas du tout.",
+        icon="📐",
+    )
+
+    st.subheader("Le seuil, selon la marge de l'opérateur")
+    reference = []
+    for overround, name in ((0.0091, "Betfair exchange"), (0.0256, "book à 2,5 %"),
+                            (0.0302, "Pinnacle"), (0.0462, "seuil théorique"),
+                            (0.0655, "Bet365"), (0.0675, "meilleur des 5 français"),
+                            (0.0734, "PMU"), (0.1111, "Winamax France")):
+        row = {"opérateur": name, "surmarge": f"{overround:.2%}"}
+        for sport, label in (("football", "football"), ("atp", "ATP"), ("wta", "WTA")):
+            limit = break_even_odds(root, sport, overround)
+            row[label] = f"jusqu'à {limit:.2f}" if limit else "aucune cote"
+        reference.append(row)
+    st.dataframe(pd.DataFrame(reference), hide_index=True, width="stretch")
+    st.caption(
+        "Au-dessus de ~4,6 % de surmarge, aucune cote n'est jouable, sur aucun "
+        "sport. C'est le cas des cinq opérateurs français et de Bet365."
+    )
+
+    st.divider()
+    st.subheader("Screening des rencontres à venir")
+
+    from src.app.odds_api import active_sports
+
+    catalogue = active_sports(root)
+    if not catalogue.ok:
+        st.error(f"Catalogue indisponible: {catalogue.error}")
+        return
+    available = [s["key"] for s in catalogue.events if s.get("active")]
+
+    left, middle, right = st.columns(3)
+    with left:
+        chosen = st.multiselect("Compétitions", available, default=available[:SCREEN_SPORTS])
+    with middle:
+        bankroll = st.number_input("Bankroll (€)", 50.0, 1_000_000.0, 1000.0, 50.0)
+        regions = st.text_input("Régions", "eu,uk,us,au")
+    with right:
+        plan = st.selectbox("Mise", list(KELLY_CHOICES), index=0)
+        show_all = st.checkbox("Montrer aussi les paris perdants", value=False)
+
+    if not st.button("Screener", type="primary"):
+        st.info("Le screening consomme du quota: il ne part que sur demande.")
+        return
+    if not chosen:
+        st.warning("Aucune compétition sélectionnée.")
+        return
+
+    frame, remaining, errors = _screen_prices(str(root), tuple(chosen), regions)
+    for message in errors:
+        st.caption(f"⚠️ {message}")
+    if frame.empty:
+        st.warning("Aucune cote d'avant-match sur ce périmètre.")
+        return
+
+    verdicts = []
+    for row in frame.itertuples(index=False):
+        result = assess(root, row.sport, row.cote, row.surmarge)
+        if result is None:
+            continue
+        verdicts.append({
+            **row._asdict(),
+            "rendement": result.expected_return,
+            "avantage": result.edge,
+            "kelly": result.kelly_fraction * KELLY_CHOICES[plan],
+            "jouable": result.playable,
+        })
+    table = pd.DataFrame(verdicts)
+    if table.empty:
+        st.warning("Aucune sélection évaluable (sport sans courbe mesurée).")
+        return
+    table["mise (€)"] = (table["kelly"] * bankroll).round(2)
+
+    playable = table[table["jouable"]].sort_values("avantage", ascending=False)
+    st.caption(
+        f"{len(frame):,} cotes relevées · {frame['événement'].nunique()} rencontres"
+        + (f" · quota restant {remaining}" if remaining is not None else "")
+    )
+    st.metric("Sélections au-dessus du seuil", f"{len(playable)} sur {len(table):,}")
+
+    if playable.empty:
+        st.success(
+            "Aucune sélection jouable sur ce périmètre — ce qui est le résultat "
+            "attendu dès que les opérateurs dépassent 4,6 % de surmarge."
+        )
+    else:
+        columns = ["événement", "début", "sélection", "opérateur", "cote",
+                   "surmarge", "avantage", "mise (€)"]
+        st.dataframe(
+            playable[columns].style.format({
+                "cote": "{:.2f}", "surmarge": "{:.2%}", "avantage": "{:+.2%}",
+                "mise (€)": "{:.2f}",
+            }),
+            hide_index=True, width="stretch",
+        )
+        st.caption(
+            f"Mise = {plan.split(' (')[0]} sur l'avantage estimé. Total engagé "
+            f"{playable['mise (€)'].sum():.2f} € sur {len(playable)} paris."
+        )
+        st.warning(
+            "Ces avantages valent quelques dixièmes de point et reposent sur une "
+            "courbe mesurée à ±0,2 point près. Aucun intervalle de confiance de "
+            "ce dépôt n'exclut zéro sur la période récente: à traiter comme une "
+            "hypothèse à suivre, pas comme un revenu.",
+            icon="⚠️",
+        )
+
+    if show_all and not table.empty:
+        st.divider()
+        st.subheader("Toutes les sélections relevées")
+        worst = table.sort_values("avantage", ascending=False)
+        st.dataframe(
+            worst[["événement", "sélection", "opérateur", "cote", "surmarge",
+                   "avantage"]].style.format({
+                "cote": "{:.2f}", "surmarge": "{:.2%}", "avantage": "{:+.2%}"}),
+            hide_index=True, width="stretch",
+        )

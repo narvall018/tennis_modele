@@ -110,7 +110,8 @@ class PageSourceTests(unittest.TestCase):
             node.id for node in ast.walk(tree) if isinstance(node, ast.Name)
         }
         for page in ("render_predictions_page", "render_staking_page",
-                     "render_performance_page", "render_arbitrage_page"):
+                     "render_performance_page", "render_arbitrage_page",
+                     "render_profitability_page"):
             self.assertIn(page, names, f"{page} n'est pas branchée dans l'app")
 
     def test_the_arbitrage_page_states_its_guards(self):
@@ -121,6 +122,34 @@ class PageSourceTests(unittest.TestCase):
             self.assertIn(guard, source, f"garde-fou absent de la page: {guard}")
 
 
+
+
+class ProfitabilityTests(unittest.TestCase):
+    """Le seuil doit refuser d'exister là où aucune cote n'est jouable."""
+
+    def test_no_playable_odds_at_a_french_overround(self):
+        from src.app.profitability import break_even_odds
+        for sport in ("football", "atp", "wta"):
+            self.assertIsNone(break_even_odds(PROJECT_ROOT, sport, 0.0734),
+                              f"{sport}: un seuil est annoncé à 7,34% de surmarge")
+
+    def test_a_cheap_book_makes_short_favourites_playable(self):
+        from src.app.profitability import break_even_odds
+        limit = break_even_odds(PROJECT_ROOT, "football", 0.0091)
+        self.assertIsNotNone(limit)
+        self.assertGreater(limit, 1.0)
+        self.assertLess(limit, 2.0, "un seuil au-dessus de 2,00 serait invraisemblable")
+
+    def test_the_edge_shrinks_as_the_operator_gets_dearer(self):
+        from src.app.profitability import assess
+        cheap = assess(PROJECT_ROOT, "football", 1.20, 0.02)
+        dear = assess(PROJECT_ROOT, "football", 1.20, 0.09)
+        self.assertGreater(cheap.expected_return, dear.expected_return)
+
+    def test_an_incoherent_market_has_no_overround(self):
+        from src.app.profitability import market_overround
+        self.assertIsNone(market_overround([1.5]))
+        self.assertIsNone(market_overround([1.01, 1.01]))
 
 
 class ModelRegistryTests(unittest.TestCase):
