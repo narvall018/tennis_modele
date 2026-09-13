@@ -51,3 +51,6 @@ models/**/*.csv
 
 catboost_info/
 *.png
+
+# Relevés prospectifs: volumineux et reconstructibles par collecte
+models/prospective/price_snapshots.jsonl
