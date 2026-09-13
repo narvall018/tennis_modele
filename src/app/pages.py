@@ -35,6 +35,7 @@ from src.app.predictions import (
     ufc_predictions,
 )
 from src.app.staking import PLANS, apply_daily_cap, stake_for_bet
+from src.backtesting.arbitrage import EXCHANGES, classify, scan
 
 
 @st.cache_data(ttl=1800, show_spinner="Chargement des rencontres…")
@@ -707,3 +708,169 @@ def render_maintenance_page(root: Path) -> None:
     if st.button("Vider le cache des prédictions"):
         st.cache_data.clear()
         st.success("Cache vidé: le prochain chargement ira rechercher les données.")
+
+
+# Concentration mesurée le 2026-09-13: 7 des 14 occasions relevées passaient par
+# cet opérateur, et il portait à lui seul l'écart entre 1,65% et 0,29% de gain
+# moyen. Un arbitrage n'a pas de risque de marché mais reste entièrement exposé
+# au risque de contrepartie, et celui-là ne se couvre pas.
+CONCENTRATED_BOOK = "onexbet"
+
+
+@st.cache_data(ttl=120, show_spinner="Interrogation des opérateurs…")
+def _scan_arbitrage(root_text: str, sports: tuple[str, ...], regions: str):
+    """Un scan coûte du quota, d'où le cache court et le bouton explicite."""
+    from src.app.odds_api import fetch_h2h_odds
+
+    root = Path(root_text)
+    found, markets, remaining, errors = [], 0, None, []
+    for sport in sports:
+        response = fetch_h2h_odds(root, sport, regions=regions)
+        if not response.ok:
+            errors.append(f"{sport}: {response.error}")
+            continue
+        remaining = response.remaining if response.remaining is not None else remaining
+        markets += len(response.events)
+        found += scan(response.events, sport)
+    return found, markets, remaining, errors
+
+
+def render_arbitrage_page(root: Path) -> None:
+    """Où parier, combien sur chaque jambe, et ce que chaque garde-fou dit."""
+    st.title("Arbitrage")
+    st.caption(
+        "Parier les deux côtés d'un même match chez deux opérateurs qui ne sont "
+        "pas d'accord sur le prix. Aucune prévision n'est nécessaire: si les deux "
+        "mises sont acceptées, le gain est le même quel que soit le résultat."
+    )
+    st.warning(
+        "**Un arbitrage n'a pas de risque de marché — il a un risque de "
+        "contrepartie.** Il faut que les deux jambes soient acceptées, tenues et "
+        "payées. Si une seule est annulée, la perte n'est pas la marge: c'est "
+        "l'exposition entière de l'autre jambe.",
+        icon="⚠️",
+    )
+
+    from src.app.odds_api import active_sports
+
+    catalogue = active_sports(root)
+    if not catalogue.ok:
+        st.error(f"Catalogue indisponible: {catalogue.error}")
+        return
+    available = [s["key"] for s in catalogue.events if s.get("active")]
+
+    left, right = st.columns([2, 1])
+    with left:
+        chosen = st.multiselect(
+            "Compétitions à interroger", available,
+            default=available[:8],
+            help="Chaque compétition coûte une requête d'API.",
+        )
+    with right:
+        bankroll = st.number_input("Capital à engager (€)", 10.0, 100_000.0, 500.0, 10.0)
+        regions = st.text_input("Régions", "eu,uk,us,au")
+
+    if not st.button("Lancer un scan", type="primary"):
+        st.info("Le scan consomme du quota: il ne part que sur demande.")
+        return
+    if not chosen:
+        st.warning("Aucune compétition sélectionnée.")
+        return
+
+    found, markets, remaining, errors = _scan_arbitrage(
+        str(root), tuple(chosen), regions)
+    for message in errors:
+        st.caption(f"⚠️ {message}")
+    st.caption(
+        f"{markets} marchés interrogés · {len(found)} écart(s) brut(s)"
+        + (f" · quota restant {remaining}" if remaining is not None else "")
+    )
+    if not found:
+        st.success("Aucun écart de prix sur ce périmètre.")
+        return
+
+    now = pd.Timestamp.now("UTC")
+    rows = []
+    for item in sorted(found, key=lambda o: -o.guaranteed_return):
+        starts = pd.to_datetime(item.commence_time, utc=True, errors="coerce")
+        stakes = item.stakes(bankroll)
+        rows.append({
+            "opportunité": item,
+            "gain": item.guaranteed_return,
+            "profit": bankroll * item.guaranteed_return,
+            "avant_match": bool(pd.notna(starts) and starts > now),
+            "sans_exchange": not item.uses_exchange,
+            "hors_book_concentré": all(
+                leg["bookmaker"] != CONCENTRATED_BOOK for leg in item.legs),
+            "fraîcheur": item.worst_staleness,
+            "stakes": stakes,
+        })
+
+    clean = [r for r in rows
+             if r["avant_match"] and r["sans_exchange"] and r["hors_book_concentré"]]
+    st.metric(
+        "Occasions passant toutes les gardes",
+        f"{len(clean)} sur {len(rows)}",
+        help="Avant-match, sans exchange, et sans l'opérateur qui concentrait "
+             "la moitié du gain moyen au relevé du 13 septembre.",
+    )
+
+    for row in rows:
+        item = row["opportunité"]
+        badge = "✅" if row in clean else "⚠️"
+        header = (f"{badge}  {item.event}  ·  {row['gain']:+.2%}  "
+                  f"→ {row['profit']:+.2f} €")
+        with st.expander(header, expanded=row in clean):
+            legs = pd.DataFrame([{
+                "issue": leg["outcome"],
+                "opérateur": leg["bookmaker"],
+                "cote": round(leg["price"], 3),
+                "mise (€)": row["stakes"].get(leg["outcome"], 0.0),
+                "retour si gagnant (€)": round(
+                    row["stakes"].get(leg["outcome"], 0.0) * leg["price"], 2),
+                "fraîcheur (min)": round(leg["staleness_minutes"], 1),
+            } for leg in item.legs])
+            st.dataframe(legs, hide_index=True, width="stretch")
+            st.caption(
+                f"Total engagé {sum(row['stakes'].values()):.2f} € · "
+                f"retour identique quelle que soit l'issue · "
+                f"début {item.commence_time[:16] or 'inconnu'}"
+            )
+            problems = []
+            if not row["avant_match"]:
+                problems.append(
+                    "**match déjà commencé** — ce sont des prix en direct, pas "
+                    "une offre d'avant-match")
+            if not row["sans_exchange"]:
+                problems.append(
+                    "**une jambe sur un exchange** — le prix affiché n'engage "
+                    "que la liquidité disponible, à vérifier avant de miser")
+            if not row["hors_book_concentré"]:
+                problems.append(
+                    f"**{CONCENTRATED_BOOK}** — opérateur qui portait la moitié "
+                    "du gain moyen au relevé, et dont le risque de contrepartie "
+                    "est précisément celui qu'un arbitrage ne couvre pas")
+            if row["fraîcheur"] > 5.0:
+                problems.append(
+                    f"**cotes vieilles de {row['fraîcheur']:.0f} min** — rien ne "
+                    "prouve qu'elles sont simultanées")
+            if problems:
+                for problem in problems:
+                    st.markdown(f"- {problem}")
+            else:
+                st.markdown(
+                    "- toutes les gardes passent; restent le glissement de prix "
+                    "entre les deux exécutions et l'acceptation des mises")
+
+    st.divider()
+    st.subheader("Ce que le relevé du 13 septembre a mesuré")
+    st.markdown(
+        "- **3,5 % des marchés** portaient un écart avant-match (14 sur 397).\n"
+        "- Gain théorique moyen **0,97 %**.\n"
+        "- Mais **7 des 14 passaient par un seul opérateur**, qui portait l'écart "
+        "entre 1,65 % et 0,29 % de gain moyen. Sans lui: **1 % des marchés à "
+        "0,29 %**, ce qui ne finance ni le glissement de prix, ni le refus de "
+        "mise, ni la limitation de compte.\n"
+        "- Les gros écarts (>3 %) changent de paire d'opérateurs à chaque passe: "
+        "ce sont des artefacts. Les petits persistent au centième près."
+    )

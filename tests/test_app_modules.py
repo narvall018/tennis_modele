@@ -110,8 +110,15 @@ class PageSourceTests(unittest.TestCase):
             node.id for node in ast.walk(tree) if isinstance(node, ast.Name)
         }
         for page in ("render_predictions_page", "render_staking_page",
-                     "render_performance_page"):
+                     "render_performance_page", "render_arbitrage_page"):
             self.assertIn(page, names, f"{page} n'est pas branchée dans l'app")
+
+    def test_the_arbitrage_page_states_its_guards(self):
+        """La page doit nommer ce qu'elle ne garantit pas, pas seulement le gain."""
+        source = (PROJECT_ROOT / "src" / "app" / "pages.py").read_text(encoding="utf-8")
+        self.assertIn("render_arbitrage_page", source)
+        for guard in ("risque de contrepartie", "exchange", "CONCENTRATED_BOOK"):
+            self.assertIn(guard, source, f"garde-fou absent de la page: {guard}")
 
 
 

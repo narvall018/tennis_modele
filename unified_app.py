@@ -37,6 +37,7 @@ try:
     from src.app.ledger import migrate_sports
     from src.app.pages import (
         render_maintenance_page,
+        render_arbitrage_page,
         render_performance_page,
         render_predictions_page,
         render_staking_page,
@@ -1976,7 +1977,8 @@ def main() -> None:
             st.session_state.pop("unified_ufc_bets_folder", None)
             st.session_state["_goto_section"] = "Accueil"
             st.rerun()
-        sections = ["Accueil", "Prédictions", "Mises", "Performances", "Mise à jour", "Tennis", "UFC"]
+        sections = ["Accueil", "Prédictions", "Arbitrage", "Mises", "Performances",
+                    "Mise à jour", "Tennis", "UFC"]
         if is_admin and username == ADMIN_USERNAME:
             sections.append("Administration")
         pending_section = st.session_state.pop("_goto_section", None)
@@ -1989,7 +1991,7 @@ def main() -> None:
     section = st.session_state["section"]
     if section == "Accueil":
         _render_unified_home(user)
-    elif section in {"Prédictions", "Mises", "Performances", "Mise à jour"}:
+    elif section in {"Prédictions", "Arbitrage", "Mises", "Performances", "Mise à jour"}:
         if not RESEARCH_PAGES_AVAILABLE:
             st.error(
                 "Pages de recherche indisponibles: "
@@ -1997,6 +1999,8 @@ def main() -> None:
             )
         elif section == "Prédictions":
             render_predictions_page(PROJECT_ROOT)
+        elif section == "Arbitrage":
+            render_arbitrage_page(PROJECT_ROOT)
         elif section == "Mises":
             render_staking_page(PROJECT_ROOT, user_id=int(user["id"]))
         elif section == "Mise à jour":
