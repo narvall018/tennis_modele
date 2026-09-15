@@ -1,0 +1,128 @@
+{
+  "conditional_arms": {
+    "marché+base": 32,
+    "marché+base+marge": 49,
+    "marché_seul": 1
+  },
+  "data_sha256": {
+    "atp": "260c867f2fad537c08739185f6f64cf6f336cece2b5aa4c63855fb3f1fa129d4",
+    "wta": "fc5e5009e9abf620d8f44e7fa30ff44629df2e4b5d09dcc2d3e1a8abb03ac02c"
+  },
+  "decision_rule": "Gate B échouée → NO BET, aucune conclusion économique, aucun budget vierge dépensé. Gate A franchie et Gate B échouée → les descripteurs sont retenus pour l'opinion de l'application et pour rien d'autre.",
+  "devig": "proportionnel: q1 = (1/o1) / (1/o1 + 1/o2)",
+  "evidence_budget": {
+    "atp_main": "brûlé pour toute conclusion économique (étude imbriquée + phase 4)",
+    "consequence": "Cette étude ne produit AUCUNE conclusion économique et n'autorise aucune mise. Elle mesure de la prévision. Une gate franchie est une hypothèse à confirmer sur du budget vierge — holdout UFC jamais ouvert, saisons football jamais ouvertes, ou collecte prospective à partir du 7 septembre 2026 — jamais sur un nouveau passage ATP ou WTA.",
+    "wta_main": "brûlé pour toute conclusion économique (holdout ouvert le 2026-09-06)"
+  },
+  "family_selection": "La famille de modèle qui porte la décision est celle qui minimise la log-loss du bras SANS marge. Ce choix ne peut donc pas être incliné par l'effet mesuré. Les deux familles restent publiées dans tous les cas.",
+  "feature_time_rule": "L'état d'un joueur est lu au début de la journée et mis à jour seulement une fois tous les matchs de cette journée décrits.",
+  "frozen_at_utc": "2026-09-15T23:43:38.925805+00:00",
+  "frozen_before_any_return": true,
+  "gates": {
+    "gate_a_descriptor_gain": {
+      "definition": "log-loss(base) - log-loss(base+marge), poolée sur toutes les années de test, sur le prix primaire non requis (toute la population jouée).",
+      "meaning": "qualité de l'opinion affichée par l'application, sans portée économique",
+      "threshold": 0.002
+    },
+    "gate_b_conditional_gain": {
+      "definition": "log-loss(marché_seul) - log-loss(marché+base+marge), poolée, sur les matchs à prix valide. Seuil repris tel quel du test conditionnel football déjà appliqué dans ce dépôt.",
+      "meaning": "la seule barre qui a jamais décidé d'un pari ici",
+      "threshold": 0.001
+    }
+  },
+  "model_families": {
+    "hist_gradient_boosting": {
+      "kind": "hist_gradient_boosting",
+      "l2_regularization": 1.0,
+      "learning_rate": 0.06,
+      "max_iter": 300,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 50,
+      "random_state": 0
+    },
+    "logistic": {
+      "C": 0.05,
+      "kind": "logistic",
+      "max_iter": 2000
+    }
+  },
+  "populations": {
+    "atp": "data/atp_tennis.csv",
+    "wta": "data/wta_tennis.csv"
+  },
+  "price_validity": "overround dans [0,95 ; 1,25] et deux cotes > 1, convention _valid_market du dépôt",
+  "primary_price": "average",
+  "protocol_sha256": "86ff79833ab22499fd92aa1c0fc7034ef3c744c94d4a0e89706f9eb97580e59d",
+  "protocol_version": "1.0.0",
+  "question": "La marge en jeux, lue dans une colonne Score qu'aucun module de ce dépôt n'avait jamais parsée, ajoute-t-elle de la prévision (a) aux descripteurs existants, (b) au prix dévigé ?",
+  "reporting_rule": "Toutes les cellules sont publiées ensemble: les deux circuits, les deux familles de modèle, les trois bras et les quatre sources de prix. Aucune sélection a posteriori de la cellule la plus flatteuse. La décision lit la cellule primaire déclarée d'avance: prix moyen, log-loss poolée.",
+  "settlement_population": "matchs terminés uniquement; abandons et walkovers exclus des métriques",
+  "study": "score_margin_descriptors",
+  "superseded": [
+    {
+      "amended_at_utc": "2026-09-15T23:42:25.605805+00:00",
+      "previous_frozen_at_utc": "2026-09-15T23:39:07.944313+00:00",
+      "previous_protocol_sha256": "3ada7296f9acd4bc83c755dee970096d39d852800bcbb4107e87889dbddfe5e9"
+    },
+    {
+      "amended_at_utc": "2026-09-15T23:43:38.925805+00:00",
+      "previous_frozen_at_utc": "2026-09-15T23:42:25.605805+00:00",
+      "previous_protocol_sha256": "7b83ef00746188c29bc8f9b59a676626739a03d0a273abcc97ed934ef46ad783"
+    }
+  ],
+  "uncertainty": {
+    "draws": 2000,
+    "level": 0.9,
+    "method": "bootstrap apparié par grappes mensuelles sur la différence de log-loss"
+  },
+  "unconditional_arms": {
+    "base": 31,
+    "base+marge": 48,
+    "marge_seule": 17
+  },
+  "walk_forward": {
+    "calibration": "isotone, appliquée identiquement à tous les bras",
+    "calibration_year": "test_year_minus_1",
+    "minimum_calibration_rows": 500,
+    "minimum_train_rows": 10000,
+    "test_years": {
+      "atp": [
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "wta": [
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    "train_through": "test_year_minus_2"
+  }
+}

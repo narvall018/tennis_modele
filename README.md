@@ -382,6 +382,44 @@ python3 scripts/collect_tennis_odds.py
 La clé doit être fournie explicitement; le collecteur de recherche ne réutilise
 pas le secret encodé de l'interface Streamlit.
 
+## La marge en jeux — le dernier gisement inexploité
+
+```bash
+python3 scripts/run_margin_study.py --freeze-only   # écrit et hashe le protocole
+python3 scripts/run_margin_study.py                 # les deux tests
+python3 predictor_ufc/run_adjusted_ablation.py      # l'équivalent UFC
+```
+
+La colonne `Score` n'était parsée nulle part : toutes les variables du dépôt
+reposaient sur le seul bit « a gagné / a perdu », et traitaient un 6‑0 6‑0 comme
+un 7‑6 6‑7 7‑6. `src/features/score_features.py` en tire dix-sept descripteurs de
+marge — Elo à multiplicateur de marge, ratios de jeux, tie-breaks, sets décisifs,
+renversements, charge comptée en jeux, fragilité lue dans les abandons,
+adversaires communs.
+
+**Gate de prévision franchie, et largement.** Aucun prix montré au modèle, le
+gain va de +0,00267 à +0,00934 selon le circuit et la famille. Surtout : dans les
+quatre cellules, **les dix-sept descripteurs de marge employés seuls battent les
+trente et un descripteurs existants**. Pour situer, les classements multi-niveaux,
+« le plus gros effet du projet », valaient +0,00469.
+
+**Gate conditionnelle échouée, sur les seize cellules.** Une fois le prix dévigé
+donné au modèle, quinze cellules sur seize sont négatives et la seizième
+(+0,00092) n'atteint pas le seuil, intervalle contenant zéro — soit exactement ce
+qu'une cellule positive sur seize vaut par hasard. Le marché seul reste meilleur
+que le marché plus n'importe quel descripteur. Statut : `MARGIN_NO_BET`.
+
+Côté UFC, treize descripteurs ajustés à l'adversaire, à l'usure et à l'âge
+gagnent +0,00316 en développement mais ne battent pas le marché (0,66038 contre
+0,61306) : gate échouée, **holdout économique 2025‑2026 non ouvert**. Deux défauts
+de `features_v2.parquet` sont sortis au passage — une orientation incohérente sur
+3 420 des 6 719 combats, et deux descripteurs annoncés qui sont vides ou
+constants. Détail complet dans [RAPPORT_MARGE.md](RAPPORT_MARGE.md).
+
+Aucune mesure football n'accompagne celle-ci : `data/football/` est absent du
+clone et l'accès réseau à la source est fermé. Le rapport le dit plutôt que de
+livrer un résultat non validé.
+
 ## Règles de rigueur
 
 - L'orientation `Player_1` / `Player_2` est déterministe et indépendante du résultat.
@@ -410,6 +448,8 @@ Un jeu de données ne sert de preuve qu'une fois. Ce qui a déjà été dépens�
 | WTA principal | holdout 2023–2026 ouvert une fois le 6 septembre 2026, `NO BET` | brûlé à son tour |
 | Challenger et qualifications | aucun marché dans les données | ne peuvent porter aucune preuve économique, seulement des classements |
 | Période à partir du 7 septembre 2026 | vierge | seule preuve prospective encore disponible |
+| Holdout économique UFC 2025‑09‑13 → 2026‑08‑29 | jamais ouvert | quatre études s'y sont arrêtées avant, dont celle des descripteurs ajustés |
+| Saisons football de réglage, validation et holdout | jamais ouvertes | non mesurables ici: `data/football/` absent du clone |
 
 Toute nouvelle hypothèse doit dire quelles données jamais explorées elle consomme.
 Si la réponse est « les mêmes que la dernière fois », la démarche honnête est la

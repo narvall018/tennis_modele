@@ -1,0 +1,134 @@
+{
+  "decision_family": "logistic",
+  "economic_claim": "Aucune. Cette ablation mesure de la prévision sur une fenêtre déjà explorée par les études antérieures. Elle n'autorise aucune mise.",
+  "gate_passed": false,
+  "generated_at_utc": "2026-09-15T23:54:18.014108+00:00",
+  "holdout_opened": false,
+  "orientation_audit": {
+    "age_diff_correlation_after_repair": 1.0,
+    "ambiguous_rows_resolved_by_seed": 510,
+    "consistent_rows": 3299,
+    "fights": 6719,
+    "flipped_rows": 3420
+  },
+  "protocol_sha256": "0209efdfe2e61640cb64fd85e83d3b223cdb964135bcb585ef291e93fbc5a203",
+  "results": {
+    "hist_gradient_boosting": {
+      "baseline_log_loss": 0.7285145518839107,
+      "challenger_beats_market": false,
+      "challenger_log_loss": 0.7277087859135772,
+      "challenger_log_loss_on_market_rows": 0.7278973524794884,
+      "gain": {
+        "clusters": 411,
+        "high": 0.01247058158824075,
+        "low": -0.010003075120177207,
+        "mean": 0.0008057659703335038
+      },
+      "market_log_loss": 0.6130586483478072,
+      "n": 4656,
+      "per_year": {
+        "2015": {
+          "baseline": 0.7502389918226103,
+          "challenger": 0.7817931816302159
+        },
+        "2016": {
+          "baseline": 0.783626031646862,
+          "challenger": 0.7511170928870324
+        },
+        "2017": {
+          "baseline": 0.7359005719907278,
+          "challenger": 0.7381141637403612
+        },
+        "2018": {
+          "baseline": 0.7440029247264314,
+          "challenger": 0.7658866368402687
+        },
+        "2019": {
+          "baseline": 0.7559184764869061,
+          "challenger": 0.7026224648262411
+        },
+        "2020": {
+          "baseline": 0.6880377572610019,
+          "challenger": 0.692998513134494
+        },
+        "2021": {
+          "baseline": 0.7494608689261637,
+          "challenger": 0.7491786553650309
+        },
+        "2022": {
+          "baseline": 0.6868091209436776,
+          "challenger": 0.6854650683219444
+        },
+        "2023": {
+          "baseline": 0.7030149742252345,
+          "challenger": 0.7152124777161998
+        },
+        "2024": {
+          "baseline": 0.6931851386310086,
+          "challenger": 0.7030079139109752
+        }
+      },
+      "years_challenger_better": 4,
+      "years_total": 10
+    },
+    "logistic": {
+      "baseline_log_loss": 0.6638000075218556,
+      "challenger_beats_market": false,
+      "challenger_log_loss": 0.6606403886373431,
+      "challenger_log_loss_on_market_rows": 0.6603769141766065,
+      "gain": {
+        "clusters": 411,
+        "high": 0.006761240676044996,
+        "low": -0.0002740137325580497,
+        "mean": 0.003159618884512627
+      },
+      "market_log_loss": 0.6130586483478072,
+      "n": 4656,
+      "per_year": {
+        "2015": {
+          "baseline": 0.67600362068356,
+          "challenger": 0.6675464157098253
+        },
+        "2016": {
+          "baseline": 0.654883083813164,
+          "challenger": 0.659178159666998
+        },
+        "2017": {
+          "baseline": 0.6657580042526438,
+          "challenger": 0.6556534947145545
+        },
+        "2018": {
+          "baseline": 0.661355527680394,
+          "challenger": 0.664007113107694
+        },
+        "2019": {
+          "baseline": 0.6767564110699039,
+          "challenger": 0.669786393164524
+        },
+        "2020": {
+          "baseline": 0.6589535940763089,
+          "challenger": 0.6456598888861869
+        },
+        "2021": {
+          "baseline": 0.6659336278919834,
+          "challenger": 0.6828061545153902
+        },
+        "2022": {
+          "baseline": 0.6622037717019208,
+          "challenger": 0.6616290386618386
+        },
+        "2023": {
+          "baseline": 0.6645559325263696,
+          "challenger": 0.6582858434826963
+        },
+        "2024": {
+          "baseline": 0.6522881118001821,
+          "challenger": 0.6410119162479772
+        }
+      },
+      "years_challenger_better": 7,
+      "years_total": 10
+    }
+  },
+  "status": "ADJUSTED_DEVELOPMENT_GATE_FAILED"
+}

@@ -1,0 +1,838 @@
+{
+  "economic_claim": "Aucune. ATP et WTA sont brûlés pour toute conclusion économique; une gate conditionnelle franchie ici serait une hypothèse à confirmer sur du budget vierge, jamais un rendement.",
+  "generated_at_utc": "2026-09-15T23:49:07.312311+00:00",
+  "protocol_sha256": "86ff79833ab22499fd92aa1c0fc7034ef3c744c94d4a0e89706f9eb97580e59d",
+  "results": {
+    "atp": {
+      "conditional": {
+        "average": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5980747894152615,
+                  "n": 26006
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5965911794296388,
+                  "n": 26006
+                },
+                "marché_seul": {
+                  "log_loss": 0.5939272251049671,
+                  "n": 26006
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.004625396155739015,
+                "ci_low": -0.001399635197694288,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": 0.00148360998562269,
+                "n": 26006
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.0007987779157688386,
+                "ci_low": -0.007583292567007868,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.004147564310294436,
+                "n": 26006
+              },
+              "gain_market_to_full": {
+                "ci_high": 5.6021327296278416e-05,
+                "ci_low": -0.005439160040353365,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.0026639543246717457,
+                "n": 26006
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5959468072428299,
+                  "n": 26006
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5947272615869806,
+                  "n": 26006
+                },
+                "marché_seul": {
+                  "log_loss": 0.594282363109073,
+                  "n": 26006
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0027982709884881167,
+                "ci_low": -0.0002516217255048447,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": 0.0012195456558492088,
+                "n": 26006
+              },
+              "gain_market_to_base": {
+                "ci_high": -4.643544357653001e-05,
+                "ci_low": -0.0032678194990544704,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.0016644441337568575,
+                "n": 26006
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0013471645711398703,
+                "ci_low": -0.0019605676797812242,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.000444898477907649,
+                "n": 26006
+              }
+            }
+          },
+          "n_valid": 40249
+        },
+        "bet365": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5844762770062308,
+                  "n": 40982
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5833568001852368,
+                  "n": 40982
+                },
+                "marché_seul": {
+                  "log_loss": 0.5802989250454113,
+                  "n": 40982
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0031968456097355743,
+                "ci_low": -0.0010491795479615424,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": 0.0011194768209939062,
+                "n": 40982
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.0018212199480835193,
+                "ci_low": -0.006840973107115509,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": -0.0041773519608196055,
+                "n": 40982
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.0005317587172800912,
+                "ci_low": -0.005669642562918718,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": -0.0030578751398256977,
+                "n": 40982
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5826253487373764,
+                  "n": 40982
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5825103656213387,
+                  "n": 40982
+                },
+                "marché_seul": {
+                  "log_loss": 0.5802989103212108,
+                  "n": 40982
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.001225046039316697,
+                "ci_low": -0.001028535205735565,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": 0.00011498311603777914,
+                "n": 40982
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.0013087620110448245,
+                "ci_low": -0.003476245781258069,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": -0.002326438416165729,
+                "n": 40982
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.0006653858275282218,
+                "ci_low": -0.003858416042848282,
+                "clusters": 186,
+                "excludes_zero_from_below": false,
+                "gain": -0.00221145530012795,
+                "n": 40982
+              }
+            }
+          },
+          "n_valid": 60218
+        },
+        "maximum": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5946641785853403,
+                  "n": 25985
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5962359225964388,
+                  "n": 25985
+                },
+                "marché_seul": {
+                  "log_loss": 0.5942226865629767,
+                  "n": 25985
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0005341505383080039,
+                "ci_low": -0.0037404183657217,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.0015717440110984957,
+                "n": 25985
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.0015465322973919997,
+                "ci_low": -0.0023539358320527073,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.00044149202236354573,
+                "n": 25985
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.000333009619119049,
+                "ci_low": -0.004801902132779343,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.0020132360334620416,
+                "n": 25985
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.594698228908912,
+                  "n": 25985
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5942625971558002,
+                  "n": 25985
+                },
+                "marché_seul": {
+                  "log_loss": 0.594087389278141,
+                  "n": 25985
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0016346488209834239,
+                "ci_low": -0.0006665837278256439,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": 0.00043563175311183203,
+                "n": 25985
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.0014202711531829224,
+                "ci_low": -0.002480140313384928,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.000610839630771164,
+                "n": 25985
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0016792403924293022,
+                "ci_low": -0.001794780872472755,
+                "clusters": 118,
+                "excludes_zero_from_below": false,
+                "gain": -0.00017520787765933193,
+                "n": 25985
+              }
+            }
+          },
+          "n_valid": 40197
+        },
+        "pinnacle": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5832877978852683,
+                  "n": 36468
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5820147687391861,
+                  "n": 36468
+                },
+                "marché_seul": {
+                  "log_loss": 0.5819067950039929,
+                  "n": 36468
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0032561217995257744,
+                "ci_low": -0.000575128352333308,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": 0.0012730291460822105,
+                "n": 36468
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.0007567400541315189,
+                "ci_low": -0.003940973633077501,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": -0.0013810028812753909,
+                "n": 36468
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.002298381765923939,
+                "ci_low": -0.002569762053420209,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": -0.00010797373519318025,
+                "n": 36468
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5803703694887408,
+                  "n": 36468
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5809777496846885,
+                  "n": 36468
+                },
+                "marché_seul": {
+                  "log_loss": 0.5808147566206922,
+                  "n": 36468
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0002773781948652597,
+                "ci_low": -0.0015530156584004763,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": -0.0006073801959478076,
+                "n": 36468
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.0021275709259716614,
+                "ci_low": -0.0012043354220968728,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": 0.00044438713195141277,
+                "n": 36468
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0013483220953859015,
+                "ci_low": -0.001690701894866019,
+                "clusters": 168,
+                "excludes_zero_from_below": false,
+                "gain": -0.00016299306399639475,
+                "n": 36468
+              }
+            }
+          },
+          "n_valid": 52275
+        }
+      },
+      "matches_played": 68779,
+      "tour": "atp",
+      "unconditional": {
+        "hist_gradient_boosting": {
+          "cells": {
+            "base": {
+              "log_loss": 0.6087321893352432,
+              "n": 41205
+            },
+            "base+marge": {
+              "log_loss": 0.6060575537610403,
+              "n": 41205
+            },
+            "marge_seule": {
+              "log_loss": 0.6065205631140347,
+              "n": 41205
+            }
+          },
+          "gain_base_to_marge": {
+            "ci_high": 0.00544388175822694,
+            "ci_low": -0.00018753215796981395,
+            "clusters": 186,
+            "excludes_zero_from_below": false,
+            "gain": 0.002674635574202929,
+            "n": 41205
+          }
+        },
+        "logistic": {
+          "cells": {
+            "base": {
+              "log_loss": 0.6104497633116407,
+              "n": 41205
+            },
+            "base+marge": {
+              "log_loss": 0.6037797091510612,
+              "n": 41205
+            },
+            "marge_seule": {
+              "log_loss": 0.6073221297806279,
+              "n": 41205
+            }
+          },
+          "gain_base_to_marge": {
+            "ci_high": 0.009022561885570905,
+            "ci_low": 0.004379177830500417,
+            "clusters": 186,
+            "excludes_zero_from_below": true,
+            "gain": 0.006670054160579325,
+            "n": 41205
+          }
+        }
+      }
+    },
+    "wta": {
+      "conditional": {
+        "average": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.6001914495906495,
+                  "n": 24255
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5997619984910179,
+                  "n": 24255
+                },
+                "marché_seul": {
+                  "log_loss": 0.597432124415446,
+                  "n": 24255
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.003916358405627574,
+                "ci_low": -0.0028956535193702957,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": 0.00042945109963161,
+                "n": 24255
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.000601153393687625,
+                "ci_low": -0.005955865043441898,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0027593251752034854,
+                "n": 24255
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0011741220250913657,
+                "ci_low": -0.005705666751507988,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0023298740755718756,
+                "n": 24255
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5987787095029586,
+                  "n": 24255
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5997644681311912,
+                  "n": 24255
+                },
+                "marché_seul": {
+                  "log_loss": 0.5979668593014201,
+                  "n": 24255
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0011727548168213883,
+                "ci_low": -0.0033589943469527982,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0009857586282326636,
+                "n": 24255
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.00165105112105514,
+                "ci_low": -0.003136162245090711,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0008118502015385327,
+                "n": 24255
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0012904760104826634,
+                "ci_low": -0.004995121701602224,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0017976088297711956,
+                "n": 24255
+              }
+            }
+          },
+          "n_valid": 37600
+        },
+        "bet365": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5997452053793123,
+                  "n": 31291
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5958446976565189,
+                  "n": 31291
+                },
+                "marché_seul": {
+                  "log_loss": 0.5967614222323727,
+                  "n": 31291
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.006940474588405222,
+                "ci_low": 0.0010354501737208429,
+                "clusters": 151,
+                "excludes_zero_from_below": true,
+                "gain": 0.0039005077227933457,
+                "n": 31291
+              },
+              "gain_market_to_base": {
+                "ci_high": 0.00013937043231109164,
+                "ci_low": -0.006162250709573507,
+                "clusters": 151,
+                "excludes_zero_from_below": false,
+                "gain": -0.002983783146939503,
+                "n": 31291
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0037374434216243535,
+                "ci_low": -0.0017677647987579881,
+                "clusters": 151,
+                "excludes_zero_from_below": false,
+                "gain": 0.0009167245758538437,
+                "n": 31291
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.596657916048353,
+                  "n": 31291
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5970050390351513,
+                  "n": 31291
+                },
+                "marché_seul": {
+                  "log_loss": 0.5940239789275694,
+                  "n": 31291
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0011234170979146818,
+                "ci_low": -0.0018103390158570824,
+                "clusters": 151,
+                "excludes_zero_from_below": false,
+                "gain": -0.00034712298679821584,
+                "n": 31291
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.00021044936896005704,
+                "ci_low": -0.00512563080256229,
+                "clusters": 151,
+                "excludes_zero_from_below": false,
+                "gain": -0.0026339371207837665,
+                "n": 31291
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.00046835847311772955,
+                "ci_low": -0.005435784852849959,
+                "clusters": 151,
+                "excludes_zero_from_below": false,
+                "gain": -0.0029810601075819826,
+                "n": 31291
+              }
+            }
+          },
+          "n_valid": 45236
+        },
+        "maximum": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.603265201329724,
+                  "n": 24226
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.6002226027085099,
+                  "n": 24226
+                },
+                "marché_seul": {
+                  "log_loss": 0.5988371242306102,
+                  "n": 24226
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.006162665867078407,
+                "ci_low": 0.00010639466579786764,
+                "clusters": 117,
+                "excludes_zero_from_below": true,
+                "gain": 0.0030425986212142186,
+                "n": 24226
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.0007847442596670026,
+                "ci_low": -0.008031426746654666,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.004428077099113935,
+                "n": 24226
+              },
+              "gain_market_to_full": {
+                "ci_high": 0.0014495420773760065,
+                "ci_low": -0.004238009463867336,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0013854784778997145,
+                "n": 24226
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5983695390121619,
+                  "n": 24226
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5985677726660913,
+                  "n": 24226
+                },
+                "marché_seul": {
+                  "log_loss": 0.5951140739676536,
+                  "n": 24226
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0015450131795250962,
+                "ci_low": -0.0020745014823986114,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.00019823365392933781,
+                "n": 24226
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.0012826974251579635,
+                "ci_low": -0.005287432843687136,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.0032554650445084233,
+                "n": 24226
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.0014126300141573595,
+                "ci_low": -0.005767007354885572,
+                "clusters": 117,
+                "excludes_zero_from_below": false,
+                "gain": -0.003453698698437762,
+                "n": 24226
+              }
+            }
+          },
+          "n_valid": 37551
+        },
+        "pinnacle": {
+          "families": {
+            "hist_gradient_boosting": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.6054519527296354,
+                  "n": 27007
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.6061624129027849,
+                  "n": 27007
+                },
+                "marché_seul": {
+                  "log_loss": 0.5968887390668149,
+                  "n": 27007
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.003347804213495643,
+                "ci_low": -0.004814920426971091,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.0007104601731496388,
+                "n": 27007
+              },
+              "gain_market_to_base": {
+                "ci_high": -0.005412408384880927,
+                "ci_low": -0.011748988279592695,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.008563213662820333,
+                "n": 27007
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.005934749590740923,
+                "ci_low": -0.012719496955361932,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.009273673835969972,
+                "n": 27007
+              }
+            },
+            "logistic": {
+              "cells": {
+                "marché+base": {
+                  "log_loss": 0.5988042313539655,
+                  "n": 27007
+                },
+                "marché+base+marge": {
+                  "log_loss": 0.5993832804049335,
+                  "n": 27007
+                },
+                "marché_seul": {
+                  "log_loss": 0.5968638367698983,
+                  "n": 27007
+                }
+              },
+              "gain_base_to_marge": {
+                "ci_high": 0.0013296431805288119,
+                "ci_low": -0.002443731771569252,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.0005790490509679185,
+                "n": 27007
+              },
+              "gain_market_to_base": {
+                "ci_high": -6.974456197760283e-05,
+                "ci_low": -0.003910960869438764,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.0019403945840673013,
+                "n": 27007
+              },
+              "gain_market_to_full": {
+                "ci_high": -0.000517171941241666,
+                "ci_low": -0.004605053469988629,
+                "clusters": 132,
+                "excludes_zero_from_below": false,
+                "gain": -0.002519443635035219,
+                "n": 27007
+              }
+            }
+          },
+          "n_valid": 40972
+        }
+      },
+      "matches_played": 45563,
+      "tour": "wta",
+      "unconditional": {
+        "hist_gradient_boosting": {
+          "cells": {
+            "base": {
+              "log_loss": 0.6284690131921089,
+              "n": 31427
+            },
+            "base+marge": {
+              "log_loss": 0.6191278395054765,
+              "n": 31427
+            },
+            "marge_seule": {
+              "log_loss": 0.62141677442614,
+              "n": 31427
+            }
+          },
+          "gain_base_to_marge": {
+            "ci_high": 0.012714968030294949,
+            "ci_low": 0.005996112422515162,
+            "clusters": 151,
+            "excludes_zero_from_below": true,
+            "gain": 0.009341173686632377,
+            "n": 31427
+          }
+        },
+        "logistic": {
+          "cells": {
+            "base": {
+              "log_loss": 0.6267401373318621,
+              "n": 31427
+            },
+            "base+marge": {
+              "log_loss": 0.6202149916088772,
+              "n": 31427
+            },
+            "marge_seule": {
+              "log_loss": 0.621404394441577,
+              "n": 31427
+            }
+          },
+          "gain_base_to_marge": {
+            "ci_high": 0.009728812435794031,
+            "ci_low": 0.0034474737676222574,
+            "clusters": 151,
+            "excludes_zero_from_below": true,
+            "gain": 0.0065251457229849,
+            "n": 31427
+          }
+        }
+      }
+    }
+  },
+  "status": "MARGIN_NO_BET",
+  "verdicts": {
+    "atp": {
+      "conditional_family_for_decision": "logistic",
+      "family_for_decision": "hist_gradient_boosting",
+      "gate_a_ci": [
+        -0.00018753215796981395,
+        0.00544388175822694
+      ],
+      "gate_a_gain": 0.002674635574202929,
+      "gate_a_passed": true,
+      "gate_a_threshold": 0.002,
+      "gate_b_ci": [
+        -0.0019605676797812242,
+        0.0013471645711398703
+      ],
+      "gate_b_gain": -0.000444898477907649,
+      "gate_b_passed": false,
+      "gate_b_threshold": 0.001
+    },
+    "wta": {
+      "conditional_family_for_decision": "logistic",
+      "family_for_decision": "logistic",
+      "gate_a_ci": [
+        0.0034474737676222574,
+        0.009728812435794031
+      ],
+      "gate_a_gain": 0.0065251457229849,
+      "gate_a_passed": true,
+      "gate_a_threshold": 0.002,
+      "gate_b_ci": [
+        -0.004995121701602224,
+        0.0012904760104826634
+      ],
+      "gate_b_gain": -0.0017976088297711956,
+      "gate_b_passed": false,
+      "gate_b_threshold": 0.001
+    }
+  }
+}

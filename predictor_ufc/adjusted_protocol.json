@@ -1,0 +1,118 @@
+{
+  "baseline_features": [
+    "diff_sig_lnd_L5",
+    "diff_sig_acc_L5",
+    "diff_td_lnd_L5",
+    "diff_td_acc_L5",
+    "diff_sub_att_L5",
+    "diff_ctrl_secs_L5",
+    "diff_kd_L5",
+    "diff_def_sig_absorbed_L5",
+    "diff_def_td_absorbed_L5",
+    "diff_def_ctrl_secs_L5",
+    "diff_def_kd_L5",
+    "diff_net_sig_L5",
+    "diff_result_win_L5",
+    "diff_ufc_fights",
+    "diff_days_off",
+    "elo_diff",
+    "reach_diff",
+    "age_diff"
+  ],
+  "challenger_features": [
+    "diff_sig_lnd_L5",
+    "diff_sig_acc_L5",
+    "diff_td_lnd_L5",
+    "diff_td_acc_L5",
+    "diff_sub_att_L5",
+    "diff_ctrl_secs_L5",
+    "diff_kd_L5",
+    "diff_def_sig_absorbed_L5",
+    "diff_def_td_absorbed_L5",
+    "diff_def_ctrl_secs_L5",
+    "diff_def_kd_L5",
+    "diff_net_sig_L5",
+    "diff_result_win_L5",
+    "diff_ufc_fights",
+    "diff_days_off",
+    "elo_diff",
+    "reach_diff",
+    "age_diff",
+    "adj_sig_lnd_diff",
+    "adj_sig_absorbed_diff",
+    "adj_td_lnd_diff",
+    "adj_ctrl_diff",
+    "adj_kd_diff",
+    "opponent_quality_diff",
+    "wear_sig_absorbed_diff",
+    "wear_kd_suffered_diff",
+    "wear_fights_diff",
+    "age_gap_to_peak_diff",
+    "fights_365d_diff",
+    "long_layoff_diff",
+    "weight_class_change_diff"
+  ],
+  "development_window": [
+    "2015-01-01",
+    "2024-12-31"
+  ],
+  "economic_claim": "Aucune. Cette ablation mesure de la prévision sur une fenêtre déjà explorée par les études antérieures. Elle n'autorise aucune mise.",
+  "excluded_dead_features": {
+    "columns": [
+      "height_diff",
+      "southpaw_matchup"
+    ],
+    "reason": "height_diff est vide sur 6 719 combats sur 6 719; southpaw_matchup ne prend qu'une seule valeur. Ni l'un ni l'autre ne peut porter d'information, dans aucun des deux bras."
+  },
+  "excluded_duplicates": {
+    "columns": [
+      "age_diff_years"
+    ],
+    "reason": "age_diff existe déjà dans la table; le doublon fausserait l'ablation."
+  },
+  "frozen_at_utc": "2026-09-15T23:51:51.734225+00:00",
+  "frozen_before_any_return": true,
+  "gate_before_opening_holdout": {
+    "challenger_log_loss_must_beat_baseline_by": 0.001,
+    "challenger_must_beat_market": true,
+    "note": "Seuils repris tels quels du protocole phase 3 déjà gelé dans ce dossier.",
+    "years_beating_baseline_minimum": 7,
+    "years_total": 10
+  },
+  "holdout_opened": false,
+  "holdout_rule": "Le holdout n'est ouvert que si la gate de développement est franchie. C'est le dernier budget de preuve UFC intact: les trois études précédentes se sont arrêtées avant de l'ouvrir.",
+  "hypothesis": "Des statistiques ajustées à ce que l'adversaire concède, une usure cumulée de carrière et une courbe d'âge améliorent le modèle UFC par rapport aux moyennes brutes sur cinq combats.",
+  "model_families": {
+    "hist_gradient_boosting": {
+      "l2_regularization": 1.0,
+      "learning_rate": 0.06,
+      "max_iter": 300,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "random_state": 0
+    },
+    "logistic": {
+      "C": 0.05,
+      "max_iter": 2000
+    }
+  },
+  "orientation_repair": "features_v2 inverse le signe des colonnes signées et de y sur 3 671 des 6 719 combats sans permuter fighter_1_id/fighter_2_id. L'orientation logique est reconstruite par comparaison de elo_diff à elo_1_pre - elo_2_pre, puis vérifiée sur les noms.",
+  "pristine_economic_holdout": [
+    "2025-09-13",
+    "2026-08-29"
+  ],
+  "protocol_sha256": "0209efdfe2e61640cb64fd85e83d3b223cdb964135bcb585ef291e93fbc5a203",
+  "protocol_version": "1.0.0",
+  "study": "ufc_adjusted_descriptors",
+  "uncertainty": {
+    "draws": 2000,
+    "level": 0.9,
+    "method": "bootstrap apparié par grappes d'événement (soirée)"
+  },
+  "walk_forward": {
+    "first_test_year": 2015,
+    "last_test_year": 2024,
+    "minimum_training_rows": 1000,
+    "train_uses_only_dates_strictly_before_test_year": true
+  }
+}
