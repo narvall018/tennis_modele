@@ -54,3 +54,8 @@ catboost_info/
 
 # Relevés prospectifs: volumineux et reconstructibles par collecte
 models/prospective/price_snapshots.jsonl
+
+# Portable native model + public historical inputs required by the ATP paper page.
+!models/tennis_strategy/history.csv.gz
+# Never version per-user prospective bankrolls, journals or SQLite sidecars.
+bets/tennis_strategy.sqlite3*

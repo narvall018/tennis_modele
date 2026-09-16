@@ -1978,7 +1978,7 @@ def main() -> None:
             st.session_state.pop("unified_ufc_bets_folder", None)
             st.session_state["_goto_section"] = "Accueil"
             st.rerun()
-        sections = ["Accueil", "Prédictions", "Seuil de rentabilité", "Arbitrage",
+        sections = ["Accueil", "Stratégie ATP", "Prédictions", "Seuil de rentabilité", "Arbitrage",
                     "Mises", "Performances", "Mise à jour", "Tennis", "UFC"]
         if is_admin and username == ADMIN_USERNAME:
             sections.append("Administration")
@@ -1992,6 +1992,12 @@ def main() -> None:
     section = st.session_state["section"]
     if section == "Accueil":
         _render_unified_home(user)
+    elif section == "Stratégie ATP":
+        try:
+            from src.app.tennis_strategy_page import render_tennis_strategy_page
+            render_tennis_strategy_page(PROJECT_ROOT, user_id=int(user['id']), username=username)
+        except ImportError as error:
+            st.error(f"Section ATP indisponible : dépendance manquante ({error.name}).")
     elif section in {"Prédictions", "Seuil de rentabilité", "Arbitrage", "Mises",
                      "Performances", "Mise à jour"}:
         if not RESEARCH_PAGES_AVAILABLE:

@@ -1,0 +1,156 @@
+{
+  "created_date": "2026-09-15",
+  "evidence": "EXPLORATORY_REUSED_HISTORY; previous evaluation results were already observed",
+  "hypothesis": "Shallow nonlinear corrections around market probabilities, with invariant match context, may capture interactions missed by linear residuals. Compare all-history versus 3-year recency half-life, and full versus half correction. No post-result subgroup search.",
+  "frozen_files": {
+    "models/three_sport_residual/atp_matched_master.csv.gz": "761a22a34ed7654e73db5f15086657142ee54d4dc5160699fec3d50eeed82181",
+    "models/three_sport_residual/football_features.parquet": "b33df2ee7e959fe307f785714f4cf7fb0f927d5817aa97e0bb46ab45b02cc686",
+    "models/three_sport_residual/atp_features.parquet": "f2a0e9c6c772ead49f626258ffe4d64aa8bbba4acdc01f57c3823f731a893ce3",
+    "models/three_sport_residual/ufc_features.parquet": "374eecaba786b29dabab7e9438a85662febabdbae88b1b96cffc5628682aa4ce",
+    "src/backtesting/three_sport_residual.py": "4a63b6cdf20a81593db61a6d9df344314f5d1b8875180526379ebc8641b6ecd2",
+    "src/backtesting/wta_price_residual.py": "5791222142bbbcf3261d7aea8b32cfef2f693f3fca4aaa34b06d958561eb433b",
+    "src/backtesting/football_cross_market.py": "bde52e83e14adebc5ad54417f6df836f1d0cb12857fbb313ddeb4607267d73e0",
+    "src/backtesting/economic_selection.py": "41152f3a5597ab82ad9f142531e61cca6a493dedb06cc8f747fdd03daaafaf81",
+    "models/three_sport_residual/protocol.json": "4fdb9640d27c62e3bd5c1bf8b40d847805f45f2ce7a0f0f5fb920f46abbca95d"
+  },
+  "sports": {
+    "football": {
+      "tuning": [
+        2021,
+        2022
+      ],
+      "evaluation": [
+        2023,
+        2024,
+        2025
+      ],
+      "min_train": 5000
+    },
+    "atp": {
+      "tuning": [
+        2021,
+        2022
+      ],
+      "evaluation": [
+        2023,
+        2024,
+        2025
+      ],
+      "min_train": 5000
+    },
+    "ufc": {
+      "tuning": [
+        2019,
+        2020,
+        2021
+      ],
+      "evaluation": [
+        2022,
+        2023,
+        2024
+      ],
+      "min_train": 1000
+    }
+  },
+  "candidates": {
+    "trees_all": {
+      "half_life_years": null,
+      "correction_fraction": 1.0
+    },
+    "trees_recent": {
+      "half_life_years": 3.0,
+      "correction_fraction": 1.0
+    },
+    "trees_all_half": {
+      "half_life_years": null,
+      "correction_fraction": 0.5
+    },
+    "trees_recent_half": {
+      "half_life_years": 3.0,
+      "correction_fraction": 0.5
+    }
+  },
+  "features": {
+    "base": "Frozen enriched design from three_sport_residual; fixed zero for nonfinite inputs",
+    "atp_context": [
+      "is_hard",
+      "is_clay",
+      "is_grass",
+      "is_indoor",
+      "best_of_5",
+      "round_progress",
+      "level_strength",
+      "court_pace",
+      "log_surface_samples"
+    ],
+    "atp_context_pre_run_audit": "Before any new tuning/model returns, found inherited is_indoor and round_progress constant due to unrecognised Tennis-Data labels. Reconstruct these two columns by exact unique match_id from frozen matched master, using only indoor and round; preserve upstream files and report numbers of changed rows. Fixed ordinal mapping 1st/2nd/3rd/4th/QF/SF/F=1/2/3/4/5/6/7, RR=4, divided by7; unknown labels abort.",
+    "ufc_context": [
+      "minimum_experience",
+      "mean_age",
+      "maximum_layoff"
+    ],
+    "swap": "Binary enriched descriptors change sign; context descriptors remain invariant. Train both orientations with half weight each; symmetrise predictions. Football retains home/draw/away order."
+  },
+  "booster": {
+    "tree_method": "hist",
+    "max_depth": 2,
+    "eta": 0.03,
+    "min_child_weight": 20,
+    "lambda": 20,
+    "alpha": 1,
+    "max_delta_step": 0.5,
+    "subsample": 1.0,
+    "colsample_bytree": 1.0,
+    "seed": 20260915,
+    "nthread": 1,
+    "base_score": 0.5
+  },
+  "boost_rounds": 150,
+  "offset": "Market logit for binary (target outcome zero), log probabilities for three classes, supplied in training AND prediction; no random validation or early stopping",
+  "recency": "Weights exponential in age relative to fold cutoff, normalised to mean one before binary augmentation; half-life fixed to three years, not selected continuously",
+  "embargo_days": 7,
+  "fit": "Annual Jan1 fit on completed rows strictly before Jan1 minus7days. Fixed hyperparameters; current-year results can update next-year fit, never the frozen model family or threshold.",
+  "thresholds": [
+    0.02,
+    0.05,
+    0.08
+  ],
+  "choice": "Highest 95pct bootstrap lower ROI on tuning, among pairs with >=50settled; ties use declared candidate then threshold order; no eligible pair means abstention, not a lowered threshold",
+  "tuning_admission": "Chosen tuning ROI2pct and ordinary95pct lower both positive; if rejected, evaluation remains a rejected diagnostic",
+  "selection": {
+    "minimum_ev_after_haircut": 0.02,
+    "profit_haircut": 0.02,
+    "odds_min": 1.3,
+    "odds_max": 5.0,
+    "flat_fraction": 0.0025,
+    "quarter_kelly_fraction": 0.25,
+    "maximum_fraction_per_bet": 0.005,
+    "maximum_daily_exposure": 0.02,
+    "sensitivity_haircuts": [
+      0.0,
+      0.02,
+      0.05
+    ]
+  },
+  "primary_staking": "flat",
+  "secondary_staking": "quarter_kelly diagnostic only, not selected on evaluation",
+  "uncertainty": {
+    "samples": 10000,
+    "evaluation_samples": 100000,
+    "seed": 20260915,
+    "lower_quantile_per_candidate": 0.0001893939393939394,
+    "family_size": 264,
+    "scope": "192 previous nominal configurations plus72 new (3sports*4variants*3thresholds*2stakes), not all adaptive project research; circular3month blocks"
+  },
+  "research_gate": "Tuning admission, >=200 settled evaluation, positive ROI at2and5pct, positive corrected lower, >=2positive years, positive without best profit year",
+  "ufc_2025_onward": "REMAINS_CLOSED",
+  "no_promotions": true,
+  "real_money_authorised": false,
+  "limitations": [
+    "Reused history not independent validation",
+    "Quote timing, availability and settlement in France unverified",
+    "Inherits documented ATP source conflicts and retrospective stat revisions",
+    "No new injury, true xG or point-in-time archive collected",
+    "No claim that nonlinear models or staking ensure profit"
+  ]
+}

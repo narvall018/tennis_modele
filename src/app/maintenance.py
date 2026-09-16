@@ -43,6 +43,15 @@ TASKS: list[Task] = [
         minutes="8–12 min",
     ),
     Task(
+        key="tennis_strategy",
+        label="Paquet Stratégie ATP (simulation)",
+        description="Après actualisation des données ATP : rafraîchit l'historique de la stratégie "
+                    "expérimentale. Ne change ni le modèle annuel figé ni les seuils.",
+        command=["scripts/prepare_tennis_strategy.py"],
+        produces=["models/tennis_strategy/metadata.json", "models/tennis_strategy/booster.ubj"],
+        minutes="1–3 min",
+    ),
+    Task(
         key="tennis_expansion",
         label="Données WTA, Challenger, qualifications",
         description="Les circuits que le pipeline ATP laisse de côté. La WTA porte des "

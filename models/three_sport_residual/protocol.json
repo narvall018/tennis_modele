@@ -1,0 +1,52 @@
+{
+  "created_date": "2026-09-13",
+  "evidence": "EXPLORATORY_REUSED_HISTORY; no independent confirmation claimed",
+  "inputs": {
+    "data/football/football_matches.csv.gz": "c834346562e21c281479e71a0f53d886b51ba8d3acebd2c8c4074694167d9b1d",
+    "data/atp_tennis.csv": "260c867f2fad537c08739185f6f64cf6f336cece2b5aa4c63855fb3f1fa129d4",
+    "data/processed/atp_matches_enriched.csv.gz": "1024d83e02923f6e624ff0711f7fcdb91f777cc3f1d81e6a54b8e151208b8f63",
+    "predictor_ufc/data/rigorous/processed/features.parquet": "9ebd07f0fe3ba161644a375f70e1134364e40622519bd0bd2807adf5c7d33ea7"
+  },
+  "upstream_implementations": {
+    "src/features/football_features.py": "13837588bb8ee8583df476a0dbf3ede7cbc4e42983fc6f9e2746c27c43c71184",
+    "src/backtesting/tennis_phase4.py": "d3f10e5b25ccb2690b69d676bb1026ca9cffe3b6e2b8e5f52c7ed16994837967",
+    "predictor_ufc/rigorous/model_pipeline.py": "6454653b17e907896f83460c466c1d65dc56faf9821f2950407e245c2b3c5099"
+  },
+  "sports": {
+    "football": {"first_train_year": 2000, "development": [2017,2018,2019,2020], "tuning": [2021,2022], "evaluation": [2023,2024,2025], "min_train": 5000},
+    "atp": {"first_train_year": 2000, "development": [2017,2018,2019,2020], "tuning": [2021,2022], "evaluation": [2023,2024,2025], "min_train": 5000},
+    "ufc": {"first_train_year": 2010, "development": [2015,2016,2017,2018], "tuning": [2019,2020,2021], "evaluation": [2022,2023,2024], "min_train": 1000}
+  },
+  "candidates": {"market": 0.01, "base": 0.01, "enriched": 0.01, "enriched_strong": 0.10},
+  "model": "L2 residual around log market probabilities; binary player-swap augmentation and symmetrised prediction",
+  "nonfinite_features": "zero, fixed neutral prior, not learned using evaluation data",
+  "feature_rules": {
+    "football": "19 prior-day baseline descriptors; enriched adds last3 versus last10 form, goal and target differences, goals-minus-0.3-targets proxy, previous-market result surprise, 14-day workload and nonlinear market interactions; not actual xG",
+    "atp": "Rebuild prior-day states on Tennis-Data actual match dates, coherent B365 prices. Attach rich match statistics on unordered canonical name pair, year and round, within 14 days, only unique one-to-one candidates, independently of winner. Baseline structural, enrichment serve-return and surface/pace interactions plus sample-confidence and fatigue interactions. Never use inherited average odds as bet prices.",
+    "ufc": "Prior-date baseline Elo, experience, recent win rate, age, layoff; enrich lagged striking/grappling/control/knockdowns, experience-weighted reliability, market disagreement and nonlinear age/layoff interactions. No stance or current profile performance rates. No evaluation of 2025 onward."
+  },
+  "odds": "football B365 pre-closing 1X2; ATP B365 coherent pair; UFC legacy paired quotes of unverified bookmaker/timing",
+  "overround_bounds": [1.0,1.20],
+  "embargo_days": 7,
+  "fit": "Annual Jan1 fit, completed training results strictly before Jan1 minus7days; all model preprocessing train-only",
+  "model_choice": "Lowest pooled development log-loss, ties use candidate order; never evaluation returns",
+  "thresholds": [0.02,0.05,0.08],
+  "threshold_choice": "On tuning years only, maximise 95pct bootstrap lower ROI bound for fixed staking among thresholds with at least50settled bets; tie prefers lower threshold. If none, freeze 0.02 as diagnostic but mark tuning_failed.",
+  "primary_staking": "flat",
+  "secondary_staking": "quarter_kelly diagnostic only; not selected after evaluation",
+  "selection": {
+    "minimum_ev_after_haircut": 0.02, "profit_haircut": 0.02,
+    "odds_min": 1.3, "odds_max": 5.0,
+    "flat_fraction": 0.0025, "quarter_kelly_fraction": 0.25,
+    "maximum_fraction_per_bet": 0.005, "maximum_daily_exposure": 0.02,
+    "sensitivity_haircuts": [0.0,0.02,0.05]
+  },
+  "settlement": "Noncompleted ATP and nondecisive UFC void, retained in selection and potential exposure. Operator-specific settlement not verified.",
+  "uncertainty": {"samples": 10000, "seed": 20260913, "lower_quantile_per_candidate": 0.0006944444444444445, "family_size": 72, "method": "circular3month blocks; 3sports*4models*3thresholds*2stakes; does not cover earlier research"},
+  "research_gate": "tuning passed, >=200 settled evaluation bets, positive ROI at2and5pct haircut, family-adjusted lower>0, >=2of3positive evaluation years, positive without best profit year. This is not an authorisation to bet.",
+  "ufc_holdout_2025_2026": "REMAINS_CLOSED",
+  "no_posthoc_subgroup_selection": true,
+  "no_promotions": true,
+  "real_money_authorised": false,
+  "limitations": ["History already explored", "Quotes not demonstrably simultaneous or executable in France", "Source calendar dates do not establish exact end times", "Historical stat/profile revisions are not point-in-time archives", "No invented injuries, xG or current-match descriptors", "No paid data or live bets"]
+}
