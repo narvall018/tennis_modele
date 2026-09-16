@@ -66,8 +66,11 @@ ils ne représentent pas un relevé bancaire ou un paiement réel du bookmaker.
   chaque rencontre récente ou chaque profil est complet.
 - Aucun substitut Elo, aucune probabilité ou cote fabriquée en cas d'absence.
 
-Le paquet initial contient l'historique jusqu'au **29 août 2026**. Au 16 septembre,
-**les nouvelles sélections sont donc bloquées**. Le carnet reste accessible.
+Le paquet actualisé le **16 septembre 2026** contient **71 496 matchs jusqu'au
+13 septembre 2026**, soit 127 matchs supplémentaires par rapport au paquet
+initial du 29 août. Le contrôle de fraîcheur est satisfait à cette date.
+Le modèle annuel et les seuils n'ont pas changé. Quand les données deviennent
+trop anciennes, le carnet reste accessible mais les sélections sont bloquées.
 La page propose désormais **« Actualiser les données de la stratégie ATP »**.
 Ce bouton télécharge uniquement la saison courante chez Tennis-Data et
 TennisMyLife, contrôle les identités et les dates, conserve les années passées
@@ -81,11 +84,20 @@ python3 scripts/refresh_tennis_strategy.py
 
 Une panne fournisseur, des données encore anciennes, des matchs disparus ou
 des dates modifiées empêchent la publication. Le carnet et l'ancien paquet
-sont conservés. Le 16 septembre, Tennis-Data répondait HTTP 503 lors des essais :
-ce correctif permet de relancer la mise à jour mais ne supprime pas cette panne
-externe. Les dates TennisMyLife seules ne remplacent pas les dates de matchs
-Tennis-Data du protocole. Aucun résultat récent n'a été inventé pour débloquer
-l'interface.
+sont conservés. Le 16 septembre, après des erreurs HTTP 503 puis 404 sur les
+anciennes URL, l'index officiel a révélé un nouveau préfixe de dossier. Le
+téléchargement suit désormais les liens réellement publiés sur cet index,
+pour l'ATP et la WTA, aux formats XLS/XLSX. Aucun préfixe opaque n'est codé en dur.
+Une réponse 404 ne prouve pas qu'une saison n'est pas publiée ; les erreurs
+403/429 sont distinguées des liens introuvables. Les dates TennisMyLife seules
+ne remplacent pas les dates de matchs Tennis-Data du protocole.
+
+Si un environnement Conda `base` affiche l'avertissement SciPy « binary
+incompatibility », il s'agit d'un problème distinct de l'adresse de téléchargement.
+Les imports scientifiques et cette actualisation ont été vérifiés ici avec
+`/usr/bin/python3` (Python 3.12), sans cet avertissement. Ne pas masquer le warning
+ni réinstaller à l'aveugle dans `base` ; utiliser un interpréteur vérifié ou un
+environnement dédié avec les dépendances du projet.
 
 L'actualisation complète des tables locales reste disponible :
 

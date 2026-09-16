@@ -29,6 +29,7 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from difflib import SequenceMatcher
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -185,26 +186,52 @@ def _http_bytes(url: str, timeout: int = 120, attempts: int = 3) -> bytes:
 
 
 def _download_message(url: str, statuses: set[int], error: Exception | None) -> str:
-    """Dire ce qui s'est passé, pas seulement que ça a échoué.
-
-    Une panne du site et un fichier pas encore publié demandent deux réactions
-    opposées — attendre, ou ne rien attendre du tout — et le code HTTP brut ne
-    les distingue pas pour qui lit la sortie.
-    """
+    """Report observed HTTP errors without guessing a season's publication state."""
+    host = urllib.parse.urlsplit(url).hostname or 'Le fournisseur'
     if statuses and all(500 <= status < 600 for status in statuses):
         return (
-            f"tennis-data.co.uk est indisponible ({sorted(statuses)} sur tous les "
-            "hôtes essayés). C'est une panne du site, pas un problème local: les "
+            f"Réponses serveur indisponible chez {host} ({sorted(statuses)}). Les "
             "données déjà téléchargées sont conservées intactes, il suffit de "
             f"relancer plus tard. URL: {url}"
         )
-    if statuses and all(400 <= status < 500 for status in statuses):
+    if statuses and statuses.issubset({404, 410}):
         return (
-            f"Fichier absent chez tennis-data.co.uk ({sorted(statuses)}): la "
-            "saison n'est probablement pas encore publiée. Rien à relancer avant "
-            f"sa mise en ligne. URL: {url}"
+            f"URL introuvable ou déplacée chez {host} ({sorted(statuses)}). "
+            "Cela ne permet pas de conclure que la saison est absente ; "
+            f"vérifier le lien sur l'index officiel. URL: {url}"
         )
+    if statuses and statuses.issubset({401, 403, 429}):
+        return f"Accès refusé ou limité chez {host} ({sorted(statuses)}). URL: {url}"
     return f"Download failed for {url}: {error}"
+
+
+def _tennis_data_workbook_links(index_html: bytes, tour: str) -> dict[int, str]:
+    """Resolve published ATP/WTA links; directory prefixes can change upstream."""
+    class Links(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.hrefs = []
+
+        def handle_starttag(self, tag, attrs):
+            if tag.lower() == 'a':
+                self.hrefs.extend(value for key, value in attrs if key == 'href' and value)
+
+    parser = Links()
+    parser.feed(index_html.decode('utf-8', errors='replace'))
+    links = {}
+    for href in parser.hrefs:
+        url = urllib.parse.urljoin(TENNIS_DATA_INDEX_URL, href)
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme not in {'http', 'https'} or parsed.netloc not in HOST_FALLBACKS:
+            continue  # Never follow a third-party workbook or an unexpected scheme.
+        match = re.search(r'/(20\d{2})(w?)/\1\.(xlsx|xls)$', parsed.path, re.IGNORECASE)
+        if not match or bool(match[2]) != (tour == 'wta'):
+            continue
+        year = int(match[1])
+        if year in links and links[year] != url:
+            raise DataQualityError(f'Plusieurs liens officiels différents pour {tour.upper()} {year} ; audit nécessaire.')
+        links[year] = url
+    return links
 
 
 def _http_json(url: str, timeout: int = 60) -> dict[str, Any]:
@@ -483,12 +510,19 @@ def fetch_odds_snapshot(
     final_year = end_year or datetime.now().year
     years = list(range(start_year, final_year + 1))
     directory_suffix = "w" if tour == "wta" else ""
+    links = _tennis_data_workbook_links(_http_bytes(TENNIS_DATA_INDEX_URL), tour)
+    missing = [year for year in years if year not in links]
+    if missing:
+        raise DataQualityError(f"Lien de classeur {tour.upper()} absent de l'index officiel pour {missing}. "
+                               "Publication ou format des liens à vérifier ; aucune date inventée.")
 
     def download_year(year: int) -> pd.DataFrame:
-        url = f"{TENNIS_DATA_BASE_URL}/{year}{directory_suffix}/{year}.xlsx"
+        url = links[year]
         data = _http_bytes(url)
         frame = pd.read_excel(io.BytesIO(data))
-        frame["_source_file"] = f"{year}{directory_suffix}.xlsx"
+        extension = Path(urllib.parse.urlsplit(url).path).suffix
+        frame["_source_file"] = f"{year}{directory_suffix}{extension}"
+        frame["_source_url"] = url
         return frame
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:

@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
 
 class DownloadMessageTests(unittest.TestCase):
-    """Une panne du site et un fichier non publié demandent des réactions opposées."""
+    """HTTP statuses describe requests, not whether a season has been published."""
 
     def test_an_outage_says_to_retry_and_that_data_is_safe(self):
         from src.data.tennis_pipeline import _download_message
@@ -169,13 +169,68 @@ class DownloadMessageTests(unittest.TestCase):
         self.assertIn("conservées intactes", message)
         self.assertIn("relancer plus tard", message)
 
-    def test_a_missing_season_says_there_is_nothing_to_retry(self):
+    def test_a_404_does_not_claim_the_season_is_unpublished(self):
         from src.data.tennis_pipeline import _download_message
         message = _download_message("http://x/2027.xlsx", {404}, None)
-        self.assertIn("pas encore publiée", message)
-        self.assertNotIn("relancer plus tard", message)
+        self.assertIn("déplacée", message)
+        self.assertIn("index officiel", message)
+        self.assertNotIn("pas encore publiée", message)
+
+    def test_access_errors_are_not_reported_as_missing_files(self):
+        from src.data.tennis_pipeline import _download_message
+        for status in [401, 403, 429]:
+            message = _download_message('https://stats.example/data.csv', {status}, None)
+            self.assertIn('Accès refusé ou limité', message)
+            self.assertIn('stats.example', message)
+            self.assertNotIn('tennis-data.co.uk', message)
 
     def test_a_mixed_or_unknown_failure_keeps_the_raw_error(self):
         from src.data.tennis_pipeline import _download_message
         message = _download_message("http://x/a.xlsx", {404, 503}, RuntimeError("boum"))
         self.assertIn("boum", message)
+
+
+class WorkbookLinksTests(unittest.TestCase):
+    def test_moved_links_distinguish_tours_and_excel_extensions(self):
+        from src.data.tennis_pipeline import _tennis_data_workbook_links
+        html = b'''<a href="new-prefix/2026/2026.xlsx">2026</a>
+                   <a href="new-prefix/2026w/2026.xlsx">2026 WTA</a>
+                   <a href="new-prefix/2000/2000.xls">2000</a>
+                   <a href="https://other.example/2025/2025.xlsx">outside</a>
+                   <a href="javascript:/2024/2024.xlsx">invalid</a>'''
+        atp = _tennis_data_workbook_links(html, 'atp')
+        wta = _tennis_data_workbook_links(html, 'wta')
+        self.assertEqual(set(atp), {2000, 2026})
+        self.assertEqual(set(wta), {2026})
+        self.assertTrue(atp[2026].endswith('/new-prefix/2026/2026.xlsx'))
+        self.assertTrue(wta[2026].endswith('/new-prefix/2026w/2026.xlsx'))
+        self.assertTrue(atp[2000].endswith('.xls'))
+
+    def test_conflicting_links_fail_closed(self):
+        from src.data.tennis_pipeline import _tennis_data_workbook_links, DataQualityError
+        with self.assertRaises(DataQualityError):
+            _tennis_data_workbook_links(b'<a href="a/2026/2026.xlsx">a</a><a href="b/2026/2026.xlsx">b</a>', 'atp')
+
+    def test_fetch_uses_advertised_link_and_keeps_provenance(self):
+        import io
+        from unittest.mock import patch
+        from src.data.tennis_pipeline import fetch_odds_snapshot, TENNIS_DATA_INDEX_URL
+        excel = io.BytesIO()
+        pd.DataFrame({'Date': ['2026-09-13']}).to_excel(excel, index=False)
+        official = 'http://www.tennis-data.co.uk/moved/2026/2026.xlsx'
+        def response(url):
+            if url == TENNIS_DATA_INDEX_URL:
+                return b'<a href="moved/2026/2026.xlsx">2026</a>'
+            self.assertEqual(url, official)
+            return excel.getvalue()
+        with patch('src.data.tennis_pipeline._http_bytes', side_effect=response):
+            frame, _ = fetch_odds_snapshot(2026, 2026)
+        self.assertEqual(frame.iloc[0]['_source_url'], official)
+
+    def test_missing_link_does_not_try_a_guessed_url(self):
+        from unittest.mock import patch
+        from src.data.tennis_pipeline import fetch_odds_snapshot, DataQualityError
+        with patch('src.data.tennis_pipeline._http_bytes', return_value=b'<html></html>') as fetch:
+            with self.assertRaises(DataQualityError):
+                fetch_odds_snapshot(2026, 2026)
+            self.assertEqual(fetch.call_count, 1)
