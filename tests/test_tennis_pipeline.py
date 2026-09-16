@@ -234,3 +234,62 @@ class WorkbookLinksTests(unittest.TestCase):
             with self.assertRaises(DataQualityError):
                 fetch_odds_snapshot(2026, 2026)
             self.assertEqual(fetch.call_count, 1)
+
+
+class DownloadDeadlineTests(unittest.TestCase):
+    """Attendre douze minutes pour apprendre qu'un site est en panne est un défaut.
+
+    Une reprise n'a d'intérêt que si elle reste moins coûteuse que relancer la
+    commande soi-même; sans borne globale, un hôte muet consomme le délai
+    d'attente à chaque essai.
+    """
+
+    def test_the_total_budget_is_bounded(self):
+        from src.data import tennis_pipeline as pipeline
+        worst = pipeline.REQUEST_TIMEOUT * 3 * 2
+        self.assertGreater(worst, pipeline.DOWNLOAD_DEADLINE,
+                           "sans borne le pire cas dépasserait la limite annoncée")
+        self.assertLessEqual(pipeline.DOWNLOAD_DEADLINE, 120,
+                             "au-delà de deux minutes, mieux vaut rendre la main")
+
+    def test_a_silent_host_gives_up_within_the_deadline(self):
+        import time
+        from unittest import mock
+        from src.data import tennis_pipeline as pipeline
+
+        def never_answers(*_args, **kwargs):
+            time.sleep(0.2)
+            raise TimeoutError("pas de réponse")
+
+        started = time.monotonic()
+        with mock.patch.object(pipeline.urllib.request, "urlopen", never_answers):
+            with self.assertRaises(pipeline.DataQualityError) as raised:
+                pipeline._http_bytes("http://www.tennis-data.co.uk/x.xlsx",
+                                     timeout=1, attempts=3, deadline=0.5)
+        self.assertLess(time.monotonic() - started, 5.0)
+        self.assertIn("Abandon après", str(raised.exception))
+
+    def test_the_deadline_is_actually_respected(self):
+        """Un hôte muet ne doit pas faire dépasser la borne d'un délai entier."""
+        import time
+        from unittest import mock
+        from src.data import tennis_pipeline as pipeline
+
+        def never_answers(request, timeout=None, **kwargs):
+            time.sleep(timeout if timeout else 1.0)
+            raise TimeoutError("timed out")
+
+        started = time.monotonic()
+        with mock.patch.object(pipeline.urllib.request, "urlopen", never_answers):
+            with self.assertRaises(pipeline.DataQualityError):
+                pipeline._http_bytes("http://www.tennis-data.co.uk/x.xlsx",
+                                     timeout=10, attempts=3, deadline=1.0)
+        elapsed = time.monotonic() - started
+        self.assertLess(elapsed, 2.5,
+                        f"borne de 1 s dépassée: {elapsed:.1f} s écoulées")
+
+    def test_the_message_reports_how_long_it_waited(self):
+        from src.data.tennis_pipeline import _download_message
+        message = _download_message("http://x/a.xlsx", {503}, None, elapsed=87.4)
+        self.assertIn("Abandon après 87 s", message)
+        self.assertIn("conservées intactes", message)

@@ -157,23 +157,48 @@ def _url_variants(url: str) -> list[str]:
     return variants
 
 
-def _http_bytes(url: str, timeout: int = 120, attempts: int = 3) -> bytes:
+# Un classeur Tennis-Data pèse quelques mégaoctets et un serveur en état répond
+# en une seconde ou deux: trente secondes sont déjà généreuses. L'ancien budget
+# de 120 s par requête, multiplié par deux hôtes et trois tentatives, pouvait
+# faire attendre douze minutes avant d'annoncer une panne.
+REQUEST_TIMEOUT = 30
+DOWNLOAD_DEADLINE = 90.0
+
+
+def _http_bytes(url: str, timeout: int = REQUEST_TIMEOUT, attempts: int = 3,
+                deadline: float = DOWNLOAD_DEADLINE) -> bytes:
     """Download a URL, retrying transient failures and equivalent hosts.
 
     Tennis-Data intermittently answers ``503`` on one of its two hostnames while
     the other keeps serving the same workbooks, so a failure is only final once
     every variant has been retried.
+
+    ``deadline`` borne le temps total: sans elle, un hôte qui ne répond pas du
+    tout consomme le délai d'attente à chaque essai, et l'utilisateur attend
+    plusieurs minutes pour apprendre que le site est en panne. Une reprise n'a
+    d'intérêt que si elle reste moins coûteuse que relancer la commande.
     """
     last_error: Exception | None = None
     statuses: set[int] = set()
+    started = time.monotonic()
     for attempt in range(attempts):
         for candidate in _url_variants(url):
+            # Chaque requête n'emprunte que le temps restant: vérifier la borne
+            # seulement avant l'appel la laisserait dépasser d'un délai entier.
+            remaining = deadline - (time.monotonic() - started)
+            if remaining <= 0:
+                raise DataQualityError(
+                    _download_message(url, statuses, last_error,
+                                      elapsed=time.monotonic() - started)
+                ) from last_error
             request = urllib.request.Request(
                 candidate,
                 headers={"User-Agent": "tennis-modele-data-pipeline/1.0"},
             )
             try:
-                with urllib.request.urlopen(request, timeout=timeout) as response:
+                with urllib.request.urlopen(
+                    request, timeout=min(timeout, remaining)
+                ) as response:
                     return response.read()
             except urllib.error.HTTPError as error:
                 statuses.add(error.code)
@@ -181,18 +206,28 @@ def _http_bytes(url: str, timeout: int = 120, attempts: int = 3) -> bytes:
             except (urllib.error.URLError, TimeoutError, OSError) as error:
                 last_error = error
         if attempt + 1 < attempts:
-            time.sleep(2.0 * (attempt + 1))
-    raise DataQualityError(_download_message(url, statuses, last_error)) from last_error
+            # Ne pas dormir au-delà de la borne: l'attente doit servir à réessayer.
+            pause = min(2.0 * (attempt + 1),
+                        max(0.0, deadline - (time.monotonic() - started)))
+            if pause <= 0:
+                break
+            time.sleep(pause)
+    raise DataQualityError(
+        _download_message(url, statuses, last_error,
+                          elapsed=time.monotonic() - started)
+    ) from last_error
 
 
-def _download_message(url: str, statuses: set[int], error: Exception | None) -> str:
+def _download_message(url: str, statuses: set[int], error: Exception | None,
+                      elapsed: float | None = None) -> str:
     """Report observed HTTP errors without guessing a season's publication state."""
     host = urllib.parse.urlsplit(url).hostname or 'Le fournisseur'
+    waited = f" Abandon après {elapsed:.0f} s." if elapsed is not None else ""
     if statuses and all(500 <= status < 600 for status in statuses):
         return (
-            f"Réponses serveur indisponible chez {host} ({sorted(statuses)}). Les "
-            "données déjà téléchargées sont conservées intactes, il suffit de "
-            f"relancer plus tard. URL: {url}"
+            f"Réponses serveur indisponible chez {host} ({sorted(statuses)})."
+            f"{waited} Les données déjà téléchargées sont conservées intactes, "
+            f"il suffit de relancer plus tard. URL: {url}"
         )
     if statuses and statuses.issubset({404, 410}):
         return (
@@ -201,8 +236,13 @@ def _download_message(url: str, statuses: set[int], error: Exception | None) -> 
             f"vérifier le lien sur l'index officiel. URL: {url}"
         )
     if statuses and statuses.issubset({401, 403, 429}):
-        return f"Accès refusé ou limité chez {host} ({sorted(statuses)}). URL: {url}"
-    return f"Download failed for {url}: {error}"
+        return f"Accès refusé ou limité chez {host} ({sorted(statuses)}).{waited} URL: {url}"
+    # Sans code HTTP, le serveur n'a pas répondu du tout: c'est le cas où
+    # l'attente est la plus longue, donc celui où elle doit le plus être dite.
+    return (
+        f"{host} ne répond pas ({error}).{waited} Les données déjà téléchargées "
+        f"sont conservées intactes, il suffit de relancer plus tard. URL: {url}"
+    )
 
 
 def _tennis_data_workbook_links(index_html: bytes, tour: str) -> dict[int, str]:
