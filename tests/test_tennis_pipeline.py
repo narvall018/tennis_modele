@@ -157,3 +157,25 @@ class TennisPipelineTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DownloadMessageTests(unittest.TestCase):
+    """Une panne du site et un fichier non publié demandent des réactions opposées."""
+
+    def test_an_outage_says_to_retry_and_that_data_is_safe(self):
+        from src.data.tennis_pipeline import _download_message
+        message = _download_message("http://x/2026.xlsx", {503}, None)
+        self.assertIn("indisponible", message)
+        self.assertIn("conservées intactes", message)
+        self.assertIn("relancer plus tard", message)
+
+    def test_a_missing_season_says_there_is_nothing_to_retry(self):
+        from src.data.tennis_pipeline import _download_message
+        message = _download_message("http://x/2027.xlsx", {404}, None)
+        self.assertIn("pas encore publiée", message)
+        self.assertNotIn("relancer plus tard", message)
+
+    def test_a_mixed_or_unknown_failure_keeps_the_raw_error(self):
+        from src.data.tennis_pipeline import _download_message
+        message = _download_message("http://x/a.xlsx", {404, 503}, RuntimeError("boum"))
+        self.assertIn("boum", message)

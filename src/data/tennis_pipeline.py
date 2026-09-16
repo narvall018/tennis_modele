@@ -164,6 +164,7 @@ def _http_bytes(url: str, timeout: int = 120, attempts: int = 3) -> bytes:
     every variant has been retried.
     """
     last_error: Exception | None = None
+    statuses: set[int] = set()
     for attempt in range(attempts):
         for candidate in _url_variants(url):
             request = urllib.request.Request(
@@ -173,11 +174,37 @@ def _http_bytes(url: str, timeout: int = 120, attempts: int = 3) -> bytes:
             try:
                 with urllib.request.urlopen(request, timeout=timeout) as response:
                     return response.read()
+            except urllib.error.HTTPError as error:
+                statuses.add(error.code)
+                last_error = error
             except (urllib.error.URLError, TimeoutError, OSError) as error:
                 last_error = error
         if attempt + 1 < attempts:
             time.sleep(2.0 * (attempt + 1))
-    raise DataQualityError(f"Download failed for {url}: {last_error}") from last_error
+    raise DataQualityError(_download_message(url, statuses, last_error)) from last_error
+
+
+def _download_message(url: str, statuses: set[int], error: Exception | None) -> str:
+    """Dire ce qui s'est passé, pas seulement que ça a échoué.
+
+    Une panne du site et un fichier pas encore publié demandent deux réactions
+    opposées — attendre, ou ne rien attendre du tout — et le code HTTP brut ne
+    les distingue pas pour qui lit la sortie.
+    """
+    if statuses and all(500 <= status < 600 for status in statuses):
+        return (
+            f"tennis-data.co.uk est indisponible ({sorted(statuses)} sur tous les "
+            "hôtes essayés). C'est une panne du site, pas un problème local: les "
+            "données déjà téléchargées sont conservées intactes, il suffit de "
+            f"relancer plus tard. URL: {url}"
+        )
+    if statuses and all(400 <= status < 500 for status in statuses):
+        return (
+            f"Fichier absent chez tennis-data.co.uk ({sorted(statuses)}): la "
+            "saison n'est probablement pas encore publiée. Rien à relancer avant "
+            f"sa mise en ligne. URL: {url}"
+        )
+    return f"Download failed for {url}: {error}"
 
 
 def _http_json(url: str, timeout: int = 60) -> dict[str, Any]:
