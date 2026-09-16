@@ -65,3 +65,38 @@ def test_stale_ui_keeps_journal_but_never_offers_calculation(tmp_path,monkeypatc
     assert any('trop ancien' in e.value for e in app.error)
     assert not any('Calculer selon' in b.label for b in app.button)
     assert app.metric[0].value=='1000.00 €'
+    calls = []
+    def fail_refresh(root, key):
+        calls.append(key)
+        return {'ok': False, 'output': 'HTTP 503 fournisseur'}
+    monkeypatch.setattr(page, 'run_task', fail_refresh)
+    next(b for b in app.button if b.label=='Actualiser les données de la stratégie ATP').click().run()
+    assert calls == ['tennis_strategy_refresh']
+    assert not app.exception
+    assert any('Actualisation non validée' in e.value for e in app.error)
+    assert app.metric[0].value=='1000.00 €'
+
+
+def test_refresh_success_reloads_metadata_without_touching_bankroll(tmp_path, monkeypatch):
+    folder=tmp_path/'models/tennis_strategy';folder.mkdir(parents=True)
+    (folder/'metadata.json').write_text('{}')
+    meta={'model_year':engine.utc().year,'history_last_date':'2020-01-01',
+          'evidence':{'roi':{'0.02':.1},'settled':54,'uncertainty':{'ci95':[-.1,.4]}}}
+    def bundle(*args):
+        return meta, pd.DataFrame(), {}, None
+    cleared=[]
+    bundle.clear=lambda: cleared.append(True)
+    monkeypatch.setattr(page, '_bundle', bundle)
+    monkeypatch.setattr(engine, 'latest_profiles', lambda *a: pd.DataFrame())
+    def refresh(root, key):
+        meta['history_last_date']=str(engine.utc().tz_convert('Europe/Paris').date())
+        return {'ok':True, 'output':'OK'}
+    monkeypatch.setattr(page,'run_task',refresh)
+    ledger.initialise(tmp_path/'bets/tennis_strategy.sqlite3','7:test',1000)
+    app=AppTest.from_string('from pathlib import Path\nfrom src.app.tennis_strategy_page import render_tennis_strategy_page\n'
+                           f'render_tennis_strategy_page(Path({str(tmp_path)!r}),7,"test")',default_timeout=15).run()
+    next(b for b in app.button if b.label=='Actualiser les données de la stratégie ATP').click().run()
+    assert not app.exception
+    assert cleared == [True]
+    assert not any('trop ancien' in e.value for e in app.error)
+    assert app.metric[0].value=='1000.00 €'

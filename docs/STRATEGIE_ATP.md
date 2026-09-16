@@ -68,7 +68,26 @@ ils ne représentent pas un relevé bancaire ou un paiement réel du bookmaker.
 
 Le paquet initial contient l'historique jusqu'au **29 août 2026**. Au 16 septembre,
 **les nouvelles sélections sont donc bloquées**. Le carnet reste accessible.
-La page affiche la raison et les commandes nécessaires :
+La page propose désormais **« Actualiser les données de la stratégie ATP »**.
+Ce bouton télécharge uniquement la saison courante chez Tennis-Data et
+TennisMyLife, contrôle les identités et les dates, conserve les années passées
+et le modèle annuel, puis recharge les caches de la page. Il fonctionne avec
+le paquet livré, sans dépendre des archives de recherche locales. Il ne touche
+pas à la bankroll. Équivalent local :
+
+```bash
+python3 scripts/refresh_tennis_strategy.py
+```
+
+Une panne fournisseur, des données encore anciennes, des matchs disparus ou
+des dates modifiées empêchent la publication. Le carnet et l'ancien paquet
+sont conservés. Le 16 septembre, Tennis-Data répondait HTTP 503 lors des essais :
+ce correctif permet de relancer la mise à jour mais ne supprime pas cette panne
+externe. Les dates TennisMyLife seules ne remplacent pas les dates de matchs
+Tennis-Data du protocole. Aucun résultat récent n'a été inventé pour débloquer
+l'interface.
+
+L'actualisation complète des tables locales reste disponible :
 
 ```bash
 python3 scripts/update_tennis_data.py

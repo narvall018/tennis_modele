@@ -12,6 +12,7 @@ import streamlit as st
 from src.app import tennis_strategy as engine
 from src.app import tennis_strategy_ledger as ledger
 from src.app.odds_api import active_sports, fetch_h2h_odds
+from src.app.maintenance import run_task
 
 
 @st.cache_resource(show_spinner=False)
@@ -127,13 +128,24 @@ def render_tennis_strategy_page(root: Path, user_id: int, username: str):
         st.caption(f"Diagnostic historique 2023–2025 : {evidence['roi']['0.02']:+.2%} sur "
                    f"{evidence['settled']} paris réglés ; intervalle 95 % [{interval[0]:+.2%} ; {interval[1]:+.2%}]. "
                    'Filtre de validation non franchi. Les prix français constituent une nouvelle expérience, pas une reproduction prouvée de Bet365.')
-        st.write(f"Historique disponible jusqu’au **{meta['history_last_date']}** ; modèle annuel **{meta['model_year']}**.")
+        st.markdown(f"Historique disponible jusqu’au **{meta['history_last_date']}** ; modèle annuel **{meta['model_year']}**.")
         reasons = engine.freshness_reasons(meta)
         for reason in reasons:
             st.error(reason)
         if reasons:
-            st.code('python3 scripts/update_tennis_data.py\npython3 scripts/prepare_tennis_strategy.py')
-            st.caption('Ces actions sont également accessibles dans « Mise à jour ». Le carnet reste utilisable même quand les sélections sont bloquées.')
+            st.caption('Le carnet reste utilisable. La mise à jour télécharge les résultats, contrôle les données et conserve le modèle annuel ; aucune modification de la bankroll.')
+            if st.button('Actualiser les données de la stratégie ATP', key=f'atp_refresh_{owner}'):
+                with st.spinner('Téléchargement et vérification des résultats ATP…'):
+                    result = run_task(root, 'tennis_strategy_refresh')
+                if result['ok']:
+                    _bundle.clear()
+                    _score.clear()
+                    st.rerun()
+                else:
+                    st.error('Actualisation non validée : les sélections restent bloquées. Aucun historique périmé ne sera autorisé.')
+                    st.code(result['output'], language='text')
+            with st.expander('Commandes pour une installation locale'):
+                st.code('python3 scripts/refresh_tennis_strategy.py', language='bash')
             return
         if st.button('Consulter les cotes ATP françaises (consomme du quota API)', key=f'atp_prices_{owner}'):
             with st.spinner('Consultation explicite du fournisseur…'):
