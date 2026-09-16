@@ -4,6 +4,13 @@ Dans la navigation de l’application, ouvrir **Stratégie WTA** et initialiser
 une bankroll fictive. Le carnet WTA est indépendant de l’ATP : aucun capital,
 pari ou plafond quotidien n’est partagé. Aucun pari réel n’est envoyé.
 
+La présentation reprend celle de l’ATP : mêmes cinq compteurs, budget quotidien,
+onglets **Analyser un match** et **Carnet et sauvegarde**, formulaire à deux côtés,
+boutons **Calculer selon la stratégie figée** et **Enregistrer ce pari en simulation**.
+Le tournoi peut être choisi dans l’historique ou saisi. Les quatre cotes de référence
+propres au modèle WTA sont regroupées dans un bloc dédié obligatoire ; les champs
+spécifiques au modèle ATP qui ne servent pas au WTA ne sont pas demandés.
+
 ## Modèle et limites
 
 Le candidat `trees_recent` de la recherche du 16 septembre 2026 utilise des

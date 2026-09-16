@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-09-16T16:00:04.868031+00:00",
+  "built_at": "2026-09-16T22:19:24.046615+00:00",
   "candidate": "trees_recent",
   "cutoff_exclusive": "2025-12-25",
   "evidence": {
@@ -67,11 +67,23 @@
   ],
   "files": {
     "booster.ubj": "dd40639ea3721bbfa150c56bbc24c22dae2cb0c31a180bead69f56b6e202d262",
-    "history.csv.gz": "187bf7d4cb39861fefa94e3607d092e0e01d6415c69c730e6b8a2cb36feb2be9",
+    "history.csv.gz": "a88b6cad503d9c509592675a982663a0e75d080e581e5f3b5fe9e79d1afe9e4b",
     "protocol.json": "47891aa003fc7f99c4129f6321ba5baed1040ae9aeba020ffb5b61e419f1e665"
   },
-  "history_last_date": "2026-08-30",
-  "history_rows": 47356,
+  "history_last_date": "2026-09-12",
+  "history_rows": 47483,
+  "live_refresh": {
+    "policy": "Prior-day history only; annual model unchanged",
+    "retrieved_at": "2026-09-16T22:19:24.046615+00:00",
+    "source": {
+      "name": "Tennis-Data official WTA workbooks",
+      "updated_at": "2026-09-16T22:20:40.896401+00:00",
+      "url": "http://www.tennis-data.co.uk/alldata.php"
+    },
+    "workbook_urls": [
+      "http://www.tennis-data.co.uk/hrjk-85HytOjkhth76j_ygh4jf7/2026w/2026.xlsx"
+    ]
+  },
   "model_year": 2026,
   "real_money_authorised": false,
   "registration_sha256": "0671c69995821c7eb3623cc0d93879a21f9674a3907831ac8784830a54296b66",

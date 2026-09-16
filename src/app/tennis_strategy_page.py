@@ -69,6 +69,18 @@ def _history(db, owner, summary, ledger_api=ledger, prefix='atp'):
                        f'{prefix}_bankroll_sauvegarde.json', 'application/json', key=f'{prefix}_backup_{owner}')
 
 
+def _bankroll_metrics(summary, ledger_api=ledger):
+    """Same account dashboard for ATP and WTA; accounting remains isolated."""
+    values = [f"{summary['balance_cents']/100:.2f} €", f"{summary['available_cents']/100:.2f} €",
+              f"{summary['reserved_cents']/100:.2f} €", f"{summary['profit_cents']/100:+.2f} €",
+              '—' if summary['roi'] is None else f"{summary['roi']:+.2%}"]
+    for col, label, value in zip(st.columns(5), ['Bankroll simulée', 'Disponible', 'Mises ouvertes', 'Résultat net', 'ROI sur mises'], values):
+        col.metric(label, value)
+    st.caption(f"Budget encore disponible aujourd’hui : {summary['day_remaining_cents']/100:.2f} € ; "
+               f"prochaine mise théorique au maximum {ledger_api.proposed_stake(summary)/100:.2f} €. "
+               'Journée Europe/Paris ; le montant est revérifié à l’enregistrement, sans augmenter les mises avec les gains du jour.')
+
+
 def render_tennis_strategy_page(root: Path, user_id: int, username: str):
     owner = f'{int(user_id)}:{username}'
     db = root / 'bets/tennis_strategy.sqlite3'
@@ -101,15 +113,7 @@ def render_tennis_strategy_page(root: Path, user_id: int, username: str):
                 st.error(f'Sauvegarde refusée : {error}')
         return
 
-    cols = st.columns(5)
-    for col, label, value in zip(cols, ['Bankroll simulée', 'Disponible', 'Mises ouvertes', 'Résultat net', 'ROI sur mises'],
-                                 [f"{summary['balance_cents']/100:.2f} €", f"{summary['available_cents']/100:.2f} €",
-                                  f"{summary['reserved_cents']/100:.2f} €", f"{summary['profit_cents']/100:+.2f} €",
-                                  '—' if summary['roi'] is None else f"{summary['roi']:+.2%}"]):
-        col.metric(label, value)
-    st.caption(f"Budget encore disponible aujourd’hui : {summary['day_remaining_cents']/100:.2f} € ; "
-               f"prochaine mise théorique au maximum {ledger.proposed_stake(summary)/100:.2f} €. "
-               'Journée Europe/Paris ; le montant est revérifié à l’enregistrement, sans augmenter les mises avec les gains du jour.')
+    _bankroll_metrics(summary)
     analyse, journal = st.tabs(['Analyser un match', 'Carnet et sauvegarde'])
     with journal:
         _history(db, owner, summary)
