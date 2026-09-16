@@ -25,7 +25,7 @@ def _score(root_text, metadata_hash, fixture_json):
     return engine.score_fixture(_bundle(root_text, metadata_hash), json.loads(fixture_json))
 
 
-def _history(db, owner, summary):
+def _history(db, owner, summary, ledger_api=ledger, prefix='atp'):
     bets = pd.DataFrame(summary['bets'])
     st.subheader('Carnet de simulation')
     st.caption('Résultats saisis manuellement, gains simulés après décote de 2 %. '
@@ -46,7 +46,7 @@ def _history(db, owner, summary):
             st.line_chart(curve.set_index('Date'))
         pending = bets[bets['status'] == 'pending']
         if not pending.empty:
-            with st.form(f'atp_settle_{owner}'):
+            with st.form(f'{prefix}_settle_{owner}'):
                 by_id = pending.set_index('id')
                 bet_id = st.selectbox('Pari à régler', list(by_id.index),
                                       format_func=lambda i: f"#{i} — {by_id.loc[i, 'pick']}")
@@ -57,16 +57,16 @@ def _history(db, owner, summary):
                     try:
                         if not confirmed:
                             raise ValueError('Confirmer le résultat final avant de l’enregistrer.')
-                        ledger.settle(db, owner, int(bet_id), result)
+                        ledger_api.settle(db, owner, int(bet_id), result)
                         st.rerun()
                     except ValueError as error:
                         st.error(str(error))
         st.download_button('Exporter le carnet CSV', table.to_csv(index=False).encode('utf-8-sig'),
-                           'atp_simulation.csv', 'text/csv', key=f'atp_csv_{owner}')
+                           f'{prefix}_simulation.csv', 'text/csv', key=f'{prefix}_csv_{owner}')
     else:
         st.info('Aucune simulation enregistrée. Une absence de sélection est un résultat normal.')
-    st.download_button('Sauvegarder bankroll + carnet (JSON)', ledger.export_backup(db, owner),
-                       'atp_bankroll_sauvegarde.json', 'application/json', key=f'atp_backup_{owner}')
+    st.download_button('Sauvegarder bankroll + carnet (JSON)', ledger_api.export_backup(db, owner),
+                       f'{prefix}_bankroll_sauvegarde.json', 'application/json', key=f'{prefix}_backup_{owner}')
 
 
 def render_tennis_strategy_page(root: Path, user_id: int, username: str):

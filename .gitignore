@@ -59,3 +59,5 @@ models/prospective/price_snapshots.jsonl
 !models/tennis_strategy/history.csv.gz
 # Never version per-user prospective bankrolls, journals or SQLite sidecars.
 bets/tennis_strategy.sqlite3*
+!models/wta_live_strategy/history.csv.gz
+bets/wta_strategy.sqlite3*

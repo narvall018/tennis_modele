@@ -34,6 +34,14 @@ class Task:
 
 TASKS: list[Task] = [
     Task(
+        key="wta_strategy_refresh",
+        label="Actualisation directe Stratégie WTA",
+        description="Actualise la saison WTA courante après contrôles, sans réentraîner le modèle ni modifier la bankroll.",
+        command=["scripts/refresh_wta_strategy.py"],
+        produces=["models/wta_live_strategy/metadata.json", "models/wta_live_strategy/history.csv.gz"],
+        minutes="1–3 min",
+    ),
+    Task(
         key="tennis_strategy_refresh",
         label="Actualisation directe Stratégie ATP",
         description="Télécharge uniquement la saison ATP courante, vérifie les dates et les statistiques "

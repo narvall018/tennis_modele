@@ -81,11 +81,11 @@ def proposed_stake(summary):
                summary['day_remaining_cents'], summary['available_cents'])
 
 
-def record(path, owner, candidate, now=None):
+def record(path, owner, candidate, now=None, *, strategy_id=STRATEGY_ID, validator=validate_fixture):
     now = utc(now)
-    if candidate.get('strategy_id') != STRATEGY_ID or not candidate.get('eligible'):
+    if candidate.get('strategy_id') != strategy_id or not candidate.get('eligible'):
         raise ValueError('Sélection absente ou stratégie incompatible.')
-    validate_fixture(candidate['fixture'], now)
+    validator(candidate['fixture'], now)
     computed = utc(candidate['computed_at'])
     if computed > now or now - computed > pd.Timedelta(minutes=15):
         raise ValueError('Calcul trop ancien : recalculer avec des cotes fraîches.')
@@ -107,7 +107,7 @@ def record(path, owner, candidate, now=None):
         conn.execute('''INSERT INTO atp_paper_bets
             (owner,strategy,event_key,decision_day,created_at,start_at,pick,odds,probability,stake_cents,snapshot)
             VALUES (?,?,?,?,?,?,?,?,?,?,?)''',
-            (str(owner), STRATEGY_ID, candidate['event_key'], summary['decision_day'], now.isoformat(),
+            (str(owner), strategy_id, candidate['event_key'], summary['decision_day'], now.isoformat(),
              utc(candidate['fixture']['start']).isoformat(), candidate['pick'], odds, p, stake,
              json.dumps(candidate, ensure_ascii=False, allow_nan=False)))
         conn.commit()
@@ -146,21 +146,21 @@ def settle(path, owner, bet_id, result, now=None):
         conn.close()
 
 
-def export_backup(path, owner, now=None):
+def export_backup(path, owner, now=None, *, strategy_id=STRATEGY_ID, backup_format='atp-paper-v1'):
     summary = state(path, owner, now)
     # Only this user's paper account, never the authentication DB or other users.
-    return json.dumps({'format': 'atp-paper-v1', 'strategy': STRATEGY_ID,
+    return json.dumps({'format': backup_format, 'strategy': strategy_id,
                        'initial_cents': summary['initial_cents'], 'bets': summary['bets']},
                       ensure_ascii=False, indent=2)
 
 
-def restore_backup(path, owner, text, now=None):
+def restore_backup(path, owner, text, now=None, *, strategy_id=STRATEGY_ID, backup_format='atp-paper-v1'):
     """Restore into an empty account only. No overwrite or merge ambiguity."""
     now = utc(now)
     if len(text) > 10_000_000:
         raise ValueError('Sauvegarde trop volumineuse.')
     data = json.loads(text)
-    if data.get('format') != 'atp-paper-v1' or data.get('strategy') != STRATEGY_ID:
+    if data.get('format') != backup_format or data.get('strategy') != strategy_id:
         raise ValueError('Format de sauvegarde incompatible.')
     initial = data['initial_cents']
     if type(initial) is not int or not 1000 <= initial <= 100_000_000:
@@ -175,7 +175,7 @@ def restore_backup(path, owner, text, now=None):
         conn.execute('INSERT INTO atp_paper_accounts VALUES (?,?,?)', (str(owner), initial, utc(now).isoformat()))
         for b in data['bets']:
             stake, odds = b['stake_cents'], float(b['odds'])
-            if (b['strategy'] != STRATEGY_ID or type(stake) is not int or stake <= 0
+            if (b['strategy'] != strategy_id or type(stake) is not int or stake <= 0
                     or not math.isfinite(odds) or not 1.3 <= odds <= 5
                     or not math.isfinite(float(b['probability'])) or not 0 < float(b['probability']) < 1
                     or b['status'] not in {'pending', 'won', 'lost', 'void'}):
@@ -192,7 +192,7 @@ def restore_backup(path, owner, text, now=None):
             if b['profit_cents'] != expected or (b['status'] == 'pending') != (b['settled_at'] is None):
                 raise ValueError('Règlement incohérent dans la sauvegarde.')
             snapshot = json.loads(b['snapshot'])
-            if snapshot.get('strategy_id') != STRATEGY_ID:
+            if snapshot.get('strategy_id') != strategy_id:
                 raise ValueError('Snapshot incompatible.')
             conn.execute(f"INSERT INTO atp_paper_bets (owner,{','.join(allowed)}) VALUES ({','.join(['?'] * (len(allowed)+1))})",
                          [str(owner), *[b[k] for k in allowed]])

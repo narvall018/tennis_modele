@@ -1,0 +1,232 @@
+{
+  "research": {
+    "boost_rounds": 150,
+    "booster": {
+      "alpha": 1,
+      "base_score": 0.5,
+      "colsample_bytree": 1.0,
+      "eta": 0.03,
+      "lambda": 20,
+      "max_delta_step": 0.5,
+      "max_depth": 2,
+      "min_child_weight": 20,
+      "nthread": 1,
+      "seed": 20260915,
+      "subsample": 1.0,
+      "tree_method": "hist"
+    },
+    "committee": "Mean probabilities are normalised. Unanimity uses coordinatewise minimum of both probabilities as an EV decision score, NOT a renormalised probability distribution or statistical confidence bound. Choose at most one eligible outcome by this score.",
+    "daily_cap_limitation": "Retrospective proportional daily allocation, not an exact sequential live staking process.",
+    "embargo_days": 7,
+    "evidence": "EXPLORATORY_REUSED_HISTORY_NOT_INDEPENDENT_VALIDATION",
+    "features": {
+      "football": "Frozen enriched prior-day design; no closing prices, Pinnacle, xG or invented injuries.",
+      "ufc": "Frozen enriched design plus minimum experience, mean age, max layoff; no 2025+ input.",
+      "wta": "Audited prior-day cross_book_form plus surface context for trees; class0=P1. No uncorrected rolling features. No 2026 data."
+    },
+    "fit": "Annual fit strictly before Jan1 minus7days, completed training only. Fit transformations on training only. Binary orientation symmetrised. No random split, early stopping or evaluation-dependent changes.",
+    "gate": "Each variant separately: >=50 settled tuning and positive tuning ROI and ordinary95pct lower. Then >=200 settled evaluation, positive ROI2/5pct, corrected lower>0, >=2 positive years, positive without best profit year. No real-money authorisation even if passed.",
+    "half_life_years": 3.0,
+    "hypothesis": "Recent shallow trees and regularised linear corrections may agree on more stable price errors. Compare each component, fixed equal average and unanimous positive-EV gate. No post-result subgroup or threshold search.",
+    "linear_penalty": 0.01,
+    "no_independent_models_claim": true,
+    "no_price_time_or_french_execution_proof": true,
+    "real_money_authorised": false,
+    "registered_at": "2026-09-16T15:40:01.915184+00:00",
+    "selection": {
+      "flat_fraction": 0.0025,
+      "maximum_daily_exposure": 0.02,
+      "maximum_fraction_per_bet": 0.005,
+      "minimum_ev_after_haircut": 0.02,
+      "odds_max": 5.0,
+      "odds_min": 1.3,
+      "profit_haircut": 0.02,
+      "quarter_kelly_fraction": 0.25,
+      "sensitivity_haircuts": [
+        0.0,
+        0.02,
+        0.05
+      ]
+    },
+    "sources": {
+      "models/three_sport_residual/football_features.parquet": "b33df2ee7e959fe307f785714f4cf7fb0f927d5817aa97e0bb46ab45b02cc686",
+      "models/three_sport_residual/ufc_features.parquet": "374eecaba786b29dabab7e9438a85662febabdbae88b1b96cffc5628682aa4ce",
+      "models/wta_strategy/pre_match_features.csv.gz": "3b90b331985b4e69e8bd8cf04a2dcde09927296c216c13743465ac6e0aeb474d"
+    },
+    "sports": {
+      "football": {
+        "evaluation": [
+          2023,
+          2024,
+          2025
+        ],
+        "min_train": 5000,
+        "tuning": [
+          2021,
+          2022
+        ]
+      },
+      "ufc": {
+        "evaluation": [
+          2022,
+          2023,
+          2024
+        ],
+        "min_train": 1000,
+        "tuning": [
+          2019,
+          2020,
+          2021
+        ]
+      },
+      "wta": {
+        "evaluation": [
+          2023,
+          2024,
+          2025
+        ],
+        "min_train": 5000,
+        "tuning": [
+          2021,
+          2022
+        ]
+      }
+    },
+    "staking": "flat only; no Kelly or martingale search",
+    "study": "consensus_research_2026_09_16",
+    "threshold": 0.02,
+    "ufc_2025_onward": "REMAINS_CLOSED",
+    "uncertainty": {
+      "evaluation_samples": 100000,
+      "family_size": 282,
+      "lower_quantile_per_candidate": 0.0001773049645390071,
+      "samples": 20000,
+      "scope": "264 previous nominal comparisons +6 WTA +12 here. Does not cover all adaptive research. Circular3month blocks; extreme tail is Monte-Carlo approximation.",
+      "seed": 20260916
+    },
+    "variants": [
+      "linear",
+      "trees_recent",
+      "mean",
+      "unanimous"
+    ]
+  },
+  "wta_features": {
+    "calibration_features": [
+      "B365_logit",
+      "B365_logit_x_abs_logit",
+      "B365_logit_x_overround"
+    ],
+    "candidates": [
+      "book_calibration",
+      "cross_book",
+      "cross_book_form"
+    ],
+    "created_date": "2026-09-11",
+    "cross_book_features": [
+      "Pinnacle_minus_B365_logit",
+      "delta_x_abs_B365_logit",
+      "delta_x_Pinnacle_overround"
+    ],
+    "data_path": "models/wta_strategy/pre_match_features.csv.gz",
+    "data_sha256": "3b90b331985b4e69e8bd8cf04a2dcde09927296c216c13743465ac6e0aeb474d",
+    "embargo_days": 7,
+    "evidence_status": "EXPLORATORY_REUSED_HISTORY_NOT_PRISTINE_HOLDOUT",
+    "execution_book": "B365 historical edition; not demonstrated equal to bet365.fr",
+    "first_train_year": 2007,
+    "fit_rule": "once at Jan 1 of test year, only earlier completed matches strictly before Jan 1 minus embargo",
+    "hypothesis": "A learned symmetric residual can use bookmaker disagreement and lagged player information to select better WTA bets than calibration of a single price.",
+    "imputation": "nonfinite signed lagged differences replaced by zero; symmetric neutral prior",
+    "l2_penalty_mean_loss": 0.01,
+    "lagged_form_features": [
+      "elo_diff",
+      "surface_elo_diff",
+      "form_10_diff",
+      "rest_diff",
+      "fatigue_diff",
+      "log_rank_diff"
+    ],
+    "limitations": [
+      "Per-bookmaker odds not timestamped, may not be simultaneous",
+      "Historical price editions not proven available in France",
+      "No accepted-stake or liquidity history",
+      "Lagged features inherited from prior audited pipeline",
+      "Repeatedly inspected history cannot confirm a strategy",
+      "Conditional void rules must be matched to a real operator before execution"
+    ],
+    "minimum_training_completed": 5000,
+    "model": "ridge residual around B365 log odds, symmetric augmented training and predictions",
+    "no_log_loss_gate": true,
+    "no_posthoc_threshold_or_country_or_surface_search": true,
+    "no_promotions": true,
+    "overround_bounds": [
+      1.0,
+      1.2
+    ],
+    "real_money_authorised": false,
+    "reference_book": "Pinnacle historical Tennis-Data; not a ground-truth probability",
+    "required_pairs": [
+      [
+        "B365_1",
+        "B365_2"
+      ],
+      [
+        "Pinnacle_1",
+        "Pinnacle_2"
+      ]
+    ],
+    "research_gate": [
+      "500_settled_bets",
+      "roi_positive_2pct",
+      "roi_positive_5pct",
+      "family_adjusted_lower_positive",
+      "at_least_6_of_9_years_positive",
+      "roi_without_best_profit_year_positive"
+    ],
+    "selection": {
+      "bankroll": "1000 initial; all bets on same day use start-of-day bankroll, proportional daily cap; no reinvestment within day",
+      "criterion": "highest EV among eligible outcomes, without using match status",
+      "flat_fraction": 0.0025,
+      "maximum_daily_exposure": 0.02,
+      "maximum_fraction_per_bet": 0.005,
+      "maximum_selections_per_match_per_candidate": 1,
+      "minimum_ev_after_haircut": 0.02,
+      "noncompleted_settlement": "void; kept in selection and exposure, final status only used at settlement",
+      "odds_max": 5.0,
+      "odds_min": 1.3,
+      "profit_haircut": 0.02,
+      "quarter_kelly_fraction": 0.25,
+      "sensitivity": "same selections and primary stakes; only payouts change",
+      "sensitivity_haircuts": [
+        0.0,
+        0.02,
+        0.05
+      ]
+    },
+    "stakes": [
+      "flat",
+      "quarter_kelly"
+    ],
+    "study": "wta_price_residual_2026_09_11",
+    "test_years": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "uncertainty": {
+      "bootstrap": "circular moving blocks of 3 months including no-bet months; profit divided by exposure",
+      "family_alpha": 0.05,
+      "family_size": 6,
+      "lower_quantile_per_candidate": 0.008333333333333333,
+      "samples": 10000,
+      "scope": "corrects these six configurations only, not earlier project searches",
+      "seed": 20260912
+    }
+  }
+}

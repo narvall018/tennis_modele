@@ -1,0 +1,141 @@
+{
+  "built_at": "2026-09-16T16:00:04.868031+00:00",
+  "candidate": "trees_recent",
+  "cutoff_exclusive": "2025-12-25",
+  "evidence": {
+    "bankroll": {
+      "final_bankroll": 1041.7930245048115,
+      "maximum_drawdown": 0.01736929550986155
+    },
+    "best_year": "2025",
+    "market_log_loss": 0.5884999308008685,
+    "matches": 7324,
+    "model_log_loss": 0.5869859885108449,
+    "research_gate_passed": false,
+    "roi": {
+      "0.0": 0.15999999999999998,
+      "0.02": 0.146098245614035,
+      "0.05": 0.12524561403508766
+    },
+    "roi_without_best_year": 0.09421351351351342,
+    "selections": 119,
+    "settled": 114,
+    "unanimity_is_not_statistical_confidence_bound": true,
+    "uncertainty": {
+      "ci95": [
+        -0.14788350458715593,
+        0.3690574405149932
+      ],
+      "family_lower": -0.4244071597935635,
+      "months": 35
+    },
+    "void": 5,
+    "yearly": {
+      "2023": {
+        "profit_fraction": 0.014700499999999991,
+        "roi": 0.12000408163265296,
+        "settled": 49
+      },
+      "2024": {
+        "profit_fraction": 0.002728999999999997,
+        "roi": 0.04366399999999995,
+        "settled": 25
+      },
+      "2025": {
+        "profit_fraction": 0.024208499999999994,
+        "roi": 0.24208499999999994,
+        "settled": 40
+      }
+    }
+  },
+  "features": [
+    "B365_logit",
+    "B365_logit_x_abs_logit",
+    "B365_logit_x_overround",
+    "Pinnacle_minus_B365_logit",
+    "delta_x_abs_B365_logit",
+    "delta_x_Pinnacle_overround",
+    "elo_diff",
+    "surface_elo_diff",
+    "form_10_diff",
+    "rest_diff",
+    "fatigue_diff",
+    "log_rank_diff",
+    "is_hard",
+    "is_clay",
+    "is_grass"
+  ],
+  "files": {
+    "booster.ubj": "dd40639ea3721bbfa150c56bbc24c22dae2cb0c31a180bead69f56b6e202d262",
+    "history.csv.gz": "187bf7d4cb39861fefa94e3607d092e0e01d6415c69c730e6b8a2cb36feb2be9",
+    "protocol.json": "47891aa003fc7f99c4129f6321ba5baed1040ae9aeba020ffb5b61e419f1e665"
+  },
+  "history_last_date": "2026-08-30",
+  "history_rows": 47356,
+  "model_year": 2026,
+  "real_money_authorised": false,
+  "registration_sha256": "0671c69995821c7eb3623cc0d93879a21f9674a3907831ac8784830a54296b66",
+  "strategy_id": "wta_trees_recent_cross_book_paper_v1",
+  "swap_signs": [
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    -1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "train_last_date": "2025-11-08",
+  "train_rows": 40739,
+  "training_features_sha256": "8576ea8df5c569648f30417eca55b1571ddd20453d08d5430d60e8cb1de9e81f",
+  "tuning": {
+    "admitted": false,
+    "summary": {
+      "bankroll": {
+        "final_bankroll": 1020.2346306253102,
+        "maximum_drawdown": 0.03055524203108151
+      },
+      "best_year": "2022",
+      "market_log_loss": 0.5796894583697203,
+      "matches": 4737,
+      "model_log_loss": 0.576860226845152,
+      "roi": {
+        "0.0": 0.09636363636363639,
+        "0.02": 0.08332525252525252,
+        "0.05": 0.06376767676767668
+      },
+      "roi_without_best_year": 0.03845084745762711,
+      "selections": 104,
+      "settled": 99,
+      "uncertainty": {
+        "ci95": [
+          -0.23203511918604638,
+          0.42219533509700113
+        ],
+        "family_lower": -0.45679630112438696,
+        "months": 23
+      },
+      "void": 5,
+      "yearly": {
+        "2021": {
+          "profit_fraction": 0.00567149999999999,
+          "roi": 0.03845084745762711,
+          "settled": 59
+        },
+        "2022": {
+          "profit_fraction": 0.014951499999999996,
+          "roi": 0.14951499999999998,
+          "settled": 40
+        }
+      }
+    }
+  }
+}
