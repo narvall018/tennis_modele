@@ -25,7 +25,7 @@ def _score(root_text, metadata_hash, fixture_json):
     return engine.score_fixture(_bundle(root_text, metadata_hash), json.loads(fixture_json))
 
 
-def _history(db, owner, summary, ledger_api=ledger, prefix='atp'):
+def _history(db, owner, summary, ledger_api=ledger, prefix='atp', probability_label='Probabilité modèle'):
     bets = pd.DataFrame(summary['bets'])
     st.subheader('Carnet de simulation')
     st.caption('Résultats saisis manuellement, gains simulés après décote de 2 %. '
@@ -37,7 +37,7 @@ def _history(db, owner, summary, ledger_api=ledger, prefix='atp'):
         table['profit_cents'] /= 100
         st.dataframe(table.rename(columns={'id': 'N°', 'created_at': 'Enregistré UTC',
                      'start_at': 'Début UTC', 'pick': 'Sélection', 'odds': 'Cote',
-                     'probability': 'Probabilité modèle', 'stake_cents': 'Mise €',
+                     'probability': probability_label, 'stake_cents': 'Mise €',
                      'status': 'Statut', 'profit_cents': 'Résultat €'}), hide_index=True)
         settled = bets[bets['settled_at'].notna()].sort_values(['settled_at', 'id'])
         if not settled.empty:
@@ -69,16 +69,17 @@ def _history(db, owner, summary, ledger_api=ledger, prefix='atp'):
                        f'{prefix}_bankroll_sauvegarde.json', 'application/json', key=f'{prefix}_backup_{owner}')
 
 
-def _bankroll_metrics(summary, ledger_api=ledger):
+def _bankroll_metrics(summary, ledger_api=ledger, show_budget=True):
     """Same account dashboard for ATP and WTA; accounting remains isolated."""
     values = [f"{summary['balance_cents']/100:.2f} €", f"{summary['available_cents']/100:.2f} €",
               f"{summary['reserved_cents']/100:.2f} €", f"{summary['profit_cents']/100:+.2f} €",
               '—' if summary['roi'] is None else f"{summary['roi']:+.2%}"]
     for col, label, value in zip(st.columns(5), ['Bankroll simulée', 'Disponible', 'Mises ouvertes', 'Résultat net', 'ROI sur mises'], values):
         col.metric(label, value)
-    st.caption(f"Budget encore disponible aujourd’hui : {summary['day_remaining_cents']/100:.2f} € ; "
-               f"prochaine mise théorique au maximum {ledger_api.proposed_stake(summary)/100:.2f} €. "
-               'Journée Europe/Paris ; le montant est revérifié à l’enregistrement, sans augmenter les mises avec les gains du jour.')
+    if show_budget:
+        st.caption(f"Budget encore disponible aujourd’hui : {summary['day_remaining_cents']/100:.2f} € ; "
+                   f"prochaine mise théorique au maximum {ledger_api.proposed_stake(summary)/100:.2f} €. "
+                   'Journée Europe/Paris ; le montant est revérifié à l’enregistrement, sans augmenter les mises avec les gains du jour.')
 
 
 def render_tennis_strategy_page(root: Path, user_id: int, username: str):

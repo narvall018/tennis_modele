@@ -182,14 +182,16 @@ def test_backup_restore_round_trip_is_isolated_and_never_overwrites(tmp_path):
     with pytest.raises(ValueError): ledger.state(path,'c',NOW)
 
 
-def test_section_is_wired_without_changing_legacy_predictions():
+def test_reference_section_replaces_old_model_without_changing_legacy_predictions():
     import ast
     root=Path(__file__).resolve().parents[1]
     source=(root/'unified_app.py').read_text()
     ast.parse(source)
     ast.parse((root/'src/app/tennis_strategy_page.py').read_text())
     assert '"Stratégie ATP"' in source
-    assert 'render_tennis_strategy_page(PROJECT_ROOT' in source
+    assert 'render_atp_reference_page(PROJECT_ROOT' in source
+    assert 'render_tennis_strategy_page(PROJECT_ROOT' not in source
+    assert '"Stratégie WTA"' not in source
 
 
 def test_concurrent_records_cannot_exceed_daily_budget(tmp_path):
