@@ -5,6 +5,20 @@ Une rentabilité future n'est jamais garantie : toute stratégie doit être éva
 hors échantillon, avec des cotes réellement disponibles au moment du pari et des
 frais réalistes.
 
+## Meilleure opportunité, tous sports confondus
+
+Une seule commande interroge toutes les stratégies qui ont le droit de
+sélectionner et classe leurs réponses selon une règle fixée à l'avance : un
+arbitrage exploitable — gain arithmétique — passe devant toute espérance estimée
+par un modèle non validé, quel que soit le pourcentage affiché.
+
+```bash
+python3 scripts/run_best_opportunity.py
+```
+
+Détail de la règle, droits de sélection par sport et limites :
+[`docs/MEILLEURE_OPPORTUNITE.md`](docs/MEILLEURE_OPPORTUNITE.md).
+
 ## Mise à jour des données
 
 ```bash
