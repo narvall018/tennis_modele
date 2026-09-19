@@ -158,30 +158,31 @@ def test_identity_map_merges_reissued_id_but_never_namesakes_or_co_entrants():
                       'l': RIVALS[0], 'w_age': published_age(20260105, born)},
                      {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Iva Jovic',
                       'l': RIVALS[1], 'w_age': published_age(20260608, born)}])
-    mapping, merges = engine.identity_map(reissued)
-    assert mapping == {77.: 10.} and merges[0]['name'] == 'iva jovic' and merges[0]['merged_rows'] == 1
+    merges = engine.identity_map(reissued)
+    assert engine.identity_table(merges) == {('iva jovic', 77.): 10.}
+    assert merges[0]['name'] == 'iva jovic' and merges[0]['merged_rows'] == 1
     # A namesake born five years apart is a different woman.
     namesakes = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Anna Namesake',
                        'l': RIVALS[0], 'w_age': published_age(20260105, born)},
                       {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Anna Namesake',
                        'l': RIVALS[1], 'w_age': published_age(20260608, '2003-01-06')}])
-    assert engine.identity_map(namesakes) == ({}, [])
+    assert engine.identity_map(namesakes) == []
     # Two ids in one draw are two entrants, whatever the ages say.
     co_entrants = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Anna Namesake',
                          'l': RIVALS[0], 'w_age': published_age(20260105, born)},
                         {'t': 'a', 'date': 20260105, 'wid': 77, 'lid': 98, 'w': 'Anna Namesake',
                          'l': RIVALS[1], 'w_age': published_age(20260105, born)}])
-    assert engine.identity_map(co_entrants) == ({}, [])
+    assert engine.identity_map(co_entrants) == []
     # A corrupt age carries no evidence, so nationality decides; the feed really ships 2808.
     ages = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Lea Blank', 'l': RIVALS[0], 'w_ioc': 'FRA'},
                  {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Lea Blank', 'l': RIVALS[1],
                   'w_age': 2808.0, 'w_ioc': 'FRA'}])
-    assert engine.identity_map(ages)[0] == {77.: 10.}
+    assert engine.identity_table(engine.identity_map(ages)) == {('lea blank', 77.): 10.}
     foreign = ages.copy(); foreign.loc[1, 'winner_ioc'] = 'JPN'
-    assert engine.identity_map(foreign) == ({}, [])
+    assert engine.identity_map(foreign) == []
     # Neither age nor nationality: an absence of evidence is not evidence of sameness.
     blind = ages.copy(); blind['winner_ioc'] = ''
-    assert engine.identity_map(blind) == ({}, [])
+    assert engine.identity_map(blind) == []
 
 
 def test_identity_table_survives_a_partial_feed_and_repairs_split_profiles():
@@ -192,11 +193,12 @@ def test_identity_table_survives_a_partial_feed_and_repairs_split_profiles():
     new = feed([{'t': f'n{i}', 'date': 20260105+i, 'wid': 77, 'lid': 90, 'w': 'Robin Split',
                  'l': RIVALS[0], 'w_age': published_age(20260105+i, born)} for i in range(5)])
     whole = pd.concat([old, new], ignore_index=True)
-    assert engine.identity_map(whole)[0] == {77.: 10.}, 'the full feed must elect the long-standing id'
-    assert engine.identity_map(new)[0] == {}, 'this year alone cannot see the canonical id'
+    carried = [{'name': 'robin split', 'canonical_id': 10., 'merged_id': 77., 'merged_rows': 5}]
+    assert engine.identity_map(whole) == carried, 'the full feed must elect the long-standing id'
+    assert engine.identity_map(new) == [], 'this year alone cannot see the canonical id'
     # Seeding with the frozen table stops the partial feed electing the re-issued id.
-    assert engine.identity_map(new, {'77': 10})[0] == {77.: 10.}
-    history = engine.prepare_history(whole, pd.Timestamp('2026-09-19').date(), {77.: 10.})
+    assert engine.identity_map(new, carried) == carried
+    history = engine.prepare_history(whole, pd.Timestamp('2026-09-19').date(), carried)
     assert set(history.winner_id) == {10.}, 'both spells belong to one player'
     # Split across two ids she is unresolvable; merged, both spells feed one profile.
     split = engine.prepare_history(whole, pd.Timestamp('2026-09-19').date())
@@ -209,6 +211,26 @@ def test_identity_table_survives_a_partial_feed_and_repairs_split_profiles():
     assert engine.fixture_inputs(history, f, now)[2][0] == 10.
 
 
+def test_a_merge_never_moves_rows_belonging_to_another_player():
+    # The feed really does mistype one row: Zhang Shuai carries an id whose 190 other
+    # rows are Maria Sanchez Lorenzo's. Merging that id wholesale would steal her career.
+    born, other = '1988-01-21', '1978-08-11'
+    rows = [{'t': f'm{i}', 'date': 20050105+i, 'wid': 10, 'lid': 91, 'w': 'Maria Sanchez Lorenzo',
+             'l': RIVALS[1], 'w_age': published_age(20050105+i, other)} for i in range(6)]
+    rows += [{'t': f'z{i}', 'date': 20260105+i, 'wid': 20, 'lid': 92, 'w': 'Shuai Zhang',
+              'l': RIVALS[2], 'w_age': published_age(20260105+i, born)} for i in range(4)]
+    # One stray row gives Zhang the other woman's id.
+    rows += [{'t': 'stray', 'date': 20260413, 'wid': 10, 'lid': 93, 'w': 'Shuai Zhang',
+              'l': RIVALS[3], 'w_age': published_age(20260413, born)}]
+    raw = feed(rows)
+    merges = engine.identity_map(raw)
+    assert [(m['name'], m['merged_id'], m['canonical_id']) for m in merges] == [('shuai zhang', 10., 20.)]
+    moved = engine.apply_identities(raw.copy(), merges)
+    kept = moved[moved.winner_name.eq('Maria Sanchez Lorenzo')]
+    assert set(kept.winner_id) == {10.}, 'her six matches must keep her own id'
+    assert set(moved[moved.winner_name.eq('Shuai Zhang')].winner_id) == {20.}
+
+
 def test_shipped_history_leaves_no_player_split_across_two_ids():
     root = Path(__file__).resolve().parents[1]
     meta, history, _ = engine.load_bundle(root)
@@ -217,9 +239,9 @@ def test_shipped_history_leaves_no_player_split_across_two_ids():
         for key, identity in zip(history['_'+prefix+'_key'], history[prefix+'_id']):
             seen.setdefault(key, set()).add(identity)
     assert not {k: v for k, v in seen.items() if len(v) > 1}
-    assert meta['identities'], 'the merge table must ship with the bundle'
-    merged = {float(k) for k in meta['identities']}
-    assert not merged & {i for v in seen.values() for i in v}, 'a merged id must not survive in the history'
+    assert meta['identity_merges'], 'the merge table must ship with the bundle'
+    for merge in meta['identity_merges']:
+        assert merge['merged_id'] not in seen[merge['name']], 'a merged id must not survive under its name'
 
 
 def test_refresh_preserves_model_and_refuses_missing_history(tmp_path, monkeypatch):
@@ -265,6 +287,6 @@ def test_refresh_merges_a_newly_reissued_id_and_carries_the_table_forward(tmp_pa
                         lambda *_: (pd.concat([raw, reissued], ignore_index=True), None, {'missing_files': []}))
     refresh.refresh(tmp_path, now.date())
     meta, history, _ = engine.load_bundle(tmp_path)
-    assert meta['identities'] == {'555': 1} and meta['identity_merges'][0]['name'] == 'alice alpha'
+    assert [(m['name'], m['merged_id'], m['canonical_id']) for m in meta['identity_merges']] == [('alice alpha', 555., 1.)]
     assert set(history.winner_id) == {1.}, 'the re-issued id must not survive the refresh'
     assert engine.fixture_inputs(history, fixture(now), now)[2] == [1., 2.]

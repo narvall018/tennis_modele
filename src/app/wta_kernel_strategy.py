@@ -29,6 +29,22 @@ def name_key(name):
     return ' '.join(re.findall('[a-z]+', ''.join(c for c in plain if not unicodedata.combining(c)).lower()))
 
 
+def identity_table(merges):
+    """A merge applies to one name only: the feed also mistypes an id belonging to
+    somebody else, and rewriting every row carrying it would steal her career."""
+    return {(m['name'], float(m['merged_id'])): float(m['canonical_id']) for m in merges or []}
+
+
+def apply_identities(rows, merges):
+    table = identity_table(merges)
+    if not table: return rows
+    for side in ['winner', 'loser']:
+        keys = rows[side+'_name'].map(name_key)
+        found = pd.to_numeric(rows[side+'_id'], errors='coerce')
+        rows[side+'_id'] = [table.get((k, i), i) for k, i in zip(keys, found)]
+    return rows
+
+
 def identity_map(raw, previous=None):
     """Merge upstream duplicate player ids.
 
@@ -36,24 +52,27 @@ def identity_map(raw, previous=None):
     her record and hides her from `fixture_inputs`. Two ids are the same woman only on
     positive evidence: the same normalised name plus a birth date implied by the
     published age. Ids that entered the same draw are two entrants, never merged, which
-    also covers same-name opponents. `previous` seeds the table so that a partial feed
-    cannot outvote a canonical id it does not contain."""
-    mapping = {float(k): float(v) for k, v in (previous or {}).items()}
+    also covers same-name opponents. A merge is keyed by name as well as id, because a
+    stray id in one row may belong to a different player everywhere else. `previous`
+    seeds the table so a partial feed cannot outvote a canonical id it does not
+    contain. Returns the merge records, the audit and the applicable form."""
+    merges = [dict(m) for m in previous or []]
+    table = identity_table(merges)
     start = pd.to_datetime(raw.tourney_date.astype(str), format='%Y%m%d', errors='coerce')
     missing = pd.Series(np.nan, index=raw.index)
     parts = []
     for side in ['winner', 'loser']:
         age = pd.to_numeric(raw[side+'_age'], errors='coerce') if side+'_age' in raw else missing
-        identity = pd.to_numeric(raw[side+'_id'], errors='coerce')
+        found = pd.to_numeric(raw[side+'_id'], errors='coerce')
+        key = raw[side+'_name'].map(name_key)
         # A published age outside a plausible playing range is a corrupt field, not evidence.
         days = (age.where(age.between(10, 60))*365.2425).to_numpy(float)
         known = np.isfinite(days)
-        parts.append(pd.DataFrame({'pid': identity.map(lambda i: mapping.get(i, i)),
-            'key': raw[side+'_name'].map(name_key), 'tourney': raw.tourney_id.astype(str),
+        parts.append(pd.DataFrame({'pid': [table.get((k, i), i) for k, i in zip(key, found)],
+            'key': key, 'tourney': raw.tourney_id.astype(str),
             'ioc': raw[side+'_ioc'].astype(str).str.strip() if side+'_ioc' in raw else missing,
             'dob': (start-pd.to_timedelta(np.where(known, days, 0.), unit='D')).where(known)}))
     long = pd.concat(parts, ignore_index=True).dropna(subset=['pid', 'key'])
-    merges = []
     for key, part in long.groupby('key'):
         if part.pid.nunique() < 2 or part.groupby('tourney').pid.nunique().gt(1).any(): continue
         codes = part.groupby('pid').ioc.agg(lambda s: set(s.dropna()) - {'', 'nan'})
@@ -67,22 +86,20 @@ def identity_map(raw, previous=None):
             else:  # No age published: fall back to nationality, which may legally change.
                 same = bool(row.ioc & head.ioc)  # No evidence at all is not evidence of sameness.
             if not same: continue
-            mapping[float(pid)] = canonical
             merges.append({'name': key, 'canonical_id': canonical, 'merged_id': float(pid),
                            'merged_rows': int(row.rows)})
-    for pid in list(mapping):  # Collapse chains left by an earlier table.
-        seen = {pid}
-        while mapping.get(mapping[pid], mapping[pid]) != mapping[pid] and mapping[pid] not in seen:
-            seen.add(mapping[pid]); mapping[pid] = mapping[mapping[pid]]
-    return mapping, merges
+    for merge in merges:  # Collapse chains left by an earlier table.
+        seen = {merge['merged_id']}
+        table = identity_table(merges)
+        while (merge['name'], merge['canonical_id']) in table and merge['canonical_id'] not in seen:
+            seen.add(merge['canonical_id'])
+            merge['canonical_id'] = table[(merge['name'], merge['canonical_id'])]
+    return merges
 
 
 def prepare_history(raw, today, identities=None):
     """Validate service counts; retain invalid-stat records only as identity evidence."""
-    rows = raw.copy()
-    if identities:  # Collapse ids the feed re-issued for a player already present.
-        for side in ['winner', 'loser']:
-            rows[side+'_id'] = pd.to_numeric(rows[side+'_id'], errors='coerce').map(lambda i: identities.get(i, i))
+    rows = apply_identities(raw.copy(), identities)
     rows['_start'] = pd.to_datetime(rows.tourney_date.astype(str), format='%Y%m%d', errors='raise')
     rows = rows[rows._start.between(pd.Timestamp('2007-01-01'), pd.Timestamp(today))].copy()
     if rows.duplicated(['tourney_id', 'match_num']).any(): raise ValueError('Statistiques dupliquées.')

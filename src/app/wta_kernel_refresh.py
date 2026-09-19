@@ -7,7 +7,8 @@ import tempfile
 
 import pandas as pd
 
-from src.app.wta_kernel_strategy import load_bundle, identity_map, prepare_history, FOLDER, digest
+from src.app.wta_kernel_strategy import (load_bundle, apply_identities, identity_map,
+                                         prepare_history, FOLDER, digest)
 from src.data.tennis_expansion import fetch_wta_matches
 
 
@@ -30,11 +31,10 @@ def refresh(root, today=None):
     raw = raw.drop_duplicates(key, keep='first')
     # The annual file alone cannot outvote a canonical id it does not contain, so seed
     # the table with the one frozen at build time and carry any new merge forward.
-    identities, merges = identity_map(raw, meta.get('identities'))
-    new = prepare_history(raw, today, identities)
+    merges = identity_map(raw, meta.get('identity_merges'))
+    new = prepare_history(raw, today, merges)
     new = new[new._start.dt.year.eq(today.year)]
-    for side in ['winner', 'loser']:  # A merge found this year also repairs earlier seasons.
-        old[side+'_id'] = old[side+'_id'].map(lambda i: identities.get(i, i))
+    old = apply_identities(old, merges)  # A merge found this year also repairs earlier seasons.
     previous = old[old._start.dt.year.eq(today.year)]
     old_keys = set(zip(previous.tourney_id, previous.match_num))
     if not old_keys.issubset(set(zip(new.tourney_id, new.match_num))):
@@ -49,9 +49,7 @@ def refresh(root, today=None):
         staged = Path(temp)/'history.csv.gz'
         history.to_csv(staged, index=False, compression='gzip')
         meta.update(history_rows=len(history), history_last_date=latest,
-                    identities={str(int(k)): int(v) for k, v in sorted(identities.items())},
-                    identity_merges=(meta.get('identity_merges') or [])+merges,
-                    refreshed_at=pd.Timestamp.now(tz='UTC').isoformat())
+                    identity_merges=merges, refreshed_at=pd.Timestamp.now(tz='UTC').isoformat())
         meta['files']['history.csv.gz'] = digest(staged)
         manifest = Path(temp)/'metadata.json'
         manifest.write_text(json.dumps(meta, indent=2, ensure_ascii=False, allow_nan=False)+'\n')
