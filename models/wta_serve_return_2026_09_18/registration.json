@@ -1,0 +1,11 @@
+{
+  "protocol_sha256": "66d3151233f1e8c31d62886dad02c18c1c5157ca0d3d07cc826df347a5167299",
+  "implementations": {
+    "src/backtesting/wta_serve_return.py": "7e77134c733ba166b1c423208fcaef7f97094357e002a482ca6e3a45535073bc",
+    "scripts/run_wta_serve_return.py": "54c354c955ce3c26db75ea4535f22f5cff2e590d57b6fee90228f91bdfc828d9",
+    "src/backtesting/football_cross_market.py": "bde52e83e14adebc5ad54417f6df836f1d0cb12857fbb313ddeb4607267d73e0",
+    "src/backtesting/wta_price_residual.py": "5791222142bbbcf3261d7aea8b32cfef2f693f3fca4aaa34b06d958561eb433b",
+    "src/backtesting/wta_single_book.py": "01858d5434d97706d2f374ca7549ed9e52eb9a49a1e57cafd39077c98bb4bed5"
+  },
+  "before_new_returns": true
+}

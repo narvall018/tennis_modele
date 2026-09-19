@@ -1,0 +1,112 @@
+{
+  "study": "wta_serve_return_2026_09_18",
+  "registered_at": "2026-09-18T09:14:49.863479+00:00",
+  "sources": {
+    "data/wta_tennis.csv": "fc5e5009e9abf620d8f44e7fa30ff44629df2e4b5d09dcc2d3e1a8abb03ac02c",
+    "data/raw/tennis_mylife/wta_matches_2000_current.csv.gz": "a4ac8c0904b024cc007887c691f050a7ac1aaab6c73d8e1e3eac6108f50628a5"
+  },
+  "hypothesis": "Prior service and return point success, globally and by surface, may add information to single-book calibration beyond earlier win/loss form models.",
+  "candidates": [
+    "price_control",
+    "serve_global",
+    "serve_surface"
+  ],
+  "match_columns": [
+    "Date",
+    "Tournament",
+    "Series",
+    "Surface",
+    "Best of",
+    "Round",
+    "Player_1",
+    "Player_2",
+    "Winner",
+    "Status",
+    "B365_1",
+    "B365_2"
+  ],
+  "statistics_columns": [
+    "tourney_date",
+    "tourney_id",
+    "match_num",
+    "surface",
+    "best_of",
+    "score",
+    "winner_id",
+    "loser_id",
+    "winner_name",
+    "loser_name",
+    "w_svpt",
+    "w_1stIn",
+    "w_1stWon",
+    "w_2ndWon",
+    "l_svpt",
+    "l_1stIn",
+    "l_1stWon",
+    "l_2ndWon"
+  ],
+  "stats_first_year": 2007,
+  "match_first_year": 2010,
+  "tuning_years": [
+    2021,
+    2022
+  ],
+  "evaluation_years": [
+    2023,
+    2024,
+    2025
+  ],
+  "fit": "Annual expanding history, dates strictly before January1 minus7days. Symmetric ridge logistic correction to same-book market; scaling learned on training only.",
+  "embargo_days": 7,
+  "penalty": 0.01,
+  "min_train": 3000,
+  "statistics_delay_days": 28,
+  "statistics_lookback_days": 365,
+  "half_life_days": 180.0,
+  "prior_points": 500.0,
+  "serve_prior": 0.6,
+  "return_prior": 0.4,
+  "minimum_history_matches": 5,
+  "stats_timing": "A statistic enters only when tournament_start+28days is STRICTLY before prediction date; retain starts within last365days. No intra-tournament updates. Conservative availability assumption, not verified publication timestamps.",
+  "stats_validation": "Only best_of3, known surface, no retirement/walkover/unfinished score, finite integer service counts: 0<=firstWon<=firstIn<=servicePoints, 0<=secondWon<=servicePoints-firstIn. Both players required.",
+  "identity": "No outcome-based match join. Registry of IDs from delayed prior records only. Full-name surname suffixes plus first initial compared to complete abbreviated surname and first initial. Reject keys with zero or multiple historical IDs, or both participants mapped to same ID. No fuzzy similarity or future registry.",
+  "predictors": "Control: same-book logit, signed-quadratic logit, logit*overround. Global adds differences of smoothed service logit, return logit, log1p point count. Surface adds same three on current surface; missing surface history uses fixed priors. All three evaluated on identical past-history eligible population. No current ranking.",
+  "market": "Historical B365_1/B365_2 only. This is the execution-price input, not a required external reference bookmaker. French substitution remains unvalidated.",
+  "selection": {
+    "minimum_ev_after_haircut": 0.03,
+    "profit_haircut": 0.02,
+    "odds_min": 1.3,
+    "odds_max": 5.0,
+    "flat_fraction": 0.0025,
+    "maximum_daily_exposure": 0.02,
+    "sensitivity_haircuts": [
+      0.0,
+      0.02,
+      0.05
+    ]
+  },
+  "staking": "Separate1000 initial bankroll per candidate/period; .25% day-start, 2% daily cap, floor cents, no intraday reinvestment, deterministic date/tournament/name order.",
+  "settlement": "Completed pays winner; retired/walkover/cancelled/defaulted/unfinished/unknown assumed void, included in quota. Actual bookmaker retirement rules not verified.",
+  "choice": "Highest tuning95% lower among >=50settled, declaration order breaks ties. Admit only positive tuningROI and lower; persist lock before diagnostic evaluation.",
+  "uncertainty": {
+    "samples": 100000,
+    "seed": 20260918,
+    "family_size": 3,
+    "lower_quantile_per_candidate": 0.016666666666666666,
+    "scope": "Only three variants, not all previous adaptive research; circular3month blocks."
+  },
+  "gate": "Chosen and admitted at tuning, >=200settled, positiveROI2/5%, familylower>0, >=2positiveyears, positiveROIwithoutbestyear. No real-money deployment even if passed.",
+  "evidence": "EXPLORATORY_REUSED_HISTORY_NOT_INDEPENDENT_VALIDATION",
+  "no_2026_fitting_or_evaluation": true,
+  "ufc_reserve": "NOT OPENED",
+  "real_money_authorised": false,
+  "app_modified": false,
+  "limitations": [
+    "Historical years repeatedly explored; not an independent holdout.",
+    "No verified historical publication time or French accepted odds.",
+    "Delayed name registry can miss aliases or unresolved real-world homonyms.",
+    "Service/return rates not opponent-adjusted; surface samples may be sparse.",
+    "Fixed smoothing and 28day delay are modelling assumptions, not optimised findings.",
+    "No data update, live integration, automatic schedule or actual bet."
+  ]
+}

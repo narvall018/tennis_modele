@@ -62,3 +62,5 @@ bets/tennis_strategy.sqlite3*
 !models/wta_live_strategy/history.csv.gz
 bets/wta_strategy.sqlite3*
 bets/atp_reference_price.sqlite3*
+!models/wta_kernel_strategy/history.csv.gz
+bets/wta_kernel_strategy.sqlite3*

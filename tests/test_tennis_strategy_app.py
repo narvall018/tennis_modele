@@ -191,7 +191,8 @@ def test_reference_section_replaces_old_model_without_changing_legacy_prediction
     assert '"Stratégie ATP"' in source
     assert 'render_atp_reference_page(PROJECT_ROOT' in source
     assert 'render_tennis_strategy_page(PROJECT_ROOT' not in source
-    assert '"Stratégie WTA"' not in source
+    assert 'render_wta_kernel_page(PROJECT_ROOT' in source
+    assert 'render_wta_strategy_page(PROJECT_ROOT' not in source
 
 
 def test_concurrent_records_cannot_exceed_daily_budget(tmp_path):

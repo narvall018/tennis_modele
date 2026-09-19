@@ -1,0 +1,93 @@
+{
+  "strategy_id": "wta_kernel_flexible_paper_v1",
+  "candidate": "kernel_flexible",
+  "model_year": 2026,
+  "generated_at": "2026-09-19T16:34:19.833083+00:00",
+  "features": [
+    "market_logit",
+    "market_curve",
+    "market_margin",
+    "global_serve",
+    "global_return",
+    "global_volume",
+    "surface_serve",
+    "surface_return",
+    "surface_volume",
+    "is_hard",
+    "is_clay",
+    "is_grass",
+    "log_min_history",
+    "log_mean_history"
+  ],
+  "training_rows": 9001,
+  "training_max_date": "2025-11-08",
+  "training_cutoff_exclusive": "2025-12-25",
+  "research_protocol_sha256": "2c33491aca1d4f5abd2f4dbd50ce9f8c91d65fbd6a9773e21f175dc59b91d0e8",
+  "history_rows": 52691,
+  "history_last_date": "2026-08-30",
+  "history_source_sha256": "a4ac8c0904b024cc007887c691f050a7ac1aaab6c73d8e1e3eac6108f50628a5",
+  "files": {
+    "model.npz": "9bc2283b70ed1f4e01fd188c39e897cba8299e0d0fd2fa1953a2588b29533780",
+    "history.csv.gz": "06f811970aff5689ba27a651812d7a63f73d85a5ef5685cc38f99b9b168e0c0d"
+  },
+  "evidence": {
+    "matches": 5460,
+    "selections": 120,
+    "settled": 110,
+    "void": 10,
+    "roi": {
+      "0.0": 0.20325824638031953,
+      "0.02": 0.19028466302931588,
+      "0.05": 0.1708242880028103
+    },
+    "uncertainty": {
+      "ci95": [
+        -0.026947561728942165,
+        0.38416120355733197
+      ],
+      "family_lower": -0.07706057212253152,
+      "months": 35
+    },
+    "yearly": {
+      "2023": {
+        "settled": 27,
+        "roi": 0.004774914378633947,
+        "profit_fraction": 0.0003216486768259563
+      },
+      "2024": {
+        "settled": 28,
+        "roi": 0.060598382971874934,
+        "profit_fraction": 0.0042339072614262455
+      },
+      "2025": {
+        "settled": 55,
+        "roi": 0.34734826457250223,
+        "profit_fraction": 0.04767426970306645
+      }
+    },
+    "bankroll": {
+      "final_bankroll": 1053.16,
+      "maximum_drawdown": 0.012543312543312535,
+      "skipped_daily_budget": 0,
+      "theoretical_signals": 120
+    },
+    "best_year": "2025",
+    "roi_without_best_year": 0.033196378855996224,
+    "model_log_loss": 0.5983543912830332,
+    "market_log_loss": 0.5992293370293452,
+    "cash_roi_2pct": 0.17600317838696863,
+    "checks": {
+      "tuning_admitted": false,
+      "200_settled": false,
+      "positive_roi_2pct": true,
+      "positive_roi_5pct": true,
+      "positive_family_lower": false,
+      "two_positive_years": true,
+      "positive_without_best_year": true
+    },
+    "nominal_historical_gate_passed": false,
+    "real_money_authorised": false
+  },
+  "prospective_selection": "USER_REQUEST_AFTER_EXPLORATORY_DIAGNOSTIC_NOT_TUNING_ADMITTED",
+  "real_money_authorised": false
+}

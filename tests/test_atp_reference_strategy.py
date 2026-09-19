@@ -122,9 +122,10 @@ def test_new_backup_identity_cannot_mix_with_old_atp(tmp_path):
     assert ledger.state(tmp_path/'restored.sqlite3', 'v', NOW)['reserved_cents'] == 250
 
 
-def test_nav_replaces_old_page_and_removes_wta_section():
+def test_nav_retains_atp_and_replaces_old_wta_with_kernel():
     from pathlib import Path
     source = (Path(__file__).resolve().parents[1]/'unified_app.py').read_text()
-    assert '"Stratégie WTA"' not in source
+    assert 'from src.app.wta_kernel_page import render_wta_kernel_page' in source
+    assert 'from src.app.wta_strategy_page import render_wta_strategy_page' not in source
     assert 'from src.app.atp_reference_page import render_atp_reference_page' in source
     assert 'from src.app.tennis_strategy_page import render_tennis_strategy_page' not in source

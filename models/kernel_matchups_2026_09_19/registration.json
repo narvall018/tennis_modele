@@ -1,0 +1,16 @@
+{
+  "protocol_sha256": "2c33491aca1d4f5abd2f4dbd50ce9f8c91d65fbd6a9773e21f175dc59b91d0e8",
+  "implementations": {
+    "src/backtesting/kernel_matchups.py": "3bde1c2f01d01404389d6e91d4056e241b189fd5712e23514d8927194d132e29",
+    "scripts/run_kernel_matchups.py": "643a8bb13fc34fd1c2e4ecc1bdac06e927f28eccfe2e9f31f4a575966aa81c94",
+    "src/backtesting/football_cross_market.py": "bde52e83e14adebc5ad54417f6df836f1d0cb12857fbb313ddeb4607267d73e0",
+    "src/backtesting/three_sport_residual.py": "4a63b6cdf20a81593db61a6d9df344314f5d1b8875180526379ebc8641b6ecd2",
+    "src/backtesting/wta_serve_return.py": "7e77134c733ba166b1c423208fcaef7f97094357e002a482ca6e3a45535073bc",
+    "src/backtesting/wta_price_residual.py": "5791222142bbbcf3261d7aea8b32cfef2f693f3fca4aaa34b06d958561eb433b",
+    "src/backtesting/wta_single_book.py": "01858d5434d97706d2f374ca7549ed9e52eb9a49a1e57cafd39077c98bb4bed5",
+    "src/features/football_features.py": "13837588bb8ee8583df476a0dbf3ede7cbc4e42983fc6f9e2746c27c43c71184",
+    "models/wta_serve_return_2026_09_18/protocol.json": "66d3151233f1e8c31d62886dad02c18c1c5157ca0d3d07cc826df347a5167299",
+    "models/wta_serve_return_2026_09_18/registration.json": "7b743962bfe2bb4bbeec7b2438994895fa4840331c106c415de1b125bc9af763"
+  },
+  "before_new_returns": true
+}

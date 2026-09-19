@@ -1,0 +1,261 @@
+{
+  "football": {
+    "chosen": "kernel_flexible",
+    "admitted": false,
+    "tuning": {
+      "kernel_flexible": {
+        "matches": 15949,
+        "selections": 879,
+        "settled": 879,
+        "void": 0,
+        "roi": {
+          "0.0": 0.04658638497591029,
+          "0.02": 0.03244360889144633,
+          "0.05": 0.011229444764750381
+        },
+        "uncertainty": {
+          "ci95": [
+            -0.024775769550780417,
+            0.09878070613382961
+          ],
+          "family_lower": -0.03644918315489078,
+          "months": 24
+        },
+        "yearly": {
+          "2021": {
+            "settled": 394,
+            "roi": 0.10930823470012356,
+            "profit_fraction": 0.10720274526815882
+          },
+          "2022": {
+            "settled": 485,
+            "roi": -0.030604116851534403,
+            "profit_fraction": -0.03659232207836562
+          }
+        },
+        "bankroll": {
+          "final_bankroll": 1066.39,
+          "maximum_drawdown": 0.08282862220493192,
+          "skipped_daily_budget": 27,
+          "theoretical_signals": 906
+        },
+        "best_year": "2021",
+        "roi_without_best_year": -0.030604116851534403,
+        "model_log_loss": 1.0017689810504184,
+        "market_log_loss": 1.0025575807430422,
+        "cash_roi_2pct": 0.02857536380970418
+      },
+      "kernel_strong": {
+        "matches": 15949,
+        "selections": 0,
+        "settled": 0,
+        "void": 0,
+        "roi": {
+          "0.0": null,
+          "0.02": null,
+          "0.05": null
+        },
+        "uncertainty": {
+          "ci95": [
+            null,
+            null
+          ],
+          "family_lower": null
+        },
+        "yearly": {},
+        "bankroll": {
+          "final_bankroll": 1000.0,
+          "maximum_drawdown": 0.0,
+          "skipped_daily_budget": 0,
+          "theoretical_signals": 0
+        },
+        "best_year": null,
+        "roi_without_best_year": null,
+        "model_log_loss": 1.0016523116653329,
+        "market_log_loss": 1.0025575807430422,
+        "cash_roi_2pct": null
+      }
+    },
+    "at": "2026-09-19T16:18:17.502068+00:00"
+  },
+  "ufc": {
+    "chosen": "kernel_strong",
+    "admitted": false,
+    "tuning": {
+      "kernel_flexible": {
+        "matches": 1374,
+        "selections": 528,
+        "settled": 528,
+        "void": 0,
+        "roi": {
+          "0.0": -0.01944744839914398,
+          "0.02": -0.029191280820007763,
+          "0.05": -0.043807029451303436
+        },
+        "uncertainty": {
+          "ci95": [
+            -0.08973215734729009,
+            0.032233345702202536
+          ],
+          "family_lower": -0.10266022585596109,
+          "months": 36
+        },
+        "yearly": {
+          "2019": {
+            "settled": 185,
+            "roi": -0.0841521666034021,
+            "profit_fraction": -0.03884553983274231
+          },
+          "2020": {
+            "settled": 144,
+            "roi": -0.05685787156027238,
+            "profit_fraction": -0.02042146765626504
+          },
+          "2021": {
+            "settled": 199,
+            "roi": 0.042279533997573324,
+            "profit_fraction": 0.020886607221546734
+          }
+        },
+        "bankroll": {
+          "final_bankroll": 960.7,
+          "maximum_drawdown": 0.058660000000000045,
+          "skipped_daily_budget": 1,
+          "theoretical_signals": 529
+        },
+        "best_year": "2021",
+        "roi_without_best_year": -0.07220836108512087,
+        "model_log_loss": 0.6267553775045726,
+        "market_log_loss": 0.6248762792824152,
+        "cash_roi_2pct": -0.030966094883896855
+      },
+      "kernel_strong": {
+        "matches": 1374,
+        "selections": 195,
+        "settled": 195,
+        "void": 0,
+        "roi": {
+          "0.0": 0.04549620669968042,
+          "0.02": 0.03525159278207457,
+          "0.05": 0.019884671905665785
+        },
+        "uncertainty": {
+          "ci95": [
+            -0.05497957192702835,
+            0.13158766783152598
+          ],
+          "family_lower": -0.0742984327561567,
+          "months": 36
+        },
+        "yearly": {
+          "2019": {
+            "settled": 61,
+            "roi": 0.06731954990024075,
+            "profit_fraction": 0.01024609846410919
+          },
+          "2020": {
+            "settled": 41,
+            "roi": 0.08270503654171228,
+            "profit_fraction": 0.008459988265774307
+          },
+          "2021": {
+            "settled": 93,
+            "roi": -0.006712512836807253,
+            "profit_fraction": -0.0015571694146717596
+          }
+        },
+        "bankroll": {
+          "final_bankroll": 1016.64,
+          "maximum_drawdown": 0.021593490882964028,
+          "skipped_daily_budget": 0,
+          "theoretical_signals": 195
+        },
+        "best_year": "2019",
+        "roi_without_best_year": 0.020650355242763898,
+        "model_log_loss": 0.6231803848381695,
+        "market_log_loss": 0.6248762792824152,
+        "cash_roi_2pct": 0.03377103078765248
+      }
+    },
+    "at": "2026-09-19T16:18:18.209854+00:00"
+  },
+  "wta": {
+    "chosen": null,
+    "admitted": false,
+    "tuning": {
+      "kernel_flexible": {
+        "matches": 3257,
+        "selections": 47,
+        "settled": 44,
+        "void": 3,
+        "roi": {
+          "0.0": 0.031519149870220475,
+          "0.02": 0.02179912018226125,
+          "0.05": 0.0072190756503223335
+        },
+        "uncertainty": {
+          "ci95": [
+            -0.3567581808335117,
+            0.24743428352567962
+          ],
+          "family_lower": -0.468629956922163,
+          "months": 23
+        },
+        "yearly": {
+          "2021": {
+            "settled": 13,
+            "roi": -0.17285578480038932,
+            "profit_fraction": -0.005605347154992387
+          },
+          "2022": {
+            "settled": 31,
+            "roi": 0.1034224207183859,
+            "profit_fraction": 0.007998057001671121
+          }
+        },
+        "bankroll": {
+          "final_bankroll": 1002.25,
+          "maximum_drawdown": 0.008958677359068967,
+          "skipped_daily_budget": 0,
+          "theoretical_signals": 47
+        },
+        "best_year": "2022",
+        "roi_without_best_year": -0.17285578480038932,
+        "model_log_loss": 0.5923019412003829,
+        "market_log_loss": 0.593763471356444,
+        "cash_roi_2pct": 0.019147306612203242
+      },
+      "kernel_strong": {
+        "matches": 3257,
+        "selections": 0,
+        "settled": 0,
+        "void": 0,
+        "roi": {
+          "0.0": null,
+          "0.02": null,
+          "0.05": null
+        },
+        "uncertainty": {
+          "ci95": [
+            null,
+            null
+          ],
+          "family_lower": null
+        },
+        "yearly": {},
+        "bankroll": {
+          "final_bankroll": 1000.0,
+          "maximum_drawdown": 0.0,
+          "skipped_daily_budget": 0,
+          "theoretical_signals": 0
+        },
+        "best_year": null,
+        "roi_without_best_year": null,
+        "model_log_loss": 0.5925587747853996,
+        "market_log_loss": 0.593763471356444,
+        "cash_roi_2pct": null
+      }
+    },
+    "at": "2026-09-19T16:18:19.141866+00:00"
+  }
+}
