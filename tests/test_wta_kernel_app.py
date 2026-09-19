@@ -133,6 +133,95 @@ def test_research_feature_parity_on_historical_rows():
         np.testing.assert_allclose(live_q, expected_q, atol=1e-12)
 
 
+def feed(rows):
+    """Raw-feed columns the identity table reads, with valid service counts."""
+    return pd.DataFrame([{'tourney_id': r['t'], 'match_num': i, 'tourney_date': r['date'],
+        'surface': 'Hard', 'best_of': 3, 'score': '6-1 6-1',
+        'winner_id': r['wid'], 'loser_id': r['lid'], 'winner_name': r['w'], 'loser_name': r['l'],
+        'winner_age': r.get('w_age'), 'loser_age': r.get('l_age'),
+        'winner_ioc': r.get('w_ioc', 'USA'), 'loser_ioc': r.get('l_ioc', 'USA'),
+        'w_svpt': 60, 'w_1stIn': 40, 'w_1stWon': 38, 'w_2ndWon': 19,
+        'l_svpt': 70, 'l_1stIn': 40, 'l_1stWon': 12, 'l_2ndWon': 8} for i, r in enumerate(rows)])
+
+
+RIVALS = ['Ada Rival', 'Bea Rival', 'Cleo Rival', 'Dana Rival', 'Elsa Rival', 'Fay Rival', 'Gia Rival']
+
+
+def published_age(date, born):
+    """The feed publishes age in years to three decimals; invert it as it does."""
+    return round((pd.Timestamp(str(date))-pd.Timestamp(born)).days/365.2425, 3)
+
+
+def test_identity_map_merges_reissued_id_but_never_namesakes_or_co_entrants():
+    born = '2008-01-06'
+    reissued = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Iva Jović',
+                      'l': RIVALS[0], 'w_age': published_age(20260105, born)},
+                     {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Iva Jovic',
+                      'l': RIVALS[1], 'w_age': published_age(20260608, born)}])
+    mapping, merges = engine.identity_map(reissued)
+    assert mapping == {77.: 10.} and merges[0]['name'] == 'iva jovic' and merges[0]['merged_rows'] == 1
+    # A namesake born five years apart is a different woman.
+    namesakes = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Anna Namesake',
+                       'l': RIVALS[0], 'w_age': published_age(20260105, born)},
+                      {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Anna Namesake',
+                       'l': RIVALS[1], 'w_age': published_age(20260608, '2003-01-06')}])
+    assert engine.identity_map(namesakes) == ({}, [])
+    # Two ids in one draw are two entrants, whatever the ages say.
+    co_entrants = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Anna Namesake',
+                         'l': RIVALS[0], 'w_age': published_age(20260105, born)},
+                        {'t': 'a', 'date': 20260105, 'wid': 77, 'lid': 98, 'w': 'Anna Namesake',
+                         'l': RIVALS[1], 'w_age': published_age(20260105, born)}])
+    assert engine.identity_map(co_entrants) == ({}, [])
+    # A corrupt age carries no evidence, so nationality decides; the feed really ships 2808.
+    ages = feed([{'t': 'a', 'date': 20260105, 'wid': 10, 'lid': 99, 'w': 'Lea Blank', 'l': RIVALS[0], 'w_ioc': 'FRA'},
+                 {'t': 'b', 'date': 20260608, 'wid': 77, 'lid': 98, 'w': 'Lea Blank', 'l': RIVALS[1],
+                  'w_age': 2808.0, 'w_ioc': 'FRA'}])
+    assert engine.identity_map(ages)[0] == {77.: 10.}
+    foreign = ages.copy(); foreign.loc[1, 'winner_ioc'] = 'JPN'
+    assert engine.identity_map(foreign) == ({}, [])
+    # Neither age nor nationality: an absence of evidence is not evidence of sameness.
+    blind = ages.copy(); blind['winner_ioc'] = ''
+    assert engine.identity_map(blind) == ({}, [])
+
+
+def test_identity_table_survives_a_partial_feed_and_repairs_split_profiles():
+    # The canonical id sits in an earlier season; this year the re-issued id leads on count.
+    born = '2005-01-06'
+    old = feed([{'t': f'o{i}', 'date': 20250105+i, 'wid': 10, 'lid': 90, 'w': 'Robin Split',
+                 'l': RIVALS[0], 'w_age': published_age(20250105+i, born)} for i in range(7)])
+    new = feed([{'t': f'n{i}', 'date': 20260105+i, 'wid': 77, 'lid': 90, 'w': 'Robin Split',
+                 'l': RIVALS[0], 'w_age': published_age(20260105+i, born)} for i in range(5)])
+    whole = pd.concat([old, new], ignore_index=True)
+    assert engine.identity_map(whole)[0] == {77.: 10.}, 'the full feed must elect the long-standing id'
+    assert engine.identity_map(new)[0] == {}, 'this year alone cannot see the canonical id'
+    # Seeding with the frozen table stops the partial feed electing the re-issued id.
+    assert engine.identity_map(new, {'77': 10})[0] == {77.: 10.}
+    history = engine.prepare_history(whole, pd.Timestamp('2026-09-19').date(), {77.: 10.})
+    assert set(history.winner_id) == {10.}, 'both spells belong to one player'
+    # Split across two ids she is unresolvable; merged, both spells feed one profile.
+    split = engine.prepare_history(whole, pd.Timestamp('2026-09-19').date())
+    for prefix in ['winner', 'loser']:
+        for frame in [history, split]: frame['_'+prefix+'_key'] = frame[prefix+'_name'].map(engine.name_key)
+    f = {'player_1': 'Robin Split', 'player_2': RIVALS[0], 'surface': 'Hard',
+         'start': '2026-09-19T12:00:00+00:00', 'odds_1': 1.9, 'odds_2': 1.9}
+    now = pd.Timestamp('2026-09-19T08:00:00Z')
+    with pytest.raises(ValueError, match='ambiguë'): engine.fixture_inputs(split, f, now)
+    assert engine.fixture_inputs(history, f, now)[2][0] == 10.
+
+
+def test_shipped_history_leaves_no_player_split_across_two_ids():
+    root = Path(__file__).resolve().parents[1]
+    meta, history, _ = engine.load_bundle(root)
+    seen = {}
+    for prefix in ['winner', 'loser']:
+        for key, identity in zip(history['_'+prefix+'_key'], history[prefix+'_id']):
+            seen.setdefault(key, set()).add(identity)
+    assert not {k: v for k, v in seen.items() if len(v) > 1}
+    assert meta['identities'], 'the merge table must ship with the bundle'
+    merged = {float(k) for k in meta['identities']}
+    assert not merged & {i for v in seen.values() for i in v}, 'a merged id must not survive in the history'
+
+
 def test_refresh_preserves_model_and_refuses_missing_history(tmp_path, monkeypatch):
     from src.app import wta_kernel_refresh as refresh
     now = pd.Timestamp('2026-09-19T10:00:00Z'); bundle = make_bundle(tmp_path, now)
@@ -152,3 +241,30 @@ def test_refresh_preserves_model_and_refuses_missing_history(tmp_path, monkeypat
     source['raw'] = raw.iloc[1:]
     with pytest.raises(ValueError, match='incomplet'): refresh.refresh(tmp_path, now.date())
     assert engine.digest(manifest) == before_manifest
+
+
+def test_refresh_merges_a_newly_reissued_id_and_carries_the_table_forward(tmp_path, monkeypatch):
+    from src.app import wta_kernel_refresh as refresh
+    now = pd.Timestamp('2026-09-19T10:00:00Z'); day = now.tz_convert('Europe/Paris').tz_localize(None).normalize()
+    bundle = make_bundle(tmp_path, now)
+    raw = bundle[1].rename(columns={'_start': 'tourney_date', 'w_points': 'w_svpt', 'l_points': 'l_svpt'}).copy()
+    raw['tourney_date'] = raw.tourney_date.dt.strftime('%Y%m%d').astype(int)
+    raw['best_of'], raw['score'] = 3, '6-1 6-1'
+    for side in ['w', 'l']:
+        raw[side+'_1stIn'] = raw[side+'_svpt']
+        raw[side+'_1stWon'] = raw[side+'_won']; raw[side+'_2ndWon'] = 0
+    born = '2000-02-01'
+    raw['winner_age'] = [published_age(d, born) for d in raw.tourney_date]
+    raw['loser_age'], raw['winner_ioc'], raw['loser_ioc'] = 30., 'USA', 'USA'
+    # The provider re-issues Alice under a fresh id for one later tournament.
+    reissued = raw.iloc[[0]].copy()
+    reissued['tourney_id'], reissued['match_num'], reissued['winner_id'] = 'reissue', 90, 555
+    reissued['tourney_date'] = int((day-pd.Timedelta(days=30)).strftime('%Y%m%d'))
+    reissued['winner_age'] = published_age(reissued.tourney_date.iloc[0], born)
+    monkeypatch.setattr(refresh, 'fetch_wta_matches',
+                        lambda *_: (pd.concat([raw, reissued], ignore_index=True), None, {'missing_files': []}))
+    refresh.refresh(tmp_path, now.date())
+    meta, history, _ = engine.load_bundle(tmp_path)
+    assert meta['identities'] == {'555': 1} and meta['identity_merges'][0]['name'] == 'alice alpha'
+    assert set(history.winner_id) == {1.}, 'the re-issued id must not survive the refresh'
+    assert engine.fixture_inputs(history, fixture(now), now)[2] == [1., 2.]

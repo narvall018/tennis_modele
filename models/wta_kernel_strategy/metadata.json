@@ -2,7 +2,7 @@
   "strategy_id": "wta_kernel_flexible_paper_v1",
   "candidate": "kernel_flexible",
   "model_year": 2026,
-  "generated_at": "2026-09-19T16:34:19.833083+00:00",
+  "generated_at": "2026-09-19T17:01:57.839565+00:00",
   "features": [
     "market_logit",
     "market_curve",
@@ -26,9 +26,398 @@
   "history_rows": 52691,
   "history_last_date": "2026-08-30",
   "history_source_sha256": "a4ac8c0904b024cc007887c691f050a7ac1aaab6c73d8e1e3eac6108f50628a5",
+  "identities": {
+    "200035": 201533,
+    "223168": 269265,
+    "259733": 269267,
+    "310440": 213583,
+    "310926": 201696,
+    "311779": 201533,
+    "312469": 201514,
+    "313169": 201593,
+    "313974": 201662,
+    "315130": 202663,
+    "315232": 201548,
+    "318314": 206252,
+    "318516": 202499,
+    "319007": 206420,
+    "319125": 211107,
+    "319489": 211279,
+    "319571": 211337,
+    "320124": 211651,
+    "320319": 211713,
+    "320408": 211817,
+    "320716": 213887,
+    "320983": 213631,
+    "321179": 213666,
+    "321454": 213889,
+    "322082": 214082,
+    "322222": 214643,
+    "324166": 214981,
+    "324261": 215035,
+    "324267": 215020,
+    "324479": 215936,
+    "324898": 215480,
+    "325410": 215613,
+    "325725": 216083,
+    "325936": 215872,
+    "325956": 215910,
+    "326384": 216153,
+    "326678": 220520,
+    "326735": 220367,
+    "326907": 220309,
+    "327391": 220465,
+    "327845": 220750,
+    "328120": 221012,
+    "328366": 221054,
+    "328884": 222391,
+    "328897": 221236,
+    "329081": 221333,
+    "329408": 221905,
+    "329505": 222045,
+    "329512": 222034,
+    "330332": 223253,
+    "330364": 223360,
+    "331006": 239475,
+    "331102": 243420,
+    "332285": 260300,
+    "333132": 261963
+  },
+  "identity_merges": [
+    {
+      "name": "ajla tomljanovic",
+      "canonical_id": 201548.0,
+      "merged_id": 315232.0,
+      "merged_rows": 4
+    },
+    {
+      "name": "alexandra eala",
+      "canonical_id": 223253.0,
+      "merged_id": 330332.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "amanda anisimova",
+      "canonical_id": 216153.0,
+      "merged_id": 326384.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "anna blinkova",
+      "canonical_id": 215020.0,
+      "merged_id": 324267.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "antonia ruzic",
+      "canonical_id": 222045.0,
+      "merged_id": 329505.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "barbora krejcikova",
+      "canonical_id": 206252.0,
+      "merged_id": 318314.0,
+      "merged_rows": 5
+    },
+    {
+      "name": "caty mcnally",
+      "canonical_id": 216083.0,
+      "merged_id": 325725.0,
+      "merged_rows": 3
+    },
+    {
+      "name": "daria kasatkina",
+      "canonical_id": 214082.0,
+      "merged_id": 322082.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "daria snigur",
+      "canonical_id": 220750.0,
+      "merged_id": 327845.0,
+      "merged_rows": 3
+    },
+    {
+      "name": "dayana yastremska",
+      "canonical_id": 215035.0,
+      "merged_id": 324261.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "donna vekic",
+      "canonical_id": 202499.0,
+      "merged_id": 318516.0,
+      "merged_rows": 5
+    },
+    {
+      "name": "ekaterina alexandrova",
+      "canonical_id": 206420.0,
+      "merged_id": 319007.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "elena gabriela ruse",
+      "canonical_id": 211817.0,
+      "merged_id": 320408.0,
+      "merged_rows": 3
+    },
+    {
+      "name": "elena rybakina",
+      "canonical_id": 214981.0,
+      "merged_id": 324166.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "emma navarro",
+      "canonical_id": 215613.0,
+      "merged_id": 325410.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "emma raducanu",
+      "canonical_id": 221054.0,
+      "merged_id": 328366.0,
+      "merged_rows": 5
+    },
+    {
+      "name": "francesca jones",
+      "canonical_id": 215936.0,
+      "merged_id": 324479.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "greet minnen",
+      "canonical_id": 213889.0,
+      "merged_id": 321454.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "hanne vandewinkel",
+      "canonical_id": 243420.0,
+      "merged_id": 331102.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "harriet dart",
+      "canonical_id": 211279.0,
+      "merged_id": 319489.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "irina camelia begu",
+      "canonical_id": 201593.0,
+      "merged_id": 313169.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "iva jovic",
+      "canonical_id": 260300.0,
+      "merged_id": 332285.0,
+      "merged_rows": 4
+    },
+    {
+      "name": "jaqueline cristian",
+      "canonical_id": 211713.0,
+      "merged_id": 320319.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "kaitlin quevedo",
+      "canonical_id": 269267.0,
+      "merged_id": 259733.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "kamilla rakhimova",
+      "canonical_id": 215872.0,
+      "merged_id": 325936.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "karolina pliskova",
+      "canonical_id": 201662.0,
+      "merged_id": 313974.0,
+      "merged_rows": 3
+    },
+    {
+      "name": "katie boulter",
+      "canonical_id": 211107.0,
+      "merged_id": 319125.0,
+      "merged_rows": 4
+    },
+    {
+      "name": "katie volynets",
+      "canonical_id": 220465.0,
+      "merged_id": 327391.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "laura siegemund",
+      "canonical_id": 201696.0,
+      "merged_id": 310926.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "leylah fernandez",
+      "canonical_id": 220367.0,
+      "merged_id": 326735.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "liudmila samsonova",
+      "canonical_id": 214643.0,
+      "merged_id": 322222.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "lois boisson",
+      "canonical_id": 222391.0,
+      "merged_id": 328884.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "maddison inglis",
+      "canonical_id": 213666.0,
+      "merged_id": 321179.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "magda linette",
+      "canonical_id": 202663.0,
+      "merged_id": 315130.0,
+      "merged_rows": 4
+    },
+    {
+      "name": "marie bouzkova",
+      "canonical_id": 213631.0,
+      "merged_id": 320983.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "mary stoiana",
+      "canonical_id": 269265.0,
+      "merged_id": 223168.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "mccartney kessler",
+      "canonical_id": 220520.0,
+      "merged_id": 326678.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "mika stojsavljevic",
+      "canonical_id": 261963.0,
+      "merged_id": 333132.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "nikola bartunkova",
+      "canonical_id": 223360.0,
+      "merged_id": 330364.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "panna udvardy",
+      "canonical_id": 215910.0,
+      "merged_id": 325956.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "paula badosa",
+      "canonical_id": 211651.0,
+      "merged_id": 320124.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "polina kudermetova",
+      "canonical_id": 221236.0,
+      "merged_id": 328897.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "qinwen zheng",
+      "canonical_id": 221012.0,
+      "merged_id": 328120.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "reese brantmeier",
+      "canonical_id": 222034.0,
+      "merged_id": 329512.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "renata zarazua",
+      "canonical_id": 213887.0,
+      "merged_id": 320716.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "robin montgomery",
+      "canonical_id": 221905.0,
+      "merged_id": 329408.0,
+      "merged_rows": 5
+    },
+    {
+      "name": "shuai zhang",
+      "canonical_id": 201533.0,
+      "merged_id": 200035.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "shuai zhang",
+      "canonical_id": 201533.0,
+      "merged_id": 311779.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "solana sierra",
+      "canonical_id": 221333.0,
+      "merged_id": 329081.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "sorana cirstea",
+      "canonical_id": 201514.0,
+      "merged_id": 312469.0,
+      "merged_rows": 2
+    },
+    {
+      "name": "suzan lamens",
+      "canonical_id": 215480.0,
+      "merged_id": 324898.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "tamara korpatsch",
+      "canonical_id": 211337.0,
+      "merged_id": 319571.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "tatjana maria",
+      "canonical_id": 213583.0,
+      "merged_id": 310440.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "victoria mboko",
+      "canonical_id": 239475.0,
+      "merged_id": 331006.0,
+      "merged_rows": 1
+    },
+    {
+      "name": "zeynep sonmez",
+      "canonical_id": 220309.0,
+      "merged_id": 326907.0,
+      "merged_rows": 3
+    }
+  ],
   "files": {
-    "model.npz": "9bc2283b70ed1f4e01fd188c39e897cba8299e0d0fd2fa1953a2588b29533780",
-    "history.csv.gz": "06f811970aff5689ba27a651812d7a63f73d85a5ef5685cc38f99b9b168e0c0d"
+    "model.npz": "4c79f1e40be927745beb5de96cec68dc75b4c98adfc076cf4b6e45751841d82c",
+    "history.csv.gz": "bb0a9d9f22641c99197590abecfe041d949830b7b78d33bc2eeb95ca9dbfebea"
   },
   "evidence": {
     "matches": 5460,

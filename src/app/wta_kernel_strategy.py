@@ -29,9 +29,60 @@ def name_key(name):
     return ' '.join(re.findall('[a-z]+', ''.join(c for c in plain if not unicodedata.combining(c)).lower()))
 
 
-def prepare_history(raw, today):
+def identity_map(raw, previous=None):
+    """Merge upstream duplicate player ids.
+
+    The feed occasionally issues a fresh id for a player already present, which splits
+    her record and hides her from `fixture_inputs`. Two ids are the same woman only on
+    positive evidence: the same normalised name plus a birth date implied by the
+    published age. Ids that entered the same draw are two entrants, never merged, which
+    also covers same-name opponents. `previous` seeds the table so that a partial feed
+    cannot outvote a canonical id it does not contain."""
+    mapping = {float(k): float(v) for k, v in (previous or {}).items()}
+    start = pd.to_datetime(raw.tourney_date.astype(str), format='%Y%m%d', errors='coerce')
+    missing = pd.Series(np.nan, index=raw.index)
+    parts = []
+    for side in ['winner', 'loser']:
+        age = pd.to_numeric(raw[side+'_age'], errors='coerce') if side+'_age' in raw else missing
+        identity = pd.to_numeric(raw[side+'_id'], errors='coerce')
+        # A published age outside a plausible playing range is a corrupt field, not evidence.
+        days = (age.where(age.between(10, 60))*365.2425).to_numpy(float)
+        known = np.isfinite(days)
+        parts.append(pd.DataFrame({'pid': identity.map(lambda i: mapping.get(i, i)),
+            'key': raw[side+'_name'].map(name_key), 'tourney': raw.tourney_id.astype(str),
+            'ioc': raw[side+'_ioc'].astype(str).str.strip() if side+'_ioc' in raw else missing,
+            'dob': (start-pd.to_timedelta(np.where(known, days, 0.), unit='D')).where(known)}))
+    long = pd.concat(parts, ignore_index=True).dropna(subset=['pid', 'key'])
+    merges = []
+    for key, part in long.groupby('key'):
+        if part.pid.nunique() < 2 or part.groupby('tourney').pid.nunique().gt(1).any(): continue
+        codes = part.groupby('pid').ioc.agg(lambda s: set(s.dropna()) - {'', 'nan'})
+        stats = part.groupby('pid').agg(rows=('pid', 'size'), dob=('dob', 'median'))
+        stats = stats.join(codes).sort_values('rows', ascending=False, kind='stable')
+        head = stats.iloc[0]; canonical = float(stats.index[0])
+        for pid, row in stats.iloc[1:].iterrows():
+            if pd.notna(row.dob) and pd.notna(head.dob):
+                # A real namesake is a different person with a different birth date.
+                same = abs((row.dob-head.dob).days) <= 3
+            else:  # No age published: fall back to nationality, which may legally change.
+                same = bool(row.ioc & head.ioc)  # No evidence at all is not evidence of sameness.
+            if not same: continue
+            mapping[float(pid)] = canonical
+            merges.append({'name': key, 'canonical_id': canonical, 'merged_id': float(pid),
+                           'merged_rows': int(row.rows)})
+    for pid in list(mapping):  # Collapse chains left by an earlier table.
+        seen = {pid}
+        while mapping.get(mapping[pid], mapping[pid]) != mapping[pid] and mapping[pid] not in seen:
+            seen.add(mapping[pid]); mapping[pid] = mapping[mapping[pid]]
+    return mapping, merges
+
+
+def prepare_history(raw, today, identities=None):
     """Validate service counts; retain invalid-stat records only as identity evidence."""
     rows = raw.copy()
+    if identities:  # Collapse ids the feed re-issued for a player already present.
+        for side in ['winner', 'loser']:
+            rows[side+'_id'] = pd.to_numeric(rows[side+'_id'], errors='coerce').map(lambda i: identities.get(i, i))
     rows['_start'] = pd.to_datetime(rows.tourney_date.astype(str), format='%Y%m%d', errors='raise')
     rows = rows[rows._start.between(pd.Timestamp('2007-01-01'), pd.Timestamp(today))].copy()
     if rows.duplicated(['tourney_id', 'match_num']).any(): raise ValueError('Statistiques dupliquées.')
@@ -127,7 +178,10 @@ def fixture_inputs(history, f, now=None):
         for prefix in ['winner', 'loser']:
             keys = past['_'+prefix+'_key'] if '_'+prefix+'_key' in past else past[prefix+'_name'].map(name_key)
             ids.update(past.loc[keys.eq(name_key(player)), prefix+'_id'].tolist())
-        if len(ids) != 1: raise ValueError(f'Identité absente ou ambiguë dans les données antérieures : {player}.')
+        if not ids: raise ValueError(f'Aucun match antérieur pour cette joueuse : {player}.')
+        if len(ids) > 1:
+            raise ValueError(f'Identité ambiguë : {player} porte {len(ids)} identifiants distincts '
+                             'dans les données antérieures (homonymes ou anomalie du fournisseur).')
         identities.append(next(iter(ids)))
     if identities[0] == identities[1]: raise ValueError('Les deux noms désignent la même joueuse.')
     recent = past[past._valid & past._start.ge(day-pd.Timedelta(days=365))]
