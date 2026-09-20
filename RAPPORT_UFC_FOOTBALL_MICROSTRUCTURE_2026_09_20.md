@@ -198,3 +198,101 @@ parce que ce lieu le price déjà.
 
 C'est une réponse plus forte que « la marge est trop élevée » : même en supprimant la
 marge, **il n'y a rien à prendre**.
+
+---
+
+# Addendum 2 — quatre approches structurellement différentes
+
+Après l'échec de la piste exchange, quatre questions que je n'avais jamais posées. Toutes
+sur données de développement 2012-2023 ; le holdout reste fermé.
+
+## 1. Sharp contre soft : parier B365 quand Pinnacle dit que le prix est généreux
+
+| Filtre | n | ROI | IC95 hebdo |
+|---|---|---|---|
+| Aucun (contrôle) | 113 763 | **−7,13 %** | — |
+| EV ≥ 0 % | 6 687 | +0,10 % | [−4,34 %, +4,49 %] |
+| EV ≥ 1 % | 4 437 | +0,75 % | [−4,71 %, +6,42 %] |
+| EV ≥ 5 % | 1 048 | +2,87 % | [−11,60 %, +18,92 %] |
+
+Le filtre fonctionne : il enlève les 7 points de marge. **Mais il s'arrête à zéro.**
+
+Et il ne détecte jamais de valeur sur cote courte : **1,0 %** seulement des paris retenus
+sont sous 2,00. La valeur est entièrement sur cote 3 à 7, donc variance énorme et
+intervalles inutilisables. Par bande, le meilleur est cote 3,2–5,0 : +1,94 %,
+IC95 [−3,44 %, +7,23 %], sur n=3 964.
+
+## 2. Le marché asiatique comme modèle du 1X2
+
+Jamais tenté : l'étude cross-market utilisait le handicap comme **covariable**, sans
+interpréter ses prix comme des probabilités. Ici je les inverse structurellement.
+
+Totaux 2,5 → μ par inversion de Poisson. Handicap (demi-lignes seules, sémantique exacte)
+→ suprématie par inversion de Skellam. Puis 1X2 par Skellam. 8 618 matchs, 100 %
+d'inversions réussies.
+
+| Source du 1X2 | log-loss |
+|---|---|
+| Dérivé du marché asiatique | 0,98317 |
+| Coté B365 | 0,98264 |
+| Coté Pinnacle | 0,98094 |
+
+| Comparaison appariée | gain | t |
+|---|---|---|
+| vs B365 | −0,00054 | **−0,92** |
+| vs Pinnacle | −0,00223 | −3,75 |
+
+Le dérivé est **indiscernable du 1X2 coté de B365** et significativement moins bon que
+Pinnacle. B365 price son 1X2 de façon cohérente avec son handicap et ses totaux : aucune
+incohérence inter-marchés à exploiter.
+
+## 3. Fatigue et calendrier
+
+Un descripteur de *programme*, pas de qualité d'équipe — classe de variable jamais testée
+ici. Jours depuis le match précédent de chaque équipe, 87 974 matchs.
+
+Résidus par quintile d'écart de repos : +0,29 / +0,08 / −0,17 / +0,73 points. Non monotone.
+Régression sur le logit du prix : coefficient du prix **+1,0607**, coefficient de l'écart de
+repos **−0,0002**. Le marché price déjà le calendrier.
+
+## 4. Le nul
+
+Calibration globale : implicite **0,2641**, réalisé **0,2641**, écart **+0,00 point** sur
+89 987 matchs. Le nul est l'issue la mieux cotée du marché.
+
+Par bande, aucune ne franchit la marge ; la seule positive est p ∈ [0,30 ; 0,33] à
++0,62 % ± 2,4 %.
+
+## La mesure qui ferme le dossier
+
+Charge de marge par issue : (1/cote) / p_sharp − 1. Zéro signifie prix équitable.
+
+| Book | Favori | 2ᵉ issue | 3ᵉ issue |
+|---|---|---|---|
+| B365 | +6,19 % | +5,37 % | +6,77 % |
+| Moyenne marché | +5,12 % | +6,10 % | +8,00 % |
+
+Par bande de probabilité, le minimum atteint **nulle part** moins de **+4,16 %** :
+
+| Bande | Charge médiane (moyenne marché) | ROI réel |
+|---|---|---|
+| p < 0,10 | +13,26 % | −32,82 % |
+| p 0,10–0,20 | +9,26 % | −11,53 % |
+| p 0,20–0,35 | +6,50 % | −7,63 % |
+| p 0,35–0,50 | +5,59 % | −4,66 % |
+| p 0,50–0,70 | +4,67 % | −2,63 % |
+| **p > 0,70** | **+4,16 %** | **−0,94 %** |
+
+Le biais favori tolère au mieux **4,10 points**. La charge minimale existante est de
+**4,16 points**. Ils se ratent d'un dixième de point, et le ROI réel de la meilleure cellule
+accessible est **−0,94 %**.
+
+## Conclusion
+
+Neuf approches structurellement distinctes en deux jours, sur deux sports, plus la centaine
+de tests UFC. Le motif ne varie pas : chaque biais réel est plus petit que la charge de
+marge la plus faible qui existe, et le seul lieu sans marge (l'exchange) n'a pas le biais.
+
+Ce n'est pas un problème de modèle. Les neuf approches n'ont pas échoué à modéliser — elles
+ont toutes mesuré correctement, et ce qu'elles mesurent est un marché dont le prix contient
+l'information et dont la marge dépasse ce qui reste.
