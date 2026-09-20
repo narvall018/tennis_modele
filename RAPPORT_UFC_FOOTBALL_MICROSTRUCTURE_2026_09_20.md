@@ -296,3 +296,92 @@ marge la plus faible qui existe, et le seul lieu sans marge (l'exchange) n'a pas
 Ce n'est pas un problème de modèle. Les neuf approches n'ont pas échoué à modéliser — elles
 ont toutes mesuré correctement, et ce qu'elles mesurent est un marché dont le prix contient
 l'information et dont la marge dépasse ce qui reste.
+
+---
+
+# Addendum 3 — layer les outsiders, et le mirage du line shopping
+
+Deux angles que j'avais manqués : je n'avais testé l'exchange **que sur les favoris**, et
+je n'avais jamais envisagé de **layer** — or à l'exchange on peut parier contre.
+
+## Le biais de l'outsider survit à l'exchange
+
+L'exchange a absorbé le biais du favori (addendum 1). Il n'a **pas** absorbé celui de
+l'outsider. Gamme complète, 15 537 matchs, prix de clôture Betfair :
+
+| Probabilité | n | Implicite | Réalisé | Écart | BACK | **LAY** |
+|---|---|---|---|---|---|---|
+| 0,00–0,05 | 229 | 0,0382 | 0,0393 | +0,11 pt | −9,37 % | −0,29 % |
+| **0,05–0,10** | **997** | **0,0797** | **0,0612** | **−1,85 pt** | −26,99 % | **+1,67 %** |
+| 0,10–0,15 | 1 838 | 0,1275 | 0,1197 | −0,78 pt | −11,94 % | +0,34 % |
+| 0,15–0,20 | 3 565 | 0,1773 | 0,1840 | +0,67 pt | −1,12 % | −1,50 % |
+| 0,60–0,75 | 2 332 | 0,6627 | 0,6750 | +1,22 pt | −0,68 % | −5,41 % |
+
+Rendement du lay exprimé **par unité de liabilité**, commission 5 %.
+
+## Les défenses
+
+**Déplacer les bornes** — ce n'est pas un pic isolé mais un **plateau** :
+
+| Fenêtre | n | LAY | IC95 hebdomadaire |
+|---|---|---|---|
+| 0,040–0,090 | 761 | +0,98 % | [−0,86 %, +2,71 %] |
+| **0,050–0,100** | 997 | **+1,67 %** | **[+0,14 %, +3,09 %]** |
+| **0,055–0,105** | 1 070 | **+1,82 %** | **[+0,35 %, +3,19 %]** |
+| 0,060–0,110 | 1 117 | +1,43 % | [−0,04 %, +2,83 %] |
+| **0,040–0,120** | 1 678 | **+1,70 %** | **[+0,22 %, +3,05 %]** |
+| 0,030–0,150 | 3 028 | +0,71 % | [−0,38 %, +1,80 %] |
+
+Trois fenêtres chevauchantes excluent zéro. **Par saison** : 2024 +1,55 %, 2025 +1,59 %.
+**Par ligue** : 7 positives sur 9.
+
+**Multiplicité** : t observé +2,03 ; sous H0 le meilleur des 18 cellules atteint t=1,11 en
+médiane et 2,20 au 95ᵉ centile. **p family-wise = 9,9 %.** Ça ne passe pas.
+
+## Ce que les données ne peuvent pas trancher
+
+J'ai utilisé **le même prix pour parier et pour layer**. Un exchange a un écart entre les
+deux, et ces données n'en contiennent qu'un seul. Combien la cellule en absorbe :
+
+| Écart back/lay | Rendement (comm. 5 %) |
+|---|---|
+| 0 % | +1,67 % |
+| 5 % | +1,27 % |
+| 10 % | +0,91 % |
+| 20 % | +0,28 % |
+| **25 %** | **0,00 %** |
+| 30 % | −0,25 % |
+
+L'edge meurt à **25 % d'écart**. Sur une ligue liquide l'écart est de quelques pour cent ;
+à cote 12 sur une petite ligue il peut dépasser 25 %. **Indéterminable ici.**
+
+Et le profil d'exposition est brutal : **liabilité de 11 pour 1 unité gagnée ; une seule
+perte efface 12 gains.**
+
+Enfin, la fenêtre 2024-2026 est celle que l'étude exchange du 6 septembre a déjà lue.
+Ce n'est pas une preuve vierge.
+
+## Le line shopping est un mirage
+
+| Source | Overround médian | Lignes impliquant un arbitrage |
+|---|---|---|
+| Moyenne marché | +6,24 % | 0,0 % |
+| Pinnacle | +3,25 % | 0,0 % |
+| **Maximum tous books** | **+0,32 %** | **41,3 %** |
+
+Le prix maximum ramène la marge à 0,32 %, mais **41,3 % de ces lignes impliquent un
+arbitrage** : ces prix n'existent pas simultanément. Le gain médian du maximum sur la
+moyenne est de 5,88 % de cote — c'est un composite, pas une offre.
+
+Même à ce plafond irréalisable, les favoris p > 0,70 ne rendent que +2,55 % (se 0,96).
+
+## Verdict
+
+Le lay des outsiders à l'exchange est **la chose la plus robuste trouvée en trois jours** :
+plateau et non pic, stable par saison et par ligue, et son mécanisme est cohérent — un
+marché pair-à-pair n'a aucune raison de corriger l'appétit du public pour les gros prix.
+
+Il ne passe pas la barre : p family-wise 9,9 %, fenêtre déjà lue, et un écart back/lay que
+ces données ne mesurent pas et qui peut le consommer entièrement.
+
+C'est le seul résultat de ce projet dont l'échec ne vienne **pas** de la taille du biais.
