@@ -475,3 +475,74 @@ volume, c'est une règle pour décider **où placer un boost quand on en reçoit
 
 Règle : sur le favori le plus court disponible, jamais sur un gros prix. Un +10 % vaut
 +9,3 % à cote 1,15 et **−17 %** à cote 10.
+
+---
+
+# Addendum 5 — la règle se généralise, et sa frontière est nette
+
+Trois pistes de plus, dont deux ferment et une complète le seul résultat exploitable.
+
+## Le gradient n'est pas propre au 1X2
+
+Marge effective sur les **totaux 2,5** (B365, 57 942 matchs), mesurée contre les résultats :
+
+| Cote | n | Marge effective |
+|---|---|---|
+| 1,00–1,35 | 817 | **0,97 %** |
+| 1,55–1,75 | 25 557 | 3,54 % |
+| 2,10–2,60 | 26 751 | 8,78 % |
+| 2,60+ | 5 148 | 9,19 % |
+
+Même forme que le 1X2 : **le coût dépend du prix, pas du marché.** C'est une propriété de la
+tarification en général, pas une particularité du 1X2.
+
+## Le handicap asiatique sur gros favori : mécanisme réel, exécution impossible
+
+Pour un favori domicile à cote ≤ 1,30, la ligne médiane est −1,5, et le favori ne couvre le
+−2,5 que **41,8 %** du temps. Parier le côté domicile rend **−17,02 %**.
+
+Mais le côté outsider ne rend que **+9,81 %, IC95 [−3,54 %, +23,85 %]** sur n=182 : la marge
+à ces lignes extrêmes est de **7,2 %**, pas 2,5 %, et l'échantillon est minuscule. Aucune
+cellule n'exclut zéro. Avenue fermée.
+
+## La règle du boost se généralise à tout marché
+
+Toute sélection cotée sous 1,35, quel que soit le marché :
+
+| Marché | n | Sans boost | +2 % | +5 % | +10 % |
+|---|---|---|---|---|---|
+| **1X2** | 11 054 | −0,99 % | **+0,99 %** ✓ | **+3,96 %** ✓ | **+8,91 %** ✓ |
+| **Totaux 2,5** | 817 | −0,97 % | +1,01 % | **+3,98 %** ✓ | **+8,93 %** ✓ |
+
+✓ = intervalle de confiance hebdomadaire excluant zéro.
+
+Les deux marchés donnent **le même coût de base** (−0,99 % et −0,97 %) et la même réponse au
+boost. Ce n'est donc pas une règle sur les favoris du 1X2 : c'est une règle sur **le prix**.
+
+## La frontière, précisément
+
+Avec un boost de **+5 %**, sur le 1X2 :
+
+| Cote | n | ROI avec +5 % | IC95 |
+|---|---|---|---|
+| **1,00–1,35** | 11 054 | **+3,96 %** | **[+2,96 %, +4,99 %]** |
+| **1,35–1,60** | 20 362 | **+1,48 %** | **[+0,54 %, +2,53 %]** |
+| 1,60–2,20 | 81 236 | −1,02 % | [−1,69 %, −0,29 %] |
+| 2,20–3,50 | 236 377 | −2,18 % | [−2,56 %, −1,84 %] |
+| 3,50+ | 182 376 | −6,98 % | [−7,82 %, −6,17 %] |
+
+**Un boost de +5 % est rentable jusqu'à la cote 1,60 et perd au-delà.** La frontière est nette :
+les intervalles excluent zéro des deux côtés.
+
+Et à cote < 1,35, même un boost de **+2 %** suffit sur le 1X2 (n=11 054).
+
+## La règle, en une phrase
+
+**Placer toute majoration promotionnelle sur la sélection la plus courte disponible, dans
+n'importe quel marché, jamais au-dessus de la cote 1,60.**
+
+Seuils : +2 % suffit sous 1,35 ; il faut +5 % entre 1,35 et 1,60 ; rien ne clôt au-dessus.
+
+C'est le seul résultat de ce projet dont les intervalles excluent zéro après défenses par
+source de prix, par époque, par ligue et maintenant par marché. Il ne prédit rien : il dit
+seulement où un avantage donné vaut le plus, et la réponse est l'inverse de l'instinct.
