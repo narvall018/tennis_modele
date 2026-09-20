@@ -385,3 +385,93 @@ Il ne passe pas la barre : p family-wise 9,9 %, fenêtre déjà lue, et un écar
 ces données ne mesurent pas et qui peut le consommer entièrement.
 
 C'est le seul résultat de ce projet dont l'échec ne vienne **pas** de la taille du biais.
+
+---
+
+# Addendum 4 — le bout court, et le seul résultat vraiment exploitable
+
+Contrôles croisés du lay d'outsiders, puis un angle que j'avais binné trop grossièrement
+et qui change la conclusion.
+
+## Le lay d'outsiders ne se confirme pas ailleurs
+
+| Sport | Bande | n | LAY | Remarque |
+|---|---|---|---|---|
+| Football | 0,05–0,10 | 997 | **+1,67 %** | IC95 [+0,14 %, +3,09 %] |
+| Tennis ATP | 0,20–0,30 | 539 | −4,47 % | signe opposé à la WTA |
+| Tennis WTA | 0,20–0,30 | 539 | +0,55 % | |
+| Tennis groupé | 0,10–0,15 | 238 | +2,80 % | IC95 [−1,80 %, +7,03 %] |
+| UFC | 0,20–0,30 | 118 | +1,46 % | erreur-type 5,25 % |
+
+Les prix d'exchange n'existent qu'à partir d'août 2025 en tennis et en UFC : trop peu
+d'observations sous p = 0,20 pour conclure. Et **ATP et WTA divergent en signe**. C'est
+exactement l'échec de cohérence croisée qui avait tué la cellule de septembre. Le football
+reste seul, avec p family-wise 9,9 %. Insuffisant.
+
+## La marge effective s'effondre au bout court
+
+J'avais mesuré la charge de marge en bandes larges et conclu « jamais sous +4,16 % ».
+C'était un artefact de granularité. Mesurée **contre les résultats réels** — c'est-à-dire
+le vrai coût d'un pari — sur 177 135 matchs de 2002 à 2026, B365 ouverture :
+
+| Cote | n | Marge effective |
+|---|---|---|
+| 1,00–1,12 | 747 | **0,63 %** |
+| 1,12–1,20 | 2 361 | **0,64 %** |
+| 1,20–1,35 | 7 946 | 1,12 % |
+| 1,35–1,60 | 20 362 | 3,36 % |
+| 1,60–2,20 | 81 236 | 5,73 % |
+| 2,20–3,50 | 236 377 | 6,84 % |
+| 3,50–7,00 | 159 331 | 9,69 % |
+| 7,00+ | 23 045 | **23,25 %** |
+
+**Facteur 37 entre les deux bouts.** Le book ne prend pas sa marge uniformément : il la
+place là où le public achète, sur les gros prix.
+
+### Les défenses
+
+**Cinq sources de prix indépendantes**, cote 1,10–1,20 :
+
+| Source | n | Marge effective |
+|---|---|---|
+| Pinnacle ouverture | 1 531 | **−0,54 %** |
+| Moyenne marché | 932 | 0,59 % |
+| B365 ouverture | 2 735 | 0,66 % |
+| Pinnacle clôture | 1 748 | 0,78 % |
+| B365 clôture | 963 | 2,02 % |
+
+**Quatre époques** : +0,62 % / +0,36 % / −1,07 % / −1,83 %. Toutes à moins de 2 points de
+zéro, avec une dégradation lente. **Dix ligues** : 8 dans un couloir de ±3 %.
+
+Ce n'est pas une cellule chanceuse. C'est une propriété stable de la tarification.
+
+## Ce que ça implique
+
+Parier un favori court **tel quel n'est pas rentable** : −0,66 % en moyenne, −1,83 % sur
+2021-2026. Mais le coût est si faible que **toute majoration promotionnelle supérieure à
+environ 2 % le rend positif** :
+
+| Boost sur cote 1,10–1,20 | ROI | IC95 |
+|---|---|---|
+| +2 % | +1,32 % | [−0,25 %, +2,83 %] |
+| **+5 %** | **+4,31 %** | **[+2,75 %, +5,81 %]** |
+| **+10 %** | **+9,27 %** | **[+7,64 %, +10,76 %]** |
+
+À +5 % et au-delà, l'intervalle exclut zéro sur 2 735 matchs et 24 ans.
+
+C'est le seul résultat de ce projet dont l'intervalle exclut zéro **après** défenses par
+source, par époque et par ligue.
+
+## Ses limites, qui sont réelles
+
+1. Ce n'est **pas un modèle** : aucune prédiction, seulement une arithmétique d'exécution.
+2. Les books **ne boostent presque jamais un favori écrasant** — ils majorent ce sur quoi
+   ils veulent du volume. La contrainte est l'offre promotionnelle, pas le calcul.
+3. **Plafonds de mise et durée de vie du compte** bornent le volume.
+4. La marge se dégrade lentement : le seuil de boost est aujourd'hui ~2 %, pas 0,6 %.
+
+Autrement dit : rentable, mesurable, et non extensible. Ce n'est pas une stratégie de
+volume, c'est une règle pour décider **où placer un boost quand on en reçoit un**.
+
+Règle : sur le favori le plus court disponible, jamais sur un gros prix. Un +10 % vaut
++9,3 % à cote 1,15 et **−17 %** à cote 10.
