@@ -142,3 +142,59 @@ légalement accessible ne coûte assez peu.
 Les deux seules ouvertures restantes sont des problèmes de **données**, pas de
 modèle : une série longue de prix d'exchange (inexistante avant 2024) et un accès
 à un opérateur sous 4 % de marge.
+
+---
+
+# Addendum du 20 septembre 2026 — la piste exchange est fermée
+
+J'ai construit un scanner football sur prix exchange à partir du biais mesuré ci-dessus,
+puis je l'ai retiré. Voici pourquoi, parce que l'erreur est instructive.
+
+## Le raisonnement initial
+
+Le biais favori mesuré sur prix **Pinnacle** tolère 2,9 à 4,1 points de marge. Betfair
+exchange facture 0,99 % sur la Ligue 1, contre 7,87 % pour les books français. Première
+fois qu'un lieu passe sous le biais — la règle semblait fondée.
+
+## L'erreur
+
+Le biais est une propriété du **prix du bookmaker**. Un exchange n'est pas un bookmaker.
+Sur les 751 matchs où les deux prix existent :
+
+| | Probabilité du favori |
+|---|---|
+| Implicite Pinnacle | 0,7605 |
+| **Implicite exchange** | **0,7738** |
+| Réalisé | 0,7963 |
+
+**L'exchange a déjà absorbé environ la moitié du biais.** Appliquer la correction mesurée
+chez Pinnacle à un prix d'exchange revient à la compter deux fois.
+
+## Le test direct
+
+Biais recalculé aux prix exchange de clôture (15 537 matchs, 2024-07 → 2026-09), même
+méthode de borne basse par bootstrap hebdomadaire :
+
+| Bande | n | Biais | **Borne basse 5 %** | ROI comm. 5 % |
+|---|---|---|---|---|
+| 0,60–0,65 | 1 052 | +1,04 pt | **−1,46 pt** | — |
+| 0,65–0,70 | 727 | +1,04 pt | **−1,91 pt** | −1,00 % |
+| 0,70–0,75 | 553 | +1,80 pt | **−1,42 pt** | +0,32 % |
+| 0,75–0,85 | 598 | +1,27 pt | **−1,57 pt** | −0,15 % |
+| 0,85–1,01 | 163 | +0,64 pt | **−3,45 pt** | −0,40 % |
+
+**Aucune bande ne franchit zéro.** Le biais résiduel à l'exchange est à 0,8–1,0 écart-type,
+et le rendement réalisé à commission standard oscille autour de zéro.
+
+Le garde-fou du script de préparation — « aucune bande ne prouve un biais : ne pas figer de
+règle » — est exactement ce qui doit se déclencher. Le scanner a donc été supprimé plutôt
+que publié avec une règle que les données ne portent pas.
+
+## Ce qui reste vrai
+
+Le biais favori-outsider **chez les bookmakers** est réel et monotone sur 270 000 issues.
+Mais il ne survit pas au seul lieu dont la marge serait assez faible pour l'exploiter,
+parce que ce lieu le price déjà.
+
+C'est une réponse plus forte que « la marge est trop élevée » : même en supprimant la
+marge, **il n'y a rien à prendre**.
