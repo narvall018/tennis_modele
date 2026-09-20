@@ -1,0 +1,109 @@
+{
+  "strategy_id": "football_favourite_bias_exchange_paper_v1",
+  "generated_at": "2026-09-20T11:46:27.468957+00:00",
+  "rule": {
+    "bias_bands": [
+      {
+        "from": 0.7,
+        "to": 0.75,
+        "matches": 2814,
+        "implied_mean": 0.723046858750766,
+        "realised_mean": 0.761549395877754,
+        "bias_points": 3.8502537126988035,
+        "lower_bound_points": 2.4222753039117095
+      },
+      {
+        "from": 0.75,
+        "to": 0.85,
+        "matches": 3308,
+        "implied_mean": 0.7936852246927179,
+        "realised_mean": 0.8243651753325272,
+        "bias_points": 3.067995063980933,
+        "lower_bound_points": 1.989695121893862
+      }
+    ],
+    "commission": 0.05,
+    "min_expected_return": 0.01,
+    "odds_min": 1.15,
+    "odds_max": 1.6,
+    "max_reference_overround": 1.02,
+    "max_quote_age_seconds": 300,
+    "min_minutes_before_start": 10,
+    "max_days_before_start": 7,
+    "bias_basis": "week_cluster_bootstrap_5pct_lower_bound",
+    "minimum_lower_bound_points": 1.0
+  },
+  "rule_sha256": "6330e88feb9dc9c4bd3bc6cf7482562f3f400d85c8de323f7ae9fc1c987a222d",
+  "development": {
+    "source": "data/football/football_matches.csv.gz",
+    "source_sha256": "c834346562e21c281479e71a0f53d886b51ba8d3acebd2c8c4074694167d9b1d",
+    "seasons": [
+      2012,
+      2023
+    ],
+    "matches": 90824,
+    "leagues": 22,
+    "reference_price": "Pinnacle closing, proportional devig",
+    "median_overround": 1.0267644555089892
+  },
+  "dropped_bands": [
+    {
+      "from": 0.5,
+      "to": 0.55,
+      "matches": 10951,
+      "implied_mean": 0.5240396147290023,
+      "realised_mean": 0.5285362067391106,
+      "bias_points": 0.44965920101083245,
+      "lower_bound_points": -0.3051246048209316,
+      "reason": "borne basse -0.31 pts sous le seuil de 1.0 pt"
+    },
+    {
+      "from": 0.55,
+      "to": 0.6,
+      "matches": 8383,
+      "implied_mean": 0.5737443820759993,
+      "realised_mean": 0.5760467613026363,
+      "bias_points": 0.2302379226637008,
+      "lower_bound_points": -0.6146167635043392,
+      "reason": "borne basse -0.61 pts sous le seuil de 1.0 pt"
+    },
+    {
+      "from": 0.6,
+      "to": 0.65,
+      "matches": 5690,
+      "implied_mean": 0.6232519420991621,
+      "realised_mean": 0.6353251318101933,
+      "bias_points": 1.2073189711031218,
+      "lower_bound_points": 0.1375947457932647,
+      "reason": "borne basse +0.14 pts sous le seuil de 1.0 pt"
+    },
+    {
+      "from": 0.65,
+      "to": 0.7,
+      "matches": 4021,
+      "implied_mean": 0.6730982814321387,
+      "realised_mean": 0.6868938075105695,
+      "bias_points": 1.379552607843082,
+      "lower_bound_points": 0.1453620779067351,
+      "reason": "borne basse +0.15 pts sous le seuil de 1.0 pt"
+    },
+    {
+      "from": 0.85,
+      "to": 1.01,
+      "matches": 807,
+      "implied_mean": 0.8780942499199206,
+      "realised_mean": 0.8996282527881041,
+      "bias_points": 2.153400286818352,
+      "lower_bound_points": 0.44666804693467954,
+      "reason": "borne basse +0.45 pts sous le seuil de 1.0 pt"
+    }
+  ],
+  "evidence": "EXPLORATORY_PREVIOUSLY_EXPOSED_HISTORY; le holdout 2024-2026 n'a pas ete ouvert. La regle accumule des preuves prospectives, elle n'en a pas.",
+  "known_limits": [
+    "Le biais est mesure sur des prix de cloture Pinnacle ; le scanner lit des prix exchange avant cloture. Sur les favoris la ligne ne bouge pas (0.6961 -> 0.6965 en developpement), mais ce report reste une hypothese.",
+    "Un prix d exchange est une offre de profondeur inconnue : la cote affichee peut ne pas etre disponible pour la mise proposee.",
+    "La commission reelle varie de 2 a 5 % ; la regle retient 5 %, le bout defavorable.",
+    "Les saisons 2012-2023 ont deja servi a chercher : ce ne sont pas des preuves."
+  ],
+  "real_money_authorised": false
+}
