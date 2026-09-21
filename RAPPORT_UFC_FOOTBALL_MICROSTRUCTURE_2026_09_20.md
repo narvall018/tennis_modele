@@ -546,3 +546,63 @@ Seuils : +2 % suffit sous 1,35 ; il faut +5 % entre 1,35 et 1,60 ; rien ne clôt
 C'est le seul résultat de ce projet dont les intervalles excluent zéro après défenses par
 source de prix, par époque, par ligue et maintenant par marché. Il ne prédit rien : il dit
 seulement où un avantage donné vaut le plus, et la réponse est l'inverse de l'instinct.
+
+---
+
+# Addendum 6 — les deux dernières lacunes de modélisation, 21 septembre
+
+Tout ce qui précède portait sur la structure du marché. Restaient deux vraies faiblesses
+de **modélisation**, jamais comblées ici.
+
+## Football : noter les équipes sur les tirs, pas sur les buts
+
+L'étude `football_team_goals_2026_09_18` notait les équipes sur les **buts**. Or les buts
+sont le bout bruité de la chaîne causale : les tirs cadrés prédisent mieux les buts futurs
+que les buts eux-mêmes (corrélation tirs cadrés / buts sur un même match : 0,489).
+
+Notes attaque/défense par ridge sur log(1 + tirs cadrés), **ajustées à l'adversaire**,
+réestimées chaque saison sur les trois précédentes. 70 474 matchs, 22 ligues, 2012-2023.
+
+| Modèle | Apport sur le prix | t |
+|---|---|---|
+| Notes sur **tirs cadrés** | **−0,00026** | −2,18 |
+| Notes sur **buts** | −0,00028 | −2,52 |
+| Les deux ensemble | −0,00029 | −2,70 |
+
+Les tirs sont bien marginalement meilleurs que les buts — l'intuition était juste — mais
+**les deux dégradent le prix**. Le marché a déjà les deux.
+
+## UFC : ajuster les statistiques à la qualité de l'adversaire
+
+Les phases 1-3 nourrissaient le modèle de taux **bruts** : frappes significatives par
+minute, précision de takedown, part de contrôle. Aucun ne sait contre qui. Frapper cinq
+fois par minute contre des seconds couteaux n'est pas frapper quatre fois contre des
+prétendants.
+
+Décomposition de chaque combat en une note d'attaque pour celui qui frappe et une note de
+défense pour celui qui encaisse, par ridge, réestimée chaque année sur tout l'antérieur.
+8 578 lignes combattant-combat, 2 460 combats avec notes des deux côtés.
+
+| Modèle | Apport sur le prix | t |
+|---|---|---|
+| Prix + descripteurs bruts | −0,00653 | −2,36 |
+| Prix + notes **ajustées** seules | −0,00843 | −3,65 |
+| Prix + bruts + ajustées | −0,00671 | −2,29 |
+| **Apport propre de l'ajustement** | **−0,00019** | **−0,19** |
+
+L'ajustement à l'adversaire n'apporte **rien**.
+
+## Le diagnostic, plutôt qu'un constat de plus
+
+Onze approches de modélisation ont maintenant été testées sur ces deux sports, et toutes
+reviennent à zéro ou en dessous. Ce n'est pas un hasard de onze mauvaises idées.
+
+Ces jeux de données contiennent des **agrégats d'après-match** et des **prix**. Ils ne
+contiennent pas ce qui fait bouger les prix : compositions d'équipe, blessures, conditions,
+changements de dernière minute, poids et coupes en UFC. Le marché voit les compositions une
+heure avant le coup d'envoi. Un modèle construit sur les taux de tirs de la saison passée
+n'a pas de quoi le battre — et le fait que le prix contienne déjà tout ce qu'on lui oppose
+est exactement ce qu'on doit observer si c'est le cas.
+
+C'est une limite de **données**, pas d'algorithme. Aucune famille de modèle supplémentaire
+ne la franchira.
