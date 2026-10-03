@@ -103,6 +103,26 @@ def test_switching_off_automation_does_not_call_provider_again(tmp_path, monkeyp
     assert not ui.exception and len(calls) == 12
 
 
+@pytest.mark.parametrize('sport', ['football', 'ufc'])
+def test_old_daily_cap_warning_and_none_quota_disappear_on_upgrade(tmp_path, monkeypatch, sport):
+    calls = provider(monkeypatch)
+    now = engine.utc()
+    if sport == 'ufc':
+        ufc_inputs(tmp_path, now)
+        monkeypatch.setattr(data, 'refresh_due', lambda *args: False)
+    folder = tmp_path / 'bets/value_methods_runtime'
+    data.atomic_json(folder / 'budget.json', {'day': now.tz_convert('Europe/Paris').date().isoformat(), 'used': 12})
+    data.atomic_json(folder / f'{sport}.json', {'at': now.isoformat(),
+        'sports': data.DEFAULT_LEAGUES if sport == 'football' else [engine.MMA_KEY], 'events': [],
+        'daily_used': 12, 'remaining': None, 'errors': ['Plafond quotidien partagé atteint (12 consultations). Reprise demain.']})
+    ui = app(tmp_path, sport).run()
+    assert not ui.exception and len(calls) == (6 if sport == 'football' else 2)
+    text = '\n'.join(element.value for element in [*ui.caption, *ui.warning, *ui.info])
+    assert '12/12' not in text and 'Reprise demain' not in text
+    assert 'None' not in text and 'consultations aujourd’hui' not in text
+    assert any('Dernier scan' in caption.value for caption in ui.caption)
+
+
 def test_missing_ufc_bundle_and_failed_refresh_do_not_crash_or_repeat_every_rerun(tmp_path, monkeypatch):
     calls = []
     def fail(root):

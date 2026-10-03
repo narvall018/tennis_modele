@@ -176,7 +176,7 @@ def test_record_recomputes_candidates_and_rejects_tampering_expiry_and_changed_b
     assert not ledger.state(ledger.database(tmp_path, sport), 'u', NOW)['bets']
 
 
-def test_automatic_collector_caches_limits_budget_and_keeps_secret_errors_private(tmp_path, monkeypatch):
+def test_automatic_collector_caches_without_daily_cap_and_keeps_secret_errors_private(tmp_path, monkeypatch):
     calls = []
     monkeypatch.setattr(data, 'resolve_api_key', lambda root: ('PRIVATE', 'test'))
     def request(path, key, params):
@@ -194,15 +194,38 @@ def test_automatic_collector_caches_limits_budget_and_keeps_secret_errors_privat
     data.collect_live(tmp_path, 'football', now=NOW + pd.Timedelta(hours=1))
     data.collect_live(tmp_path, 'ufc', now=NOW + pd.Timedelta(hours=1))
     last = data.collect_live(tmp_path, 'football', now=NOW + pd.Timedelta(hours=2))
-    assert last['requests'] == 1 and last['daily_used'] == 12
-    blocked = data.collect_live(tmp_path, 'ufc', now=NOW + pd.Timedelta(hours=2))
-    assert blocked['requests'] == 0 and blocked['errors']
+    assert last['requests'] == 5 and not last['errors']
+    following = data.collect_live(tmp_path, 'ufc', now=NOW + pd.Timedelta(hours=2))
+    assert following['requests'] == 1 and not following['errors']
+    assert sum(path != 'sports/' for path, _ in calls) == 17
+    assert 'daily_used' not in last and 'daily_used' not in following
     assert all('regions' not in params for path, params in calls if path != 'sports/')
     assert all('pinnacle' in params['bookmakers'] and 'betclic_fr' in params['bookmakers'] for path, params in calls if path != 'sports/')
     def fail(*args): raise ValueError('https://example/?apiKey=PRIVATE')
     monkeypatch.setattr(data, '_request', fail)
     safe = data.collect_live(tmp_path, 'football', now=NOW + pd.Timedelta(days=1))
     assert 'PRIVATE' not in json.dumps(safe) and safe['errors']
+
+
+@pytest.mark.parametrize('sport', ['football', 'ufc'])
+def test_cached_daily_cap_and_old_budget_do_not_block_new_scans(tmp_path, monkeypatch, sport):
+    folder = tmp_path / 'bets/value_methods_runtime'
+    keys = ['soccer_epl'] if sport == 'football' else [engine.MMA_KEY]
+    data.atomic_json(folder / 'budget.json', {'day': NOW.tz_convert('Europe/Paris').date().isoformat(), 'used': 12})
+    data.atomic_json(folder / f'{sport}.json', {'at': NOW.isoformat(), 'sports': keys, 'events': [],
+        'daily_used': 12, 'remaining': None, 'errors': ['Plafond quotidien partagé atteint (12 consultations). Reprise demain.']})
+    assert data.read_quote_cache(tmp_path, sport) is None
+    calls = []
+    monkeypatch.setattr(data, 'resolve_api_key', lambda root: ('PRIVATE', 'test'))
+    def request(path, key, params):
+        calls.append(path)
+        return SimpleNamespace(ok=True, remaining=100,
+                              events=[{'key': k, 'active': True} for k in keys] if path == 'sports/' else [event(sport)])
+    monkeypatch.setattr(data, '_request', request)
+    result = data.collect_live(tmp_path, sport, keys, NOW)
+    assert len(calls) == 2 and result['requests'] == 1 and not result['errors']
+    assert result['cache_version'] == data.QUOTE_CACHE_VERSION
+    assert data.read_quote_cache(tmp_path, sport) == result
 
 
 @pytest.mark.parametrize('remaining', [None, 20, 0])

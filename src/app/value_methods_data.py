@@ -20,9 +20,9 @@ from src.app.value_methods import BOOKMAKERS, FOOTBALL_SPORTS, MMA_KEY
 
 DEFAULT_LEAGUES = ['soccer_france_ligue_one', 'soccer_epl', 'soccer_germany_bundesliga',
                    'soccer_italy_serie_a', 'soccer_spain_la_liga']
-DAILY_REQUEST_CAP = 12
 QUOTA_RESERVE = 20
 AUTO_SCAN_SECONDS = 3600
+QUOTE_CACHE_VERSION = 2
 
 
 def atomic_json(path, value):
@@ -61,6 +61,15 @@ def read_json(path, default=None):
         return json.loads(Path(path).read_text(encoding='utf-8'))
     except (OSError, ValueError):
         return default
+
+
+def read_quote_cache(root, sport):
+    snapshot = read_json(Path(root) / 'bets/value_methods_runtime' / f'{sport}.json')
+    # Old caches may contain a daily-cap rejection. Do not reuse that rejection
+    # after removing the cap, including when automatic collection is disabled.
+    if not isinstance(snapshot, dict) or snapshot.get('cache_version') != QUOTE_CACHE_VERSION:
+        return None
+    return snapshot
 
 
 def load_ufc(root):
@@ -165,7 +174,7 @@ def refresh_due(root, now=None):
 
 
 def collect_live(root, sport, leagues=None, now=None, force=False):
-    """One shared cache and budget for all users; never logs provider secrets."""
+    """One shared cache, with no internal daily cap; never logs provider secrets."""
     now = utc(now)
     if sport not in {'football', 'ufc'}:
         raise ValueError('Sport inconnu.')
@@ -175,20 +184,11 @@ def collect_live(root, sport, leagues=None, now=None, force=False):
     folder = Path(root) / 'bets/value_methods_runtime'
     cache_path = folder / f'{sport}.json'
     with lock(folder / '.quotes.lock'):
-        previous = read_json(cache_path)
+        previous = read_quote_cache(root, sport)
         if not force and previous and previous.get('sports') == keys and pd.Timedelta(0) <= now - utc(previous['at']) < pd.Timedelta(seconds=AUTO_SCAN_SECONDS):
             return previous
-        snapshot = {'at': now.isoformat(), 'sport': sport, 'sports': keys, 'events': [], 'errors': [],
+        snapshot = {'cache_version': QUOTE_CACHE_VERSION, 'at': now.isoformat(), 'sport': sport, 'sports': keys, 'events': [], 'errors': [],
                     'coverage': [], 'remaining': None, 'requests': 0, 'no_promotions': True}
-        budget = read_json(folder / 'budget.json', {})
-        day = now.tz_convert('Europe/Paris').date().isoformat()
-        if budget.get('day') != day:
-            budget = {'day': day, 'used': 0}
-        snapshot['daily_used'] = budget['used']
-        if budget['used'] >= DAILY_REQUEST_CAP:
-            snapshot['errors'].append('Plafond quotidien partagé atteint (12 consultations). Reprise demain.')
-            atomic_json(cache_path, snapshot)
-            return snapshot
         try:
             key, _ = resolve_api_key(Path(root))
             if not key:
@@ -206,12 +206,9 @@ def collect_live(root, sport, leagues=None, now=None, force=False):
                         snapshot['coverage'].append({'competition': sport_key, 'status': 'inactive', 'events': 0})
                         continue
                     remaining = snapshot['remaining']
-                    if remaining is None or remaining <= QUOTA_RESERVE or budget['used'] >= DAILY_REQUEST_CAP:
-                        snapshot['errors'].append('Collecte limitée : réserve mensuelle de 20 crédits, quota inconnu ou plafond quotidien atteint.')
+                    if remaining is None or remaining <= QUOTA_RESERVE:
+                        snapshot['errors'].append('Collecte limitée : réserve mensuelle de 20 crédits ou quota fournisseur inconnu.')
                         break
-                    # Reserve the credit before the request; a failed request never refunds the local budget.
-                    budget['used'] += 1
-                    atomic_json(folder / 'budget.json', budget)
                     response = _request(f'sports/{sport_key}/odds', key,
                         {'bookmakers': ','.join([*BOOKMAKERS, 'pinnacle']), 'markets': 'h2h', 'oddsFormat': 'decimal'})
                     snapshot['requests'] += 1
@@ -227,6 +224,5 @@ def collect_live(root, sport, leagues=None, now=None, force=False):
                             break
         except Exception as error:
             snapshot['errors'].append(f'Collecte interrompue ({type(error).__name__}).')
-        snapshot['daily_used'] = budget['used']
         atomic_json(cache_path, snapshot)
         return snapshot

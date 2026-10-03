@@ -101,17 +101,14 @@ def _opportunities(root_text, sport, owner, leagues, automatic):
         except (ValueError, KeyError, TypeError) as error:
             st.error(str(error))
             return
-    cache = root / 'bets/value_methods_runtime' / f'{sport}.json'
-    snapshot = data.collect_live(root, sport, leagues, now) if automatic else data.read_json(cache)
+    snapshot = data.collect_live(root, sport, leagues, now) if automatic else data.read_quote_cache(root, sport)
     # Quotes can update while the network request is running. Assess them at
     # receipt, not against the timestamp from before the collection started.
     now = engine.utc()
     if not snapshot or snapshot.get('sports') != (list(leagues) if sport == 'football' else [engine.MMA_KEY]):
         st.info('Aucun relevé pour ces compétitions. Lancer le scan ou activer l’actualisation automatique.')
         return
-    st.caption(f"Dernier scan : {engine.utc(snapshot['at']).tz_convert('Europe/Paris'):%d/%m/%Y %H:%M:%S} (Paris) · "
-               f"consultations aujourd’hui : {snapshot.get('daily_used', 0)}/{data.DAILY_REQUEST_CAP} · "
-               f"quota fournisseur restant : {snapshot.get('remaining', 'inconnu')}.")
+    st.caption(f"Dernier scan : {engine.utc(snapshot['at']).tz_convert('Europe/Paris'):%d/%m/%Y %H:%M:%S} (Paris).")
     for error in snapshot.get('errors', []):
         st.warning(error)
     if not pd.Timedelta(0) <= now - engine.utc(snapshot['at']) <= pd.Timedelta(minutes=5):
@@ -222,8 +219,7 @@ def render_value_method_page(root: Path, sport: str, user_id: int, username: str
                 return
         automatic = st.toggle('Actualisation automatique', value=True, key=f'value_auto_{sport}_{owner}')
         st.caption('À l’ouverture puis une fois par heure tant que cette page est active. '
-                   'Toutes les 60 secondes, les prix sont revérifiés. Maximum 12 consultations par jour partagées entre ces deux sections ; '
-                   'réserve mensuelle de 20 crédits. Le carnet reste sous ton contrôle.')
+                   'Toutes les 60 secondes, les prix sont revérifiés. Le carnet reste sous ton contrôle.')
         if sport == 'ufc' and st.button('Actualiser les statistiques et le programme UFC', key=f'value_refresh_{owner}'):
             try:
                 with st.spinner('Vérification UFCStats et reconstruction du modèle…'):
