@@ -64,3 +64,10 @@ bets/wta_strategy.sqlite3*
 bets/atp_reference_price.sqlite3*
 !models/wta_kernel_strategy/history.csv.gz
 bets/wta_kernel_strategy.sqlite3*
+
+# Isolated football/UFC simulations, locks and provider caches are private.
+bets/value_football.sqlite3*
+bets/value_ufc.sqlite3*
+bets/value_methods_runtime/
+models/value_methods/.refresh.lock
+!models/value_methods/ufc_history.csv.gz

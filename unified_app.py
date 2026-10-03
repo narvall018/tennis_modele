@@ -1942,6 +1942,20 @@ def _render_unified_home(user: sqlite3.Row) -> None:
             st.session_state["_goto_section"] = "UFC"
             st.rerun()
 
+    football, markov = st.columns(2)
+    with football:
+        st.subheader("Stratégie Football")
+        st.write("Comparaison automatique des cotes 1X2, opportunités et carnet de simulation dédié.")
+        if st.button("Ouvrir la stratégie Football", use_container_width=True):
+            st.session_state["_goto_section"] = "Stratégie Football"
+            st.rerun()
+    with markov:
+        st.subheader("Stratégie UFC")
+        st.write("Modèle Markov expérimental, statistiques actualisées et carnet de simulation dédié.")
+        if st.button("Ouvrir la stratégie UFC", use_container_width=True):
+            st.session_state["_goto_section"] = "Stratégie UFC"
+            st.rerun()
+
 
 def main() -> None:
     try:
@@ -1978,7 +1992,7 @@ def main() -> None:
             st.session_state.pop("unified_ufc_bets_folder", None)
             st.session_state["_goto_section"] = "Accueil"
             st.rerun()
-        sections = ["Accueil", "Stratégie ATP", "Stratégie WTA", "Prédictions", "Seuil de rentabilité", "Arbitrage",
+        sections = ["Accueil", "Stratégie ATP", "Stratégie WTA", "Stratégie Football", "Stratégie UFC", "Prédictions", "Seuil de rentabilité", "Arbitrage",
                     "Mises", "Performances", "Mise à jour", "Tennis", "UFC"]
         if is_admin and username == ADMIN_USERNAME:
             sections.append("Administration")
@@ -2004,6 +2018,18 @@ def main() -> None:
             render_wta_kernel_page(PROJECT_ROOT, user_id=int(user['id']), username=username)
         except ImportError as error:
             st.error(f"Section WTA indisponible : dépendance manquante ({error.name}).")
+    elif section == "Stratégie Football":
+        try:
+            from src.app.value_methods_page import render_football_value_page
+            render_football_value_page(PROJECT_ROOT, user_id=int(user['id']), username=username)
+        except ImportError as error:
+            st.error(f"Section Football indisponible : dépendance manquante ({error.name}).")
+    elif section == "Stratégie UFC":
+        try:
+            from src.app.value_methods_page import render_ufc_markov_page
+            render_ufc_markov_page(PROJECT_ROOT, user_id=int(user['id']), username=username)
+        except ImportError as error:
+            st.error(f"Section UFC Markov indisponible : dépendance manquante ({error.name}).")
     elif section in {"Prédictions", "Seuil de rentabilité", "Arbitrage", "Mises",
                      "Performances", "Mise à jour"}:
         if not RESEARCH_PAGES_AVAILABLE:
